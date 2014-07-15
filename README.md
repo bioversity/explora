@@ -13,4 +13,8 @@ in collaboration with  Jacob van Etten (also of Bioversity-Costa Rica) who leads
     "Explora: a multiple-trait selection tool to identify promising 
      crop germplasm for food security and high-value product development”.
 
+This software package is being designated "Open Source" under similar terms as 
+the R Statistical software framework, that is, the GNU GENERAL PUBLIC LICENSE
+(Version 3, 29 June 2007).  See the LICENSE file in the root directory of this
+project for the legal details of the GPL v3.
 
