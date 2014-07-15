@@ -18,3 +18,10 @@ the R Statistical software framework, that is, the GNU GENERAL PUBLIC LICENSE
 (Version 3, 29 June 2007).  See the LICENSE file in the root directory of this
 project for the legal details of the GPL v3.
 
+For further details on the project, contact:
+
+Maarten van Zonneveld, PhD
+Associate Scientist in Diversity Analysis for Conservation and Use
+Bioversity International
+c/o CATIE 7170 Turrialba, Costa Rica
+Email: m.vanzonneveld AT cgiar.org
