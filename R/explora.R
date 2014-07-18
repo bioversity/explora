@@ -4,17 +4,7 @@
 #VERSION 1.0 - FEBRARY-09-2014                                                                                    #
 #------------------------------------------------------------------------------------------------------------------ 
 
-## Installing packages
-install.packages("gWidgets") ## This package is used to generate graphical interface
-install.packages("gWidgetsRGtk2") ## This package is used to generate graphical interface
-install.packages("plyr") ## Function "empty"
-install.packages("vegan")  ## Calculate Shannon index
-install.packages("cluster")  ## Cluster analysis
-install.packages("ade4")  ## principal component
-install.packages("grid")  ## generate tables in plot
-install.packages("gridExtra")  ## generate tables in plot
-
-## Loading packages
+## Loading packages (installed by install.R)
 library(vegan) 
 library(ade4)
 library(gWidgets) 
