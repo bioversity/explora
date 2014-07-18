@@ -1,0 +1,9 @@
+Generally speaking, this changelog complements but doesn't duplicate
+the regular Git commit logs in the project software repository.  The
+items to be listed in this document will be the major changes to the
+Explora package. For fine grained changes, please see the project
+Git commit graphs at https://github.com/bioversity/germplasm-selection-tool.
+
+2014-07-18  Richard Bruskiewich  <richard.bruskiewich@cropinformatics.com>
+
+* Initial baseline Explora CRAN package structure designed and implemented.

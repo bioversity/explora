@@ -22,4 +22,4 @@ License: GPL-3 | file LICENSE
 URL: https://github.com/bioversity/germplasm-selection-tool, www.bioversityinternational.org
 BugReports: https://github.com/bioversity/germplasm-selection-tool/issues
 NeedsCompilation: no
-Depends: gWidgets, gWidgetsRGtk2, plyr, vegan, cluster, ade4, grid, gridExtra
+Imports: gWidgets, gWidgetsRGtk2, plyr, vegan, cluster, ade4, grid, gridExtra
