@@ -40,6 +40,7 @@ just works!
 # Setting the repository
 
 Every time you install a R package, you are asked which repository R should use. 
+
 To set the repository and avoid having to specify this at every package install, simply:
 
 	    <create a file .Rprofile in your home area.
@@ -50,3 +51,13 @@ To set the repository and avoid having to specify this at every package install,
 		<r["CRAN"] = "http://cran.uk.r-project.org"
 		<options(repos = r)
 		<rm(r)
+		
+Alternatively, you check your Rprofile.site (in the directory /your-R-installation/etc/ , eg R-2.14.0/etc). 
+There you see following lines commented out :
+
+# set a CRAN mirror
+# local({r <- getOption("repos")
+#       r["CRAN"] <- "http://my.local.cran"
+#       options(repos=r)})
+
+So remove the comment marks and change "http://my.local.cran" to the correct website.
