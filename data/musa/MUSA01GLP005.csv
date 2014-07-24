@@ -1,4 +1,4 @@
-ID,pseudostem_height_cyc1,bunch_weight_cyc1,numb_hands_cyc1,numb_fruits_cyc1,sap_colour,petiole_canal_leaf_III,rachis_position,male_bud_shape,pulp_colour_maturity
+id,pseudostem_height_cyc1,bunch_weight_cyc1,numb_hands_cyc1,numb_fruits_cyc1,sap_colour,petiole_canal_leaf_III,rachis_position,male_bud_shape,pulp_colour_maturity
 01GLP0050004,NULL,NULL,NULL,NULL,1,4,5,NULL,NULL
 01GLP0050006,NULL,NULL,NULL,NULL,1,3,5,2,2
 01GLP0050008,NULL,NULL,NULL,NULL,1,2,5,3,NULL

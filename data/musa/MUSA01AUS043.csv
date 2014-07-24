@@ -1,4 +1,4 @@
-ID,pseudostem_height_cyc1,bunch_weight_cyc1,numb_hands_cyc1,numb_fruits_cyc1,sap_colour,petiole_canal_leaf_III,rachis_position,male_bud_shape,pulp_colour_maturity
+id,pseudostem_height_cyc1,bunch_weight_cyc1,numb_hands_cyc1,numb_fruits_cyc1,sap_colour,petiole_canal_leaf_III,rachis_position,male_bud_shape,pulp_colour_maturity
 01AUS0430001,NULL,NULL,NULL,NULL,2,4,1,2,NULL
 01AUS0430002,NULL,NULL,NULL,NULL,1,2,3,2,NULL
 01AUS0430003,NULL,NULL,NULL,NULL,1,2,3,3,3
