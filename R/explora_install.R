@@ -9,6 +9,5 @@ install.packages("plyr") ## Function "empty"
 install.packages("vegan")  ## Calculate Shannon index
 install.packages("cluster")  ## Cluster analysis
 install.packages("ade4")  ## principal component
-# install.packages("grid")  ## generate tables in plot - superseded by gridbase which integrates base+grid?
-install.packages("gridBase")  ## generate tables in plot
+# install.packages("grid")  ## generate tables in plot - Now an embedded package in R
 install.packages("gridExtra")  ## generate tables in plot
