@@ -25,7 +25,8 @@ Sys.setlocale(category = "LC_ALL", locale = "English")
 Sys.setenv(LANG = "en")
 
 # Where am I?
-script.dir <- dirname(sys.frame(1)$ofile)
+script_dir <- dirname(sys.frame(1)$ofile)
+#print(c("Script Directory: ",script_dir))
 
 #Functions used--------------------------------------------------------------
 load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
@@ -1554,7 +1555,7 @@ addHandlerChanged(btn, handler = function(h,...){
 
 ## Principal windows
 gwelcome = ggroup(cont=nb,horizontal = F,label="About application")
-gimage("Explora_Logo", script_dir, size = "button", cont = gwelcome) 
+gimage("Explora_Logo.png", dirname = script_dir, size = "button", cont = gwelcome) 
 
 visible(win) <- TRUE 
 
