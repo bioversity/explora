@@ -35,7 +35,7 @@ load = function(file){file = read.csv(file, header = T, sep = ",")}## This funct
 load_dataset <- function(){## Load dataset
   data_set = load(gfile(""))
   
-  ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
+  ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
   write.csv(data_set, file = paste(getwd(),"/Results/data_set.csv", sep = ""),
             row.names = FALSE)
   return(data_set)
@@ -176,8 +176,10 @@ number.access <- function(h,...){## Function for selection of number of accessio
   num.access <- as.numeric(svalue(num.access))
   
   if(num.access <= dim(object)[1] & num.access > 0){
-    DialogBox(paste("The accessions number in final set: ", num.access, sep=" "))
-  }else{DialogBox("Error in the accession number")}
+    DialogBox(paste("Number of accessions in the final set: ", num.access, sep=" "))
+  } else {
+	  DialogBox("Error in the accession number")
+  }
   
   num.access 
 }
@@ -258,7 +260,7 @@ DialogSelectThreholds <- function(object){## Function to select variables for th
   
   nb <- gnotebook(cont = win, expand = T, tab.pos = 3)
   
-  lyt3 = glayout(homogeneous = F, cont = nb, spacing=1, label = "Threholds analysis", expand = T)
+  lyt3 = glayout(homogeneous = F, cont = nb, spacing=1, label = "Threshold Analyses", expand = T)
   
   lyt3[3,1]=(glabel=(""))
   
@@ -388,13 +390,13 @@ DialogSelectThreholds <- function(object){## Function to select variables for th
     
     
     DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
+    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
     write.csv(d.thresholds, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisThresholds.csv", sep=""))
     write.csv(Data.Thresholds, file = paste(getwd(),"/Results/Data.Thresholds.csv", sep=""), row.names = FALSE)
     
     print(d.thresholds)
     
-    output <- list("Thresholds.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
+    output <- list("Threshold.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
     
     cat("\n")
     cat("\n")
@@ -473,8 +475,8 @@ DialogSelectOptimization <- function(object){
   lytg4[4,1]=(glabel=(""))
   lytg4[5,1] = glabel("Variable: ", cont =lytg4)
   
-  lytg4[5,2] = glabel("Objetive function: ", cont =lytg4)
-  lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: hight):", cont =lytg4)
+  lytg4[5,2] = glabel("Objective function: ", cont =lytg4)
+  lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: High):", cont =lytg4)
   
   lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuos), cont = lytg4))
   lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont, cont = lytg4))
@@ -499,8 +501,8 @@ DialogSelectOptimization <- function(object){
   lytg4[13,1] = glabel("Optimization of nominal variables: ", cont =lytg4)
   lytg4[14,1]=(glabel=(""))
   lytg4[15,1] = glabel("Variable: ", cont =lytg4)
-  lytg4[15,2] = glabel("Objetive function: ", cont =lytg4)
-  lytg4[15,3] = glabel("Ranking of importance (1: Low ; 10: hight):", cont =lytg4)
+  lytg4[15,2] = glabel("Objective function: ", cont =lytg4)
+  lytg4[15,3] = glabel("Ranking of importance (1: Low ; 10: High):", cont =lytg4)
   lytg4[16,1] = (varop1n = gdroplist(c("NA",names.nominal), cont = lytg4))
   lytg4[16,2] = (fvarop1n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
     if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop1n)])))))}}))
@@ -1040,13 +1042,13 @@ PCA.type.opt <- function(output.opt0){
     cat("\n")
     cat("\n")
     DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "Folder already exists 'Results' ")
+    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "'Results' folder already exists?")
     write.csv(final.subset.pca, file = paste(getwd(),"/Results/subset_optimal_solution_by_final_subset_PCA","_Solution(",nsol.pca,")",".csv", sep=""),
               row.names = FALSE)
     
     cat("\n")
     cat("\n")
-    cat(paste("Process completed.................")) 
+    cat(paste("Processing completed.................")) 
     
   }
   
@@ -1326,7 +1328,7 @@ DTree.type.opt <- function(output.opt0){
   if(dim(result.scale)[2] == 2){
     cat("\n")
     cat("\n")
-    cat("You can not do Decision tree analysis because it only has one objective function")
+    cat("You can not do Decision tree analysis because you only have one objective function")
     cat("\n")
     cat("\n")
   }else if(dim(result.scale)[2] > 2){
@@ -1394,7 +1396,7 @@ DTree.type.opt <- function(output.opt0){
     }
     
     DialogBox(paste("The graphics should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
+    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
     
     nsol.DTree <- as.numeric(solution[length(solution)])
     cat("\n")
@@ -1423,7 +1425,7 @@ DTree.type.opt <- function(output.opt0){
     cat("\n")
     cat("\n")
     DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "Folder already exists 'Results' ")
+    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "'Results' folder already exists?")
     write.csv(final.subset.DTree , file = paste(getwd(),"/Results/subset_optimal_solution_by_final_subset_DTree","_Solution(",nsol.DTree,")",".csv", sep=""),
               row.names = FALSE)
     
@@ -1444,7 +1446,7 @@ if(file.exists(paste(getwd(),"/Results/RI.csv", sep = "")) == TRUE){
 ##GUI---------------------------------------------------------------------------------------------------------------------------
 
 ## Principal window
-win <- gwindow("Aplication Bioversity International", visible = F , width = 500, height = 300) 
+win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
 nb <- gnotebook(cont = win, expand = T, tab.pos = 2)
 
 
@@ -1463,10 +1465,10 @@ lytgb1[4,1] = gbutton("Data set", cont = lytgb1, expand = F, handler = function(
 lyt2 = glayout(homogeneous = F, cont = nb, spacing = 1, label = "Descriptive analysis", expand = T)
 lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",cont=lyt2,expand=T,horizontal=F))
 lytg2 = glayout(homogeneous = F, cont = g1, spacing = 1, expand = T) 
-lytg2[1,1] = glabel("Dataset for analized  ",cont=lytg2)
+lytg2[1,1] = glabel("Dataset for analysis  ",cont=lytg2)
 lytg2[1,2] = (nom_data = gdroplist(c("data_set"), selected = 0, cont = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
 lytgb1[3,1] = (glabel = (""))
-lytg2[4,1] = glabel("Number of continuos variables: ", cont = lytg2)
+lytg2[4,1] = glabel("Number of continuous variables: ", cont = lytg2)
 lytg2[4,2] = (ncon <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
 lytg2[5,1] = glabel("Number of categorical variables: ",cont=lytg2)
 lytg2[5,2] = (ncat <-gedit("",cont=lyt2,width = 10,initial.msg=""))
@@ -1488,7 +1490,7 @@ lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...)
 lytg2[15,1]=(glabel=(""))
 lytg2[16,1]=(glabel=(""))
 
-lytg2[17,1] = glabel("Number accessions final dataset: ", cont = lytg2)
+lytg2[17,1] = glabel("Number accessions in final dataset: ", cont = lytg2)
 lytg2[17,2] = (num.access <- gedit("10", cont = lyt2, width = 10, initial.msg =" "))
 lytg2[18,1] = gbutton("Select number accessions", cont = lyt2, expand=F,
                       handler = function(h,...){print(number.access())})
@@ -1496,7 +1498,7 @@ lytg2[18,1] = gbutton("Select number accessions", cont = lyt2, expand=F,
 lytg2[19,1]=(glabel=(""))
 lytg2[20,1]=(glabel=(""))
 
-lytg2[21,1] = glabel("Threholds analysis: ", cont = lytg2)
+lytg2[21,1] = glabel("Threshold analysis: ", cont = lytg2)
 lytg2[22,1] = gbutton("Select variables", cont = lytg2, handler = function(h,...){DialogSelectThreholds(eval(parse(text=svalue(nom_data))))})
 
 
@@ -1528,7 +1530,7 @@ lytg5[10,1] = gbutton("Select the percentage of solutions", cont = lytg5, expand
 lytg5[11,1] = (glabel=(""))
 lytg5[12,1] = (glabel=(""))
 
-lytg5[13,1] = glabel("Enter the number of final solutions for \n (Maximum variation or Principal components) :", cont = lytg5)
+lytg5[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :", cont = lytg5)
 lytg5[13,2] = (nfinal = gedit("10", cont = lytg5))
 lytg5[14,1] = gbutton("Select the number of final solutions", cont = lytg5, expand=F,
                       handler = function(h,...){print(number.final())})
@@ -1536,7 +1538,7 @@ lytg5[14,1] = gbutton("Select the number of final solutions", cont = lytg5, expa
 lytg5[15,1] = (glabel=(""))
 lytg5[16,1] = (glabel=(""))
 
-lytg5[17,1] = glabel("Select the type selection of preferred: ", cont = lytg5, horizontal = F)
+lytg5[17,1] = glabel("Select the type of selection of preferred: ", cont = lytg5, horizontal = F)
 
 items.option <- c(" ", "Maximum variation", "Principal components",
                   "Weighted sum model", "Decision tree")
@@ -1554,7 +1556,7 @@ addHandlerChanged(btn, handler = function(h,...){
 
 
 ## Principal windows
-gwelcome = ggroup(cont=nb,horizontal = F,label="About application")
+gwelcome = ggroup(cont=nb,horizontal = F,label="About the Application")
 gimage("Explora_Logo.png", dirname = script_dir, size = "button", cont = gwelcome) 
 
 visible(win) <- TRUE 
