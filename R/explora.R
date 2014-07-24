@@ -1344,9 +1344,6 @@ DTree.type.opt <- function(output.opt0){
     WSM.df <- data.frame(cbind(result.scale[,1], WSM))
     colnames(WSM.df) <- c("Solution", "WSM.score")
     
-    
-    
-    
     #Data for Cluster analysis
     data.HighestStandardizedValues <- result.scale
     data.HighestStandardizedValues  <- cbind(data.HighestStandardizedValues , "WSM.score" = WSM.df$WSM.score)
@@ -1357,7 +1354,6 @@ DTree.type.opt <- function(output.opt0){
     out.solution.tree <- list()
     out.solution.tree[[1]] <- fcluster(object, mean.result, data.HighestStandardizedValues)
     TableChart(out.solution.tree[[1]],1) 
-    
     
     ## Initialized values
     Decision <- NA
