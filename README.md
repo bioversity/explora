@@ -7,6 +7,9 @@ to a software engineering consultant, Johann Ospina, by Maarten van Zonneveld (B
 in collaboration with  Jacob van Etten (also of Bioversity-Costa Rica) who leads the Bioversity 
 "Seeds4Needs" project funded under the Climate Change (CCAFS) CGIAR Research Programme. 
 
+Detailed instructions for installation of the Explora package are available on the
+main Github project wiki at https://github.com/bioversity/germplasm-selection-tool/wiki.
+
     Unofficial scientific publication about Explora (in preparation by Maarten):
 
     van Zonneveld M, Ospina J, Petz M, Meckelmann S, Rios L, Libreros D, Ramirez M. 
