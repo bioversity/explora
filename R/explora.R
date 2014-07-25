@@ -25,7 +25,14 @@ Sys.setlocale(category = "LC_ALL", locale = "English")
 Sys.setenv(LANG = "en")
 
 # Where am I?
-script_dir <- dirname(sys.frame(sys.nframe())$ofile)
+nframe <- sys.nframe()
+print("nframe:",nframe)
+if(nframe>0) {
+	script_dir <- dirname(c(sys.frame(nframe)$ofile,""))
+} else {
+	script_dir <- getwd()
+}
+
 #print(c("Script Directory: ",script_dir))
 
 #Functions used--------------------------------------------------------------
