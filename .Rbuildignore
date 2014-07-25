@@ -1,7 +1,7 @@
-.project
-R/.Rhistory
-R/.gitignore
-data/.gitignore
-man/.gitignore
-.git
-.settings
+\.project
+R/\.Rhistory
+R/\.gitignore
+data/\.gitignore
+man/\.gitignore
+\.git
+\.settings

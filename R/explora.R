@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------------------------------------------
 #APPLICATION BIOVERSITY                                                                                           #
-#AUTHOR: JOHANN FOR BIOVERSITY                                                                                               #
+#AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 #VERSION 1.0 - FEBRARY-09-2014                                                                                    #
 #------------------------------------------------------------------------------------------------------------------ 
 
@@ -52,15 +52,15 @@ load_dataset <- function(){## Load dataset
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
   
   w<- gwindow("Alert",width=100,height=100)
-  g <- ggroup(cont = w)
-  gimage("info", dirname="stock", size="large_toolbar", cont = g)
+  g <- ggroup( container = w)
+  gimage("info", dirname="stock", size="large_toolbar",  container = g)
   
-  ig <- ggroup(horizontal = FALSE, cont = g)
-  glabel(message, cont = ig, expand = TRUE)
+  ig <- ggroup(horizontal = FALSE,  container = g)
+  glabel(message,  container = ig, expand = TRUE)
   
-  bg <- ggroup(cont = ig)
+  bg <- ggroup( container = ig)
   addSpring(bg)
-  gbutton("Ok", handler = function(h,...) dispose(w), cont = bg)
+  gbutton("Ok", handler = function(h,...) dispose(w),  container = bg)
   
   return()
 }  
@@ -73,28 +73,25 @@ DialogBoxDTree <- function(items) {## This function make a dialog box
   w <-  gbasicdialog("", 
                      handler = function(h,...){out <<- svalue(txt)})
   
-  glabel("Do you want to continue?", con = w)
-  glabel(" ", con = w)
-  txt <- gradio(items, cont = w)
+  glabel("Do you want to continue?",  container = w)
+  glabel(" ",  container = w)
+  txt <- gradio(items,  container = w)
   visible(w, set = T)
   out
   
 }  
 
 
-DialogSelect <- function(items){## Function to select preferency category
+DialogSelect <- function(items){## Function to select preference category
   
   w <-  gbasicdialog("Select the category of preference", 
                      handler = function(h,...){out.category <<- svalue(txt.category)})
   
-  txt.category <- gdroplist(items, cont = w)
+  txt.category <- gdroplist(items,  container = w)
   visible(w, set = T)
   out.category 
   
 }
-
-
-
 
 
 SelectSolution <- function(solutions){## Function to select preferency category
@@ -102,7 +99,7 @@ SelectSolution <- function(solutions){## Function to select preferency category
   w <-  gbasicdialog("Select the solutions", 
                      handler = function(h,...){out.solution <<- svalue(txt.solution)})
   
-  txt.solution <- gdroplist(solutions, cont = w)
+  txt.solution <- gdroplist(solutions,  container = w)
   visible(w, set = T)
   out.solution
 }
@@ -265,51 +262,51 @@ DialogSelectThreholds <- function(object){## Function to select variables for th
                                                 max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2));max.var3 <<- as.numeric(svalue(max.var3));max.var4 <<- as.numeric(svalue(max.var4));max.var5 <<- as.numeric(svalue(max.var5));
                                                 max.var6 <<- as.numeric(svalue(max.var6)); max.var7 <<- as.numeric(svalue(max.var7));max.var8 <<- as.numeric(svalue(max.var8));max.var9 <<- as.numeric(svalue(max.var9));max.var10 <<- as.numeric(svalue(max.var10))}) 
   
-  nb <- gnotebook(cont = win, expand = T, tab.pos = 3)
+  nb <- gnotebook( container = win, expand = T, tab.pos = 3)
   
-  lyt3 = glayout(homogeneous = F, cont = nb, spacing=1, label = "Threshold Analyses", expand = T)
+  lyt3 = glayout(homogeneous = F,  container = nb, spacing=1, label = "Threshold Analyses", expand = T)
   
   lyt3[3,1]=(glabel=(""))
   
-  lyt3[4,1] = glabel("Variables to select", cont = lyt3)
-  lyt3[5,1:4] = (var1 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[6,1:4] = (var2 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[7,1:4] = (var3 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[8,1:4] = (var4 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[9,1:4] = (var5 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[10,1:4] = (var6 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[11,1:4] = (var7 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[12,1:4] = (var8 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[13,1:4] = (var9 = gdroplist(c("NA",  names.threholds), cont = lyt3))
-  lyt3[14,1:4] = (var10 = gdroplist(c("NA",  names.threholds), cont = lyt3))
+  lyt3[4,1] = glabel("Variables to select",  container = lyt3)
+  lyt3[5,1:4] = (var1 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[6,1:4] = (var2 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[7,1:4] = (var3 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[8,1:4] = (var4 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[9,1:4] = (var5 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[10,1:4] = (var6 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[11,1:4] = (var7 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[12,1:4] = (var8 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[13,1:4] = (var9 = gdroplist(c("NA",  names.threholds),  container = lyt3))
+  lyt3[14,1:4] = (var10 = gdroplist(c("NA",  names.threholds),  container = lyt3))
   
   lyt3[1,2]=(glabel=(""))
   
-  lyt3[4,7] = glabel("Minimum values", cont = lyt3)
-  lyt3[5,7] = (min.var1 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[6,7] = (min.var2 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[7,7] = (min.var3 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[8,7] = (min.var4 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[9,7] = (min.var5 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[10,7] = (min.var6 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[11,7] = (min.var7 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[12,7] = (min.var8 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[13,7] = (min.var9 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[14,7] = (min.var10 = gedit("", cont = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[4,7] = glabel("Minimum values",  container = lyt3)
+  lyt3[5,7] = (min.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[6,7] = (min.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[7,7] = (min.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[8,7] = (min.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[9,7] = (min.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[10,7] = (min.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[11,7] = (min.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[12,7] = (min.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[13,7] = (min.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+  lyt3[14,7] = (min.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
   
   lyt3[1,8]=(glabel=(""))
   
-  lyt3[4,10] = glabel("Maximum values", cont = lyt3)
-  lyt3[5,10] = (max.var1 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[6,10] = (max.var2 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[7,10] = (max.var3 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[8,10] = (max.var4 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[9,10] = (max.var5 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[10,10] = (max.var6 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[11,10] = (max.var7 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[12,10] = (max.var8 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[13,10] = (max.var9 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[14,10] = (max.var10 = gedit("", cont = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[4,10] = glabel("Maximum values",  container = lyt3)
+  lyt3[5,10] = (max.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[6,10] = (max.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[7,10] = (max.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[8,10] = (max.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[9,10] = (max.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[10,10] = (max.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[11,10] = (max.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[12,10] = (max.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[13,10] = (max.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+  lyt3[14,10] = (max.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
   
   
   
@@ -427,8 +424,8 @@ DialogSelectThreholds <- function(object){## Function to select variables for th
 
 select.functions <- function(fitems, f){## Function to select the objective function for nominal variables
   win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
-  g <- ggroup(horizontal=FALSE, cont = win)
-  function.optimize <- gdroplist(fitems, expand = T, editable = F, cont = g, handler = f)
+  g <- ggroup(horizontal=FALSE,  container = win)
+  function.optimize <- gdroplist(fitems, expand = T, editable = F,  container = g, handler = f)
   visible(win)<-TRUE
 }
 
@@ -469,65 +466,65 @@ DialogSelectOptimization <- function(object){
                                                 fvarop1n<<-svalue(fvarop1n);fvarop2n<<-svalue(fvarop2n);fvarop3n<<-svalue(fvarop3n);fvarop4n<<-svalue(fvarop4n);fvarop5n<<-svalue(fvarop5n);
                                                 ri1n<<-svalue(ri1n);ri2n<<-svalue(ri2n);ri3n<<-svalue(ri3n);ri4n<<-svalue(ri4n);ri5n<<-svalue(ri5n)}) 
   
-  nb <- gnotebook(cont = win, expand = T, tab.pos = 3)
+  nb <- gnotebook( container = win, expand = T, tab.pos = 3)
   
   
-  lyt4=glayout(homogeneous = F,cont = nb , spacing=1,label="Optimization",expand=T)
-  lyt4[1,1:25] = (g4 = gframe("Optimization",cont = lyt4, expand = T, horizontal = F))
-  lytg4 = glayout(homogeneous = F, cont = g4, spacing = 1, expand = T) 
+  lyt4=glayout(homogeneous = F, container = nb , spacing=1,label="Optimization",expand=T)
+  lyt4[1,1:25] = (g4 = gframe("Optimization", container = lyt4, expand = T, horizontal = F))
+  lytg4 = glayout(homogeneous = F,  container = g4, spacing = 1, expand = T) 
   lytg4[1,1]=(glabel=(""))
   lytg4[2,1]=(glabel=(""))
   
-  lytg4[3,1] = glabel("Optimization of continuous variables: ", cont =lytg4)
+  lytg4[3,1] = glabel("Optimization of continuous variables: ",  container =lytg4)
   lytg4[4,1]=(glabel=(""))
-  lytg4[5,1] = glabel("Variable: ", cont =lytg4)
+  lytg4[5,1] = glabel("Variable: ",  container =lytg4)
   
-  lytg4[5,2] = glabel("Objective function: ", cont =lytg4)
-  lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: High):", cont =lytg4)
+  lytg4[5,2] = glabel("Objective function: ",  container =lytg4)
+  lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4)
   
-  lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuos), cont = lytg4))
-  lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont, cont = lytg4))
+  lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuos), cont = lytg4))
-  lytg4[7,2] = (fvarop2c = gdroplist(f.items.cont, cont = lytg4))
+  lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[7,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuos), cont = lytg4))
-  lytg4[8,2] = (fvarop3c = gdroplist(f.items.cont, cont = lytg4))
+  lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[8,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuos), cont = lytg4))
-  lytg4[9,2] = (fvarop4c = gdroplist(f.items.cont, cont = lytg4))
+  lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[9,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuos), cont = lytg4))
-  lytg4[10,2] = (fvarop5c = gdroplist(f.items.cont, cont = lytg4))
+  lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[10,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
   
   
   lytg4[11,1]=(glabel=(""))
   lytg4[12,1]=(glabel=(""))
   
-  lytg4[13,1] = glabel("Optimization of nominal variables: ", cont =lytg4)
+  lytg4[13,1] = glabel("Optimization of nominal variables: ",  container =lytg4)
   lytg4[14,1]=(glabel=(""))
-  lytg4[15,1] = glabel("Variable: ", cont =lytg4)
-  lytg4[15,2] = glabel("Objective function: ", cont =lytg4)
-  lytg4[15,3] = glabel("Ranking of importance (1: Low ; 10: High):", cont =lytg4)
-  lytg4[16,1] = (varop1n = gdroplist(c("NA",names.nominal), cont = lytg4))
-  lytg4[16,2] = (fvarop1n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
+  lytg4[15,1] = glabel("Variable: ",  container =lytg4)
+  lytg4[15,2] = glabel("Objective function: ",  container =lytg4)
+  lytg4[15,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4)
+  lytg4[16,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4))
+  lytg4[16,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop1n)])))))}}))
   lytg4[16,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[17,1] = (varop2n = gdroplist(c("NA",names.nominal), cont = lytg4))
-  lytg4[17,2] = (fvarop2n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
+  lytg4[17,1] = (varop2n = gdroplist(c("NA",names.nominal),  container = lytg4))
+  lytg4[17,2] = (fvarop2n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop2n)])))))}}))
   lytg4[17,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[18,1] = (varop3n = gdroplist(c("NA",names.nominal), cont = lytg4))
-  lytg4[18,2] = (fvarop3n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
+  lytg4[18,1] = (varop3n = gdroplist(c("NA",names.nominal),  container = lytg4))
+  lytg4[18,2] = (fvarop3n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop3n)])))))}}))
   lytg4[18,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[19,1] = (varop4n = gdroplist(c("NA",names.nominal), cont = lytg4))
-  lytg4[19,2] = (fvarop4n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
+  lytg4[19,1] = (varop4n = gdroplist(c("NA",names.nominal),  container = lytg4))
+  lytg4[19,2] = (fvarop4n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop4n)])))))}}))
   lytg4[19,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[20,1] = (varop5n = gdroplist(c("NA",names.nominal), cont = lytg4))
-  lytg4[20,2] = (fvarop5n = gdroplist(f.items.nom, cont = lytg4, handler = function(h,...){
+  lytg4[20,1] = (varop5n = gdroplist(c("NA",names.nominal),  container = lytg4))
+  lytg4[20,2] = (fvarop5n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop5n)])))))}}))
   lytg4[20,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
   
@@ -536,7 +533,7 @@ DialogSelectOptimization <- function(object){
   lytg4[23,1]=(glabel=("Note: Run the optimization procedure before close the window"))
   
   
-  lytg4[25,2] = gbutton("Optimization", cont = lytg4,
+  lytg4[25,2] = gbutton("Optimization",  container = lytg4,
                         handler = function(h,...){
                           output.opt <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
                                                         fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
@@ -1450,28 +1447,28 @@ if(file.exists(paste(getwd(),"/Results/RI.csv", sep = "")) == TRUE){
 
 ## Principal window
 win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
-nb <- gnotebook(cont = win, expand = T, tab.pos = 2)
+nb <- gnotebook( container = win, expand = T, tab.pos = 2)
 
 
 ##Load dataset
-lyt1 = glayout(homogeneous = F, cont = nb, spacing = 1, label = "Load dataset", expand = T) 
-lyt1[1,1:3] = (g = gframe("Load dataset", cont = lyt1, horizontal = T))
-lytgb1 = glayout(homogeneous = F,cont = g, spacing = 1, expand = T) 
+lyt1 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Load dataset", expand = T) 
+lyt1[1,1:3] = (g = gframe("Load dataset",  container = lyt1, horizontal = T))
+lytgb1 = glayout(homogeneous = F, container = g, spacing = 1, expand = T) 
 lytgb1[1,1] = (glabel = (""))
-lytgb1[2,1] = (h = gbutton("Change directory", cont = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
+lytgb1[2,1] = (h = gbutton("Change directory",  container = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
 lytgb1[3,1] = (glabel = (""))
-lytgb1[4,1] = gbutton("Data set", cont = lytgb1, expand = F, handler = function(h,...){data_set<<-load_dataset()})
+lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){data_set<<-load_dataset()})
 
 
 
 ##Descriptive analysis
-lyt2 = glayout(homogeneous = F, cont = nb, spacing = 1, label = "Descriptive analysis", expand = T)
+lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
 lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",cont=lyt2,expand=T,horizontal=F))
-lytg2 = glayout(homogeneous = F, cont = g1, spacing = 1, expand = T) 
+lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
 lytg2[1,1] = glabel("Dataset for analysis  ",cont=lytg2)
-lytg2[1,2] = (nom_data = gdroplist(c("data_set"), selected = 0, cont = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
+lytg2[1,2] = (nom_data = gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
 lytgb1[3,1] = (glabel = (""))
-lytg2[4,1] = glabel("Number of continuous variables: ", cont = lytg2)
+lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
 lytg2[4,2] = (ncon <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
 lytg2[5,1] = glabel("Number of categorical variables: ",cont=lytg2)
 lytg2[5,2] = (ncat <-gedit("",cont=lyt2,width = 10,initial.msg=""))
@@ -1493,61 +1490,61 @@ lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...)
 lytg2[15,1]=(glabel=(""))
 lytg2[16,1]=(glabel=(""))
 
-lytg2[17,1] = glabel("Number accessions in final dataset: ", cont = lytg2)
-lytg2[17,2] = (num.access <- gedit("10", cont = lyt2, width = 10, initial.msg =" "))
-lytg2[18,1] = gbutton("Select number accessions", cont = lyt2, expand=F,
+lytg2[17,1] = glabel("Number accessions in final dataset: ",  container = lytg2)
+lytg2[17,2] = (num.access <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
+lytg2[18,1] = gbutton("Select number accessions",  container = lyt2, expand=F,
                       handler = function(h,...){print(number.access())})
 
 lytg2[19,1]=(glabel=(""))
 lytg2[20,1]=(glabel=(""))
 
-lytg2[21,1] = glabel("Threshold analysis: ", cont = lytg2)
-lytg2[22,1] = gbutton("Select variables", cont = lytg2, handler = function(h,...){DialogSelectThreholds(eval(parse(text=svalue(nom_data))))})
+lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
+lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThreholds(eval(parse(text=svalue(nom_data))))})
 
 
 ##Selection of preferred analysis
-lyt5 = glayout(homogeneous = F,cont = nb , spacing=1,label="Selection of preferred analysis",expand=T)
-lyt5[1,1:10] = (g5 = gframe("Type selection of preferred",cont = lyt5, expand = T, horizontal = F))
-lytg5 = glayout(homogeneous = F, cont = g5, spacing = 1, expand = T) 
+lyt5 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)
+lyt5[1,1:10] = (g5 = gframe("Type selection of preferred", container = lyt5, expand = T, horizontal = F))
+lytg5 = glayout(homogeneous = F,  container = g5, spacing = 1, expand = T) 
 
-lytg5[1,1] = glabel("Enter the number of solutions: ", cont = lytg5)
-lytg5[1,2] = (Nsim = gedit("10000", cont = lytg5))
-lytg5[2,1] = gbutton("Select the number of solutions", cont = lytg5, expand=F,
+lytg5[1,1] = glabel("Enter the number of solutions: ",  container = lytg5)
+lytg5[1,2] = (Nsim = gedit("10000",  container = lytg5))
+lytg5[2,1] = gbutton("Select the number of solutions",  container = lytg5, expand=F,
                      handler = function(h,...){print(number.solution())})
 
 lytg5[3,1] = (glabel=(""))
 lytg5[4,1] = (glabel=(""))
 
-lytg5[5,1] = glabel("Optimization analysis: ", cont = lytg5)
-lytg5[6,1] = gbutton("Select variables", cont = lytg5, expand=F,
+lytg5[5,1] = glabel("Optimization analysis: ",  container = lytg5)
+lytg5[6,1] = gbutton("Select variables",  container = lytg5, expand=F,
                      handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue(nom_data))))})
 
 lytg5[7,1] = (glabel=(""))
 lytg5[8,1] = (glabel=(""))
 
-lytg5[9,1] = glabel("Enter the percentage of solutions (%):", cont = lytg5)
-lytg5[9,2] = (npercen = gedit("1", cont = lytg5))
-lytg5[10,1] = gbutton("Select the percentage of solutions", cont = lytg5, expand=F,
+lytg5[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg5)
+lytg5[9,2] = (npercen = gedit("1",  container = lytg5))
+lytg5[10,1] = gbutton("Select the percentage of solutions",  container = lytg5, expand=F,
                       handler = function(h,...){print(number.percent())})
 
 lytg5[11,1] = (glabel=(""))
 lytg5[12,1] = (glabel=(""))
 
-lytg5[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :", cont = lytg5)
-lytg5[13,2] = (nfinal = gedit("10", cont = lytg5))
-lytg5[14,1] = gbutton("Select the number of final solutions", cont = lytg5, expand=F,
+lytg5[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :",  container = lytg5)
+lytg5[13,2] = (nfinal = gedit("10",  container = lytg5))
+lytg5[14,1] = gbutton("Select the number of final solutions",  container = lytg5, expand=F,
                       handler = function(h,...){print(number.final())})
 
 lytg5[15,1] = (glabel=(""))
 lytg5[16,1] = (glabel=(""))
 
-lytg5[17,1] = glabel("Select the type of selection of preferred: ", cont = lytg5, horizontal = F)
+lytg5[17,1] = glabel("Select the type of selection of preferred: ",  container = lytg5, horizontal = F)
 
 items.option <- c(" ", "Maximum variation", "Principal components",
                   "Weighted sum model", "Decision tree")
 
-lytg5[18,1] = (option.preferred <- gdroplist(items.option, cont = lytg5))
-lytg5[18,2] = (btn <- gbutton("Run", cont = lytg5))
+lytg5[18,1] = (option.preferred <- gdroplist(items.option,  container = lytg5))
+lytg5[18,2] = (btn <- gbutton("Run",  container = lytg5))
 
 addHandlerChanged(btn, handler = function(h,...){
   if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(output.opt)}
@@ -1560,7 +1557,7 @@ addHandlerChanged(btn, handler = function(h,...){
 
 ## Principal windows
 gwelcome = ggroup(cont=nb,horizontal = F,label="About the Application")
-gimage("Explora_Logo.png", dirname = script_dir, size = "button", cont = gwelcome) 
+gimage("Explora_Logo.png", dirname = script_dir, size = "button",  container = gwelcome) 
 
 visible(win) <- TRUE 
 
