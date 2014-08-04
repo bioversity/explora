@@ -5,9 +5,9 @@
 #
 # Explora Data Loaders
 #------------------------------------------------------------------------------------------------------------------ 
+#' @include init.r
 
 load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
-
 
 load_dataset <- function(){## Load dataset
 	data_set = load(gfile(""))

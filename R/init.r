@@ -28,7 +28,7 @@ Sys.setenv(LANG = "en")
 
 # Where am I?
 nframe <- sys.nframe()
-print("nframe:",nframe)
+#print(paste("nframe:",nframe))
 if(nframe>0) {
 	script_dir <- dirname(c(sys.frame(nframe)$ofile,""))
 } else {

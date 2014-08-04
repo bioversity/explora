@@ -5,6 +5,9 @@
 #
 # Dialog Boxes used by Explora
 #------------------------------------------------------------------------------------------------------------------ 
+
+#' @include init.r
+
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	
 	w<- gwindow("Alert",width=100,height=100)
@@ -20,7 +23,6 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	
 	return()
 }  
-
 
 
 DialogBoxDTree <- function(items) {## This function make a dialog box

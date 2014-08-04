@@ -42,3 +42,10 @@ Imports:
     ade4,
     grid,
     gridExtra
+Collate:
+    'init.r'
+    'dialogs.r'
+    'util.r'
+    'algorithms.r'
+    'loader.r'
+    'explora.r'

@@ -3,9 +3,7 @@
 #AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 #VERSION 1.0 - FEBRARY-09-2014                                                                                    #
 #------------------------------------------------------------------------------------------------------------------ 
-
-#Functions used--------------------------------------------------------------
-
+#' @include util.r
 
 des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)

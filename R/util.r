@@ -5,6 +5,7 @@
 #
 # Explora Utility Functions
 #------------------------------------------------------------------------------------------------------------------ 
+#' @include dialogs.r
 
 number.access <- function(h,...){## Function for selection of number of accessions in final set 
 	

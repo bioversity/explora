@@ -5,7 +5,9 @@
 #
 # Explora Graphical User Interface (based on RGtk2)
 #------------------------------------------------------------------------------------------------------------------ 
-
+#' @include loader.r algorithms.r
+#' 
+#' @name explora
 #' @title explora
 #' @description Bioversity/CCAFS Seeds4Needs Explora germplasm selection tool
 #' @details  The main purpose of Explora is to select a set of promising accessions 
