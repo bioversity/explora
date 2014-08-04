@@ -2,24 +2,43 @@ Package: explora
 Version: 0.1-1
 Date: 2014-07-11
 Title: Bioversity Seed4Needs Explora Germplasm Selection Tool
-Authors@R: c( person(given="Maarten", family = "van Zonneveld",  role = c("aut", "cre", "cph"), email = "m.vanzonneveld@cgiar.org",                comment = "Explora Product Designer"),
-	person(given="Jacob",          family = "van Etten",      role = "ctb",                  email = "j.vanetten@cgiar.org",                    comment = "Bioversity CCAFS Liaison and Seeds4Needs Lead Scientist" ),
-	person(given="Johann Alexis",  family = "Ospina Galindez",role = c("aut", "cph"),        email = "johann.alexis.ospina@gmail.com",          comment = "Software Engineering Consultant" ),
-	person(given="Richard Michael",family = "van Zonneveld",  role = c("aut", "cph"),        email = "richard.bruskiewich@cropinformatics.com", comment = "Bioinformatics Scientist and Software Engineer" ),
-	person(given="Lucas",          family = "Matteis",        role = "ctb",                  email = "l.matteis@cgiar.org",                     comment = "Datasource integration Software Engineer" ),
-	person(given="Elizabeth",      family = "Arnaud",         role = "ctb",                  email = "e.arnaud@cgiar.org",                      comment = "CCAFS Informatics Project Activity Manager")
-	)
-Author: Maarten van Zonneveld and Johannes Ospina with contributions from the Bioversity Seeds4Needs team
+Authors@R: c( person(given="Maarten", family = "van Zonneveld", role = c("aut",
+    "cre", "cph"), email = "m.vanzonneveld@cgiar.org", comment = "Explora
+    Product Designer"), person(given="Jacob", family = "van Etten", role =
+    "ctb", email = "j.vanetten@cgiar.org", comment = "Bioversity CCAFS Liaison
+    and Seeds4Needs Lead Scientist" ), person(given="Johann Alexis", family =
+    "Ospina Galindez",role = c("aut", "cph"), email =
+    "johann.alexis.ospina@gmail.com", comment = "Software Engineering
+    Consultant" ), person(given="Richard Michael",family = "van Zonneveld",
+    role = c("aut", "cph"), email = "richard.bruskiewich@cropinformatics.com",
+    comment = "Bioinformatics Scientist and Software Engineer" ),
+    person(given="Lucas", family = "Matteis", role = "ctb", email =
+    "l.matteis@cgiar.org", comment = "Datasource integration Software Engineer"
+    ), person(given="Elizabeth", family = "Arnaud", role = "ctb", email =
+    "e.arnaud@cgiar.org", comment = "CCAFS Informatics Project Activity
+    Manager") )
+Author: Maarten van Zonneveld, Johannes Ospina and Richard Bruskiewich with
+    contributions from the Bioversity Seeds4Needs team
 Maintainer: Maarten van Zonneveld  <m.vanzonneveld@cgiar.org>
-Depends: R (>= 3.1.0)
-Description: The "Explora" package is an R statistical application 
-	implementing a suite of algorithms, with associated user interfaces, 
-	which assist the selection of crop plant genetic resources for 
-	developing country deployment, based on trait, passport and 
-	related descriptor characteristics. Explora is being developed at 
-	Bioversity International within the CCAFS-funded Seeds-for-Needs Project.
+Depends:
+    R (>= 3.1.0)
+Description: The "Explora" package is an R statistical application
+    implementing a suite of algorithms, with associated user interfaces,
+    which assist the selection of crop plant genetic resources for
+    developing country deployment, based on trait, passport and
+    related descriptor characteristics. Explora is being developed at
+    Bioversity International within the CCAFS-funded Seeds-for-Needs Project.
 License: GPL-3 | file LICENSE
-URL: https://github.com/bioversity/germplasm-selection-tool, www.bioversityinternational.org
+URL: https://github.com/bioversity/germplasm-selection-tool,
+    www.bioversityinternational.org
 BugReports: https://github.com/bioversity/germplasm-selection-tool/issues
 NeedsCompilation: no
-Imports: gWidgets, gWidgetsRGtk2, plyr, vegan, cluster, ade4, grid, gridExtra
+Imports:
+    gWidgets,
+    gWidgetsRGtk2,
+    plyr,
+    vegan,
+    cluster,
+    ade4,
+    grid,
+    gridExtra

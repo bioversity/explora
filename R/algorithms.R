@@ -4,112 +4,10 @@
 #VERSION 1.0 - FEBRARY-09-2014                                                                                    #
 #------------------------------------------------------------------------------------------------------------------ 
 
-## Loading packages (installed by install.R)
-library(vegan) 
-library(ade4)
-library(gWidgets) 
-library(gWidgetsRGtk2) 
-library(plyr)
-library(cluster)
-library(grid)
-library(gridExtra)
-
-## Clean work spaces
-rm(list=ls())
-
-## select tools for GUI
-options("guiToolkit"="RGtk2")
-
-## Change locale for message in english
-Sys.setlocale(category = "LC_ALL", locale = "English")
-Sys.setenv(LANG = "en")
-
-# Where am I?
-nframe <- sys.nframe()
-print("nframe:",nframe)
-if(nframe>0) {
-	script_dir <- dirname(c(sys.frame(nframe)$ofile,""))
-} else {
-	script_dir <- getwd()
-}
-
-#print(c("Script Directory: ",script_dir))
-
 #Functions used--------------------------------------------------------------
-load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
 
 
-load_dataset <- function(){## Load dataset
-  data_set = load(gfile(""))
-  
-  ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
-  write.csv(data_set, file = paste(getwd(),"/Results/data_set.csv", sep = ""),
-            row.names = FALSE)
-  return(data_set)
-}
-
-
-DialogBox <- function(message, handler=NULL) {## This function make a dialog box
-  
-  w<- gwindow("Alert",width=100,height=100)
-  g <- ggroup( container = w)
-  gimage("info", dirname="stock", size="large_toolbar",  container = g)
-  
-  ig <- ggroup(horizontal = FALSE,  container = g)
-  glabel(message,  container = ig, expand = TRUE)
-  
-  bg <- ggroup( container = ig)
-  addSpring(bg)
-  gbutton("Ok", handler = function(h,...) dispose(w),  container = bg)
-  
-  return()
-}  
-
-
-
-DialogBoxDTree <- function(items) {## This function make a dialog box
-  
-  
-  w <-  gbasicdialog("", 
-                     handler = function(h,...){out <<- svalue(txt)})
-  
-  glabel("Do you want to continue?",  container = w)
-  glabel(" ",  container = w)
-  txt <- gradio(items,  container = w)
-  visible(w, set = T)
-  out
-  
-}  
-
-
-DialogSelect <- function(items){## Function to select preference category
-  
-  w <-  gbasicdialog("Select the category of preference", 
-                     handler = function(h,...){out.category <<- svalue(txt.category)})
-  
-  txt.category <- gdroplist(items,  container = w)
-  visible(w, set = T)
-  out.category 
-  
-}
-
-
-SelectSolution <- function(solutions){## Function to select preferency category
-  
-  w <-  gbasicdialog("Select the solutions", 
-                     handler = function(h,...){out.solution <<- svalue(txt.solution)})
-  
-  txt.solution <- gdroplist(solutions,  container = w)
-  visible(w, set = T)
-  out.solution
-}
-
-
-
-
-
-
-des.continuos <- function(object){## Descriptive analysis for continuous variables
+des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)
   average = round(mean(object, na.rm=T),3)
   variance = round(var(object, na.rm=T),3)
@@ -124,12 +22,12 @@ des.continuos <- function(object){## Descriptive analysis for continuous variabl
 }
 
 
-descriptives.continuos = function(object){## Used to function 'des.continuos' 
+descriptives.continuous = function(object){## Used to function 'des.continuous' 
   
   ncon <- as.numeric(svalue(ncon))
   object <- object[,-1]
   object <- object[,1:ncon]
-  d = sapply(object, des.continuos)
+  d = sapply(object, des.continuous)
   row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   d = as.table(d)
   names(dimnames(d)) <- c(" ", paste("Variable",svalue(nom_data)))
@@ -173,21 +71,6 @@ descriptives.nominal=function(object){## Used to function 'des.nominal'
   return(d)
   
 }
-
-number.access <- function(h,...){## Function for selection of number of accessions in final set 
-  
-  object = eval(parse(text=svalue(nom_data)))
-  num.access <- as.numeric(svalue(num.access))
-  
-  if(num.access <= dim(object)[1] & num.access > 0){
-    DialogBox(paste("Number of accessions in the final set: ", num.access, sep=" "))
-  } else {
-	  DialogBox("Error in the accession number")
-  }
-  
-  num.access 
-}
-
 
 correlation <- function(object){## Correlation analysis
   ncon <-as.numeric(svalue(ncon))
@@ -239,185 +122,6 @@ correlation <- function(object){## Correlation analysis
 
 
 
-DialogSelectThreholds <- function(object){## Function to select variables for threholds
-  
-  object.threholds <- object
-  ncon <- as.numeric(svalue(ncon)) 
-  object.threholds <- object.threholds[,-1]
-  object.threholds <- object.threholds[,1:ncon]
-  object.complete <- object
-  
-  
-  min.values <- matrix(round(as.table(sapply(object.threholds, min)),3), ncol = 1)
-  max.values <- matrix(round(as.table(sapply(object.threholds, max)),3), ncol = 1)
-  
-  names.threholds <- paste(names(object.threholds),":(","Min = ", min.values," ; ","Max = ",
-                           max.values, ")", sep = "")
-  
-  win <- gbasicdialog("Selection variable for threholds", visible = F , width = 700, height = 450,
-                      handler = function(h,...){var1 <<- svalue(var1);var2 <<- svalue(var2);var3 <<- svalue(var3);var4 <<- svalue(var4);var5 <<- svalue(var5);
-                                                var6 <<- svalue(var6);var7 <<- svalue(var7);var8 <<- svalue(var8);var9 <<- svalue(var9);var10 <<- svalue(var10);
-                                                min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2));min.var3 <<- as.numeric(svalue(min.var3));min.var4 <<- as.numeric(svalue(min.var4));min.var5 <<- as.numeric(svalue(min.var5));
-                                                min.var6 <<- as.numeric(svalue(min.var6)); min.var7 <<- as.numeric(svalue(min.var7));min.var8 <<- as.numeric(svalue(min.var8));min.var9 <<- as.numeric(svalue(min.var9));min.var10 <<- as.numeric(svalue(min.var10));
-                                                max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2));max.var3 <<- as.numeric(svalue(max.var3));max.var4 <<- as.numeric(svalue(max.var4));max.var5 <<- as.numeric(svalue(max.var5));
-                                                max.var6 <<- as.numeric(svalue(max.var6)); max.var7 <<- as.numeric(svalue(max.var7));max.var8 <<- as.numeric(svalue(max.var8));max.var9 <<- as.numeric(svalue(max.var9));max.var10 <<- as.numeric(svalue(max.var10))}) 
-  
-  nb <- gnotebook( container = win, expand = T, tab.pos = 3)
-  
-  lyt3 = glayout(homogeneous = F,  container = nb, spacing=1, label = "Threshold Analyses", expand = T)
-  
-  lyt3[3,1]=(glabel=(""))
-  
-  lyt3[4,1] = glabel("Variables to select",  container = lyt3)
-  lyt3[5,1:4] = (var1 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[6,1:4] = (var2 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[7,1:4] = (var3 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[8,1:4] = (var4 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[9,1:4] = (var5 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[10,1:4] = (var6 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[11,1:4] = (var7 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[12,1:4] = (var8 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[13,1:4] = (var9 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  lyt3[14,1:4] = (var10 = gdroplist(c("NA",  names.threholds),  container = lyt3))
-  
-  lyt3[1,2]=(glabel=(""))
-  
-  lyt3[4,7] = glabel("Minimum values",  container = lyt3)
-  lyt3[5,7] = (min.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[6,7] = (min.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[7,7] = (min.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[8,7] = (min.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[9,7] = (min.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[10,7] = (min.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[11,7] = (min.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[12,7] = (min.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[13,7] = (min.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  lyt3[14,7] = (min.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-  
-  lyt3[1,8]=(glabel=(""))
-  
-  lyt3[4,10] = glabel("Maximum values",  container = lyt3)
-  lyt3[5,10] = (max.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[6,10] = (max.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[7,10] = (max.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[8,10] = (max.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[9,10] = (max.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[10,10] = (max.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[11,10] = (max.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[12,10] = (max.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[13,10] = (max.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  lyt3[14,10] = (max.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-  
-  
-  
-  visible(win)<-TRUE
-  
-  if(var1!="NA"){var1<-unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2<-unlist(strsplit(var2, ":"))[1]}
-  if(var3!="NA"){var3<-unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4<-unlist(strsplit(var4, ":"))[1]}
-  if(var5!="NA"){var5<-unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6<-unlist(strsplit(var6, ":"))[1]}
-  if(var7!="NA"){var7<-unlist(strsplit(var7, ":"))[1]};if(var8!="NA"){var8<-unlist(strsplit(var8, ":"))[1]}
-  if(var9!="NA"){var9<-unlist(strsplit(var9, ":"))[1]};if(var10!="NA"){var10<-unlist(strsplit(var10, ":"))[1]}
-  
-  var.thresholds <- c(var1, var2, var3, var4, var5,
-                      var6, var7, var8, var9, var10)
-  
-  var.thresholds <- var.thresholds[var.thresholds!="NA"]
-  var.thresholds <- unique(var.thresholds)
-  
-  
-  min.val <- c(min.var1,min.var2,min.var3,min.var4,min.var5,
-               min.var6,min.var7,min.var8,min.var9,min.var10)
-  
-  min.val <- min.val[!is.na(min.val)]
-  
-  
-  max.val <- c(max.var1,max.var2,max.var3,max.var4,max.var5,
-               max.var6,max.var7,max.var8,max.var9,max.var10)
-  
-  
-  max.val <- max.val[!is.na(max.val)]
-  
-  
-  
-  matrix.thresholds <- matrix(NA, nrow=length(var.thresholds), ncol=3) 
-  matrix.thresholds <- cbind(var.thresholds, min.val, max.val)
-  matrix.thresholds <- as.data.frame(matrix.thresholds, class = c("character","numeric","numeric"))
-  colnames(matrix.thresholds) <- c("Variable", "Min", "Max")
-  matrix.thresholds = na.omit(matrix.thresholds)  
-  
-  val.min <- character(dim(matrix.thresholds)[1])
-  val.max <- character(dim(matrix.thresholds)[1])
-  
-  
-  for(i in 1:dim(matrix.thresholds)[1]){
-    
-    if(as.numeric(as.matrix(matrix.thresholds)[i,2]) < min(object[colnames(object) ==  as.character(matrix.thresholds[i,1])])){
-      val.min[i] <-  as.character(matrix.thresholds[i,1])
-    }
-    if(as.numeric(as.matrix(matrix.thresholds)[i,3]) > max(object[colnames(object) ==  as.character(matrix.thresholds[i,1])])){
-      val.max[i] <-  as.character(matrix.thresholds[i,1])
-      
-    }
-    
-    
-  }
-  
-  val.min <- val.min[val.min!=""]
-  val.max <- val.max[val.max!=""]
-  
-  
-  if(length(val.min) == 0 & length(val.max) == 0){
-    
-    ## Extrac subset of data base from thresholds
-    data.var.thresholds <- as.data.frame(object[,is.element(colnames(object), matrix.thresholds$Variable)])
-    rownames(data.var.thresholds) <- object.complete$n_acces
-    n_acces_subset <- matrix(NA, nrow = dim(object)[1], ncol = length(var.thresholds))
-    colnames(n_acces_subset) <- as.character(matrix.thresholds[,1])
-    
-    w<-1
-    while(w <= dim(matrix.thresholds)[1]){  
-      sub <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
-      data.var.thresholds <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
-      n_acces_subset[1:length(rownames(sub)),w] <- rownames(sub)
-      w <- w +1
-    }
-    
-    n_acces_subset <- as.numeric(na.omit(n_acces_subset[,dim(matrix.thresholds)[1]]))
-    data.var.thresholds.final <- object.complete[is.element(object.complete$n_acces, n_acces_subset),]
-    Data.Thresholds <- data.var.thresholds.final
-    data.var.thresholds.final <- data.var.thresholds.final[,-1]
-    data.var.thresholds.final <- data.var.thresholds.final[,1:7]
-    d.thresholds = sapply(data.var.thresholds.final, des.continuos)
-    row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
-    d.thresholds = as.table(d.thresholds)
-    names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue(nom_data)))
-    
-    
-    DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
-    write.csv(d.thresholds, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisThresholds.csv", sep=""))
-    write.csv(Data.Thresholds, file = paste(getwd(),"/Results/Data.Thresholds.csv", sep=""), row.names = FALSE)
-    
-    print(d.thresholds)
-    
-    output <- list("Threshold.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
-    
-    cat("\n")
-    cat("\n")
-    cat(paste("Process completed................."))     
-    cat("\n")
-    return(output)
-    
-    
-  }
-  
-  var1; var2; var3; var4; var5; var6; var7; var8; var9; var10
-  min.var1; min.var2; min.var3; min.var4; min.var5; min.var6; min.var7; min.var8; min.var9; min.var10
-  max.var1; max.var2; max.var3; max.var4; max.var5; max.var6; max.var7; max.var8; max.var9; max.var10
-  
-  
-  
-}
 
 
 
@@ -448,9 +152,9 @@ DialogSelectOptimization <- function(object){
   
   ncon <- as.numeric(svalue(ncon)) 
   object.optimization <- object[,-1]
-  object.continuos <- object.optimization[,1:ncon]
+  object.continuous <- object.optimization[,1:ncon]
   object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
-  names.continuos <- names(object.continuos)
+  names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
   Nsim <- as.numeric(svalue(Nsim))
   pcategory.v1 <<- 0
@@ -482,19 +186,19 @@ DialogSelectOptimization <- function(object){
   lytg4[5,2] = glabel("Objective function: ",  container =lytg4)
   lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4)
   
-  lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[7,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[8,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[9,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
-  lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuos),  container = lytg4))
+  lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[10,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4))
   lytg4[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
   
@@ -579,41 +283,9 @@ number.percent <- function(h,...){
   
 }
 
-number.solution <- function(h,...){
-  Nsim <- as.numeric(svalue(Nsim))
-  if(Nsim > 0 & Nsim <= 1000000){
-    DialogBox(paste("The number of solution is: ", Nsim, sep=" "))
-  }else{DialogBox("Error in the percentage of solutions")}
-  Nsim
-  
-}
-
-
-number.final <- function(h,...){## Function to selected number of final accessions
-  object = eval(parse(text=svalue(nom_data)))
-  nfinal = as.numeric(svalue(nfinal))
-  
-  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-    Data.Thresholds <- read.csv(paste(getwd(), "/Results/Data.Thresholds.csv", sep=""))
-    Data <- Data.Thresholds
-  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
-    Data <- object
-  } 
-  
-  if(nfinal <= dim(Data)[1] & nfinal > 0){
-    DialogBox(paste("Size of the final subset of the accessions: ", nfinal, sep=" "))
-  }else{DialogBox("Error in the size of the final subset")}
-  
-  nfinal
-}
-
-
 optimization <- function(data, option1, option2, num.access){ ## calculate 'optimization'
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
-  
-  
-  
   
   ##6)  Sampling without replacement of random combinations
   subset0 <- sample(data[,1],num.access, replace = F)
@@ -627,11 +299,8 @@ optimization <- function(data, option1, option2, num.access){ ## calculate 'opti
     
     name.var.func.con <- rep(NA,dim(option1)[1])
     val.var.func.con <- rep(NA,dim(option1)[1]) 
-    
-    
-    
-    
-    for(i in 1:dim(option1)[1]){ 
+
+	for(i in 1:dim(option1)[1]){ 
       
       if(option1[i,2] == "CV: Maximize coefficient of variation"){
         data1 <- data0[is.element(data$n_acces,subset0),as.character(option1[i,1])]
@@ -777,10 +446,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   
 }
 
-
-
 MAXVAR.type.opt <- function(output.opt0){
-  
   
   Nsim <- as.numeric(svalue(Nsim))
   npercen <- as.numeric(svalue(npercen))
@@ -799,19 +465,15 @@ MAXVAR.type.opt <- function(output.opt0){
   ##9)  Calculation of mean value of the objective functions for each subset   
   mean.result <- list("standardized.means" = apply(result, MARGIN = 1, FUN = mean),"accessions"=t(sapply(output.opt0, "[[", 2)))
   
-  
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
   
   pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
-  
   
   cat("\n")
   result.mean.acces <- mean.result$accessions[pos,]
   colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
   rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
-  
-  
-  
+
   paste("SubsetOfAccessionsWith",npercen,"%","HighestStandardizedMeanValues",sep="")
   cat(paste("#Subset of accessions with ",npercen,"%"," highest standardized mean values#",sep=""))
   cat("\n")
@@ -834,9 +496,8 @@ MAXVAR.type.opt <- function(output.opt0){
   
   write.csv(result.scale, file = paste(getwd(),"/Results/HighestStandardizedValuesOfSubset_MV.csv", sep=""),
             row.names = FALSE)
-  
-  
-  ##11)  Selection of final set of optimal solutions: 
+
+##11)  Selection of final set of optimal solutions: 
   
   ## Generate all pairs of solutions
   c <- t(combn(as.character(result.scale[,1]),2)) 
@@ -862,11 +523,7 @@ MAXVAR.type.opt <- function(output.opt0){
   pos.nfinal <- order(variance[,3],decreasing=T)
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
-  
-  
-  
-  
-  
+
   if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
     Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
     DataFinal <- Data.Thresholds
@@ -889,12 +546,6 @@ MAXVAR.type.opt <- function(output.opt0){
   ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "Folder already exists 'Results' ")
   write.csv(final.subset.max.var, file = paste(getwd(),"/Results/subset_optimal_solution_by_MaXVAR","_Solution(",pos.max.var,")",".csv", sep=""),
             row.names = FALSE)
-  
-  
-  
-  
-  
-  
 }
 
 
@@ -909,13 +560,10 @@ PCA.type.opt <- function(output.opt0){
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
   colnames(result) <- as.character(output.opt0[[1]]$names)
   
-  
   ##Drop columns with NA's
   result <- as.data.frame(result)
   result <- result[sapply(result, function(x) !all(is.na(x)))]
-  
-  
-  
+
   mean.result <- list("standardized.means" = apply(result, MARGIN = 1, FUN = mean),"accessions"=t(sapply(output.opt0, "[[", 2)))
   pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
   result.mean.acces <- mean.result$accessions[pos,]
@@ -924,7 +572,6 @@ PCA.type.opt <- function(output.opt0){
   
   result.scale <- result[pos,]
   result.scale <- cbind("solutions" = pos,result.scale)
-  
   
   ##12)  PCA of optimal solutions Present the set of solutions in a PCA   
   
@@ -944,7 +591,6 @@ PCA.type.opt <- function(output.opt0){
     
     ##Export data for PCA analysis
     write.csv(result.scale, file = paste(getwd(),"/Results/HighestStandardizedValuesOfSubset_PCA.csv", sep=""), row.names = FALSE)
-    
     
     cat("\n")
     cat("\n")
@@ -972,7 +618,8 @@ PCA.type.opt <- function(output.opt0){
       cat("\n")
       cat("List of solutions \n")
       print(as.numeric(label.row))
-    }else if(dim(result.scale.pca)[2] > 2){
+
+  } else if(dim(result.scale.pca)[2] > 2){
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 3, center = FALSE, scale = FALSE)
       
       DialogBox(paste("The graphics should be saved in",getwd(),"/Results"))
@@ -1014,17 +661,12 @@ PCA.type.opt <- function(output.opt0){
     }  
     close(ProgressBar)
     
-    
-    
     nsol.pca <- SelectSolution(label.row)
     nsol.pca <-  as.numeric(svalue(nsol.pca))
     
     cat("\n")
     
     print(nsol.pca)
-    
-    
-    
     
     if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
       Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
@@ -1034,8 +676,7 @@ PCA.type.opt <- function(output.opt0){
     } 
     
     final.subset.pca <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.pca,]),]
-    
-    
+     
     ##Selection of preferred set by PCA   
     cat("\n")
     cat("\n")
@@ -1055,11 +696,6 @@ PCA.type.opt <- function(output.opt0){
     cat(paste("Processing completed.................")) 
     
   }
-  
-  
-  
-  
-  
 }  
 
 WSM.type.opt <- function(output.opt0){
@@ -1096,7 +732,6 @@ WSM.type.opt <- function(output.opt0){
   weight4n <- ri4n/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
   weight5n <- ri5n/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
   
-  
   weights <- c(weight1c, weight2c, weight3c, 
                weight4c, weight5c, weight1n,
                weight2n, weight3n, weight4n, weight5n)
@@ -1110,7 +745,6 @@ WSM.type.opt <- function(output.opt0){
   print(round(weights,2))
   cat("\n")
   cat("\n")
-  
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -1139,7 +773,6 @@ WSM.type.opt <- function(output.opt0){
   print(result.mean.acces)
   cat("\n")
   cat("\n")
-  
   
   cat("\n")
   result.scale <- result[pos,]
@@ -1182,7 +815,6 @@ WSM.type.opt <- function(output.opt0){
   
   final.subset.wsm <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.wsm,]),]
   
-  
   ##Selection of preferred set by WSM  
   cat("\n")
   cat("\n")
@@ -1203,11 +835,8 @@ WSM.type.opt <- function(output.opt0){
   cat(paste("Process completed.................")) 
 }
 
-
 ## Cluster Function
 fcluster <- function(Data.acces, data.mean.result, data.optimization){
-  
-  
   
   row.names.cluster <- data.optimization[,1]
   data.optimization <- data.optimization[,-1]
@@ -1441,123 +1070,4 @@ DTree.type.opt <- function(output.opt0){
 if(file.exists(paste(getwd(),"/Results/RI.csv", sep = "")) == TRUE){
   unlink(paste(getwd(),"/Results/RI.csv", sep = ""))
 }  
-
-
-##GUI---------------------------------------------------------------------------------------------------------------------------
-
-## Principal window
-win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
-nb <- gnotebook( container = win, expand = T, tab.pos = 2)
-
-
-##Load dataset
-lyt1 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Load dataset", expand = T) 
-lyt1[1,1:3] = (g = gframe("Load dataset",  container = lyt1, horizontal = T))
-lytgb1 = glayout(homogeneous = F, container = g, spacing = 1, expand = T) 
-lytgb1[1,1] = (glabel = (""))
-lytgb1[2,1] = (h = gbutton("Change directory",  container = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
-lytgb1[3,1] = (glabel = (""))
-lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){data_set<<-load_dataset()})
-
-
-
-##Descriptive analysis
-lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
-lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",cont=lyt2,expand=T,horizontal=F))
-lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
-lytg2[1,1] = glabel("Dataset for analysis  ",cont=lytg2)
-lytg2[1,2] = (nom_data = gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
-lytgb1[3,1] = (glabel = (""))
-lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-lytg2[4,2] = (ncon <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
-lytg2[5,1] = glabel("Number of categorical variables: ",cont=lytg2)
-lytg2[5,2] = (ncat <-gedit("",cont=lyt2,width = 10,initial.msg=""))
-
-
-lytg2[6,1]=(glabel=(""))
-lytg2[7,1]=(glabel=(""))
-
-lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",cont=lytg2, handler=function(h,...){print(descriptives.continuos(eval(parse(text=svalue(nom_data)))))})
-lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",cont=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(nom_data)))))})
-
-lytg2[11,1]=(glabel=(""))
-lytg2[12,1]=(glabel=(""))
-
-lytg2[13,1] = glabel("Level of correlation: ",cont=lytg2)
-lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, cont=lytg2)) 
-lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(nom_data)))))})
-
-lytg2[15,1]=(glabel=(""))
-lytg2[16,1]=(glabel=(""))
-
-lytg2[17,1] = glabel("Number accessions in final dataset: ",  container = lytg2)
-lytg2[17,2] = (num.access <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
-lytg2[18,1] = gbutton("Select number accessions",  container = lyt2, expand=F,
-                      handler = function(h,...){print(number.access())})
-
-lytg2[19,1]=(glabel=(""))
-lytg2[20,1]=(glabel=(""))
-
-lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
-lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThreholds(eval(parse(text=svalue(nom_data))))})
-
-
-##Selection of preferred analysis
-lyt5 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)
-lyt5[1,1:10] = (g5 = gframe("Type selection of preferred", container = lyt5, expand = T, horizontal = F))
-lytg5 = glayout(homogeneous = F,  container = g5, spacing = 1, expand = T) 
-
-lytg5[1,1] = glabel("Enter the number of solutions: ",  container = lytg5)
-lytg5[1,2] = (Nsim = gedit("10000",  container = lytg5))
-lytg5[2,1] = gbutton("Select the number of solutions",  container = lytg5, expand=F,
-                     handler = function(h,...){print(number.solution())})
-
-lytg5[3,1] = (glabel=(""))
-lytg5[4,1] = (glabel=(""))
-
-lytg5[5,1] = glabel("Optimization analysis: ",  container = lytg5)
-lytg5[6,1] = gbutton("Select variables",  container = lytg5, expand=F,
-                     handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue(nom_data))))})
-
-lytg5[7,1] = (glabel=(""))
-lytg5[8,1] = (glabel=(""))
-
-lytg5[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg5)
-lytg5[9,2] = (npercen = gedit("1",  container = lytg5))
-lytg5[10,1] = gbutton("Select the percentage of solutions",  container = lytg5, expand=F,
-                      handler = function(h,...){print(number.percent())})
-
-lytg5[11,1] = (glabel=(""))
-lytg5[12,1] = (glabel=(""))
-
-lytg5[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :",  container = lytg5)
-lytg5[13,2] = (nfinal = gedit("10",  container = lytg5))
-lytg5[14,1] = gbutton("Select the number of final solutions",  container = lytg5, expand=F,
-                      handler = function(h,...){print(number.final())})
-
-lytg5[15,1] = (glabel=(""))
-lytg5[16,1] = (glabel=(""))
-
-lytg5[17,1] = glabel("Select the type of selection of preferred: ",  container = lytg5, horizontal = F)
-
-items.option <- c(" ", "Maximum variation", "Principal components",
-                  "Weighted sum model", "Decision tree")
-
-lytg5[18,1] = (option.preferred <- gdroplist(items.option,  container = lytg5))
-lytg5[18,2] = (btn <- gbutton("Run",  container = lytg5))
-
-addHandlerChanged(btn, handler = function(h,...){
-  if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(output.opt)}
-  if(svalue(option.preferred) == "Principal components"){PCA.type.opt(output.opt)}
-  if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(output.opt)}
-  if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(output.opt)}
-})
-
-
-
-## Principal windows
-gwelcome = ggroup(cont=nb,horizontal = F,label="About the Application")
-gimage("Explora_Logo.png", dirname = script_dir, size = "button",  container = gwelcome) 
-
-visible(win) <- TRUE 
 

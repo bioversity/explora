@@ -5,3 +5,5 @@ data/\.gitignore
 man/\.gitignore
 \.git
 \.settings
+^.*\.Rproj$
+^\.Rproj\.user$
