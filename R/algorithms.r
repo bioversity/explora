@@ -5,6 +5,13 @@
 #------------------------------------------------------------------------------------------------------------------ 
 #' @include util.r
 
+require(vegan) 
+require(ade4)
+require(plyr)
+require(cluster)
+require(grid)
+require(gridExtra)
+
 des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)
   average = round(mean(object, na.rm=T),3)
@@ -22,13 +29,13 @@ des.continuous <- function(object){## Descriptive analysis for continuous variab
 
 descriptives.continuous = function(object){## Used to function 'des.continuous' 
   
-  ncon <- as.numeric(svalue(ncon))
+  ncon <- as.numeric(svalue(numContVar(analysis)))
   object <- object[,-1]
   object <- object[,1:ncon]
   d = sapply(object, des.continuous)
   row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   d = as.table(d)
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue(nom_data)))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
@@ -51,14 +58,14 @@ des.nominal <- function(object){## Descriptive analysis for nominal variables
 
 
 descriptives.nominal=function(object){## Used to function 'des.nominal'
-  ncon <-as.numeric(svalue(ncon))
+  ncon <-as.numeric(svalue(numContVar(analysis)))
   ncat <-as.numeric(svalue(ncat))
   object <- object[,-1]
   object <- object[,(ncon+1):dim(object)[2]]
   d=lapply(object, des.nominal)
   d=ldply(d, data.frame)
   colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue(nom_data)))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
@@ -71,7 +78,7 @@ descriptives.nominal=function(object){## Used to function 'des.nominal'
 }
 
 correlation <- function(object){## Correlation analysis
-  ncon <-as.numeric(svalue(ncon))
+  ncon <-as.numeric(svalue(numContVar(analysis)))
   
   object <- object[,-1]
   object <- object[,1:ncon]
@@ -88,7 +95,7 @@ correlation <- function(object){## Correlation analysis
   
   correlation = cbind(correlation, direction)
   colnames(correlation) <- c("Variable 1", "Variable 2", "Correlation", "Direction") 
-  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue(nom_data)))
+  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
   cat("\n")
   cat("\n")
   
@@ -148,13 +155,13 @@ DialogSelectOptimization <- function(object){
   
   f.items.nom <- c("NA", "SHANNON: Maximize Shannon index", "MAX.PROP: Maximize proportion")
   
-  ncon <- as.numeric(svalue(ncon)) 
+  ncon <- as.numeric(svalue(numContVar(analysis))) 
   object.optimization <- object[,-1]
   object.continuous <- object.optimization[,1:ncon]
-  object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
+  object.nominal <- object.optimization[,ncon+1):dim(object.optimization)[2]]
   names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
-  Nsim <- as.numeric(svalue(Nsim))
+  nsoln <- as.numeric(svalue(numberSoln(analysis)))
   pcategory.v1 <<- 0
   pcategory.v2 <<- 0
   pcategory.v3 <<- 0
@@ -269,15 +276,12 @@ DialogSelectOptimization <- function(object){
   
 }
 
-
-
-
 number.percent <- function(h,...){
-  npercen <- as.numeric(svalue(npercen))
-  if(npercen > 0 & npercen <= 100){
-    DialogBox(paste("The percentage of solutions is: ", npercen, "%", sep=" "))
+  npercent <- as.numeric(svalue(percentSoln(analysis)))
+  if( npercent > 0 & npercent <= 100){
+    DialogBox(paste("The percentage of solutions is: ", npercent, "%", sep=" "))
   }else{DialogBox("Error in the percentage of solutions")}
-  npercen 
+  return(npercent) 
   
 }
 
@@ -376,10 +380,10 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
-  object = eval(parse(text=svalue(nom_data)))
-  ncon <- as.numeric(svalue(ncon)) 
+  object = eval(parse(text=svalue(dataset_selection(analysis))))
+  ncon <- as.numeric(svalue(numContVar(analysis))) 
   ncat <- as.numeric(svalue(ncat)) 
-  Nsim <- as.numeric(svalue(Nsim)) 
+  nsoln <- as.numeric(svalue(numberSoln(analysis))) 
   num.access <- as.numeric(svalue(num.access)) 
   
   varop1c <- svalue(varop1c)
@@ -433,10 +437,10 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   output.opt0 <- list()
   
   ## Creates the progress bar
-  ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = Nsim, width = 500)
-  for(j in 1:Nsim){
+  ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
+  for(j in 1:nsoln){
     output.opt0[[j]] <- optimization(Data, option.objective.con, option.objective.nom, num.access)
-    setWinProgressBar(ProgressBar, j, title=paste(round(j/Nsim*100, 0), "% progress"))
+    setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "% progress"))
   }
   close(ProgressBar)
   
@@ -446,11 +450,11 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
 
 MAXVAR.type.opt <- function(output.opt0){
   
-  Nsim <- as.numeric(svalue(Nsim))
-  npercen <- as.numeric(svalue(npercen))
+  nsoln <- as.numeric(svalue(numberSoln(analysis)))
+  npercent <- as.numeric(svalue(percentSoln(analysis)))
   nfinal <- as.numeric(svalue(nfinal))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text=svalue(nom_data)))
+  object <- eval(parse(text=svalue(dataset_selection(analysis))))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -465,22 +469,22 @@ MAXVAR.type.opt <- function(output.opt0){
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
   
-  pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.acces <- mean.result$accessions[pos,]
   colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
   rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
 
-  paste("SubsetOfAccessionsWith",npercen,"%","HighestStandardizedMeanValues",sep="")
-  cat(paste("#Subset of accessions with ",npercen,"%"," highest standardized mean values#",sep=""))
+  paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues",sep="")
+  cat(paste("#Subset of accessions with ",npercent,"%"," highest standardized mean values#",sep=""))
   cat("\n")
   print(result.mean.acces)
   cat("\n")
   cat("\n")
   
   write.csv(result.mean.acces, 
-            file = paste(getwd(),"/Results/","SubsetOfAccessionsWith",npercen,"%","HighestStandardizedMeanValues.csv", sep=""))
+            file = paste(getwd(),"/Results/","SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues.csv", sep=""))
   
   cat("\n")
   result.scale <- result[pos,]
@@ -549,10 +553,10 @@ MAXVAR.type.opt <- function(output.opt0){
 
 PCA.type.opt <- function(output.opt0){
   
-  Nsim <- as.numeric(svalue(Nsim))
-  npercen <- as.numeric(svalue(npercen))
+  nsoln <- as.numeric(svalue(numberSoln(analysis)))
+  npercent <- as.numeric(svalue(percentSoln(analysis)))
   nfinal <- as.numeric(svalue(nfinal))
-  object <- eval(parse(text=svalue(nom_data)))
+  object <- eval(parse(text=svalue(dataset_selection(analysis))))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -563,7 +567,7 @@ PCA.type.opt <- function(output.opt0){
   result <- result[sapply(result, function(x) !all(is.na(x)))]
 
   mean.result <- list("standardized.means" = apply(result, MARGIN = 1, FUN = mean),"accessions"=t(sapply(output.opt0, "[[", 2)))
-  pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   result.mean.acces <- mean.result$accessions[pos,]
   colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
   rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
@@ -698,10 +702,10 @@ PCA.type.opt <- function(output.opt0){
 
 WSM.type.opt <- function(output.opt0){
   
-  Nsim <- as.numeric(svalue(Nsim))
-  npercen <- as.numeric(svalue(npercen))
+  nsoln <- as.numeric(svalue(numberSoln(analysis)))
+  npercent <- as.numeric(svalue(percentSoln(analysis)))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue(nom_data)))
+  object <- eval(parse(text = svalue(dataset_selection(analysis))))
   
   ## Read ranking 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
@@ -758,15 +762,15 @@ WSM.type.opt <- function(output.opt0){
   
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
-  pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.acces <- mean.result$accessions[pos,]
   colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
   rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
   
-  paste("SubsetOfAccessionsWith",npercen,"%","HighestStandardizedMeanValues",sep="")
-  cat(paste("#Subset of accessions with ",npercen,"%"," highest standardized mean values#",sep=""))
+  paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues",sep="")
+  cat(paste("#Subset of accessions with ",npercent,"%"," highest standardized mean values#",sep=""))
   cat("\n")
   print(result.mean.acces)
   cat("\n")
@@ -889,10 +893,10 @@ TableChart <- function(out.solution, i){
 
 DTree.type.opt <- function(output.opt0){
   
-  Nsim <- as.numeric(svalue(Nsim))
-  npercen <- as.numeric(svalue(npercen))
+  nsoln <- as.numeric(svalue(numberSoln(analysis)))
+  npercent <- as.numeric(svalue(percentSoln(analysis)))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue(nom_data)))
+  object <- eval(parse(text = svalue(dataset_selection(analysis))))
   
   ## Read ranking importance 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
@@ -946,7 +950,7 @@ DTree.type.opt <- function(output.opt0){
   
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
-  pos <- order(mean.result[[1]],decreasing=T)[1:(Nsim*(npercen/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.acces <- mean.result$accessions[pos,]

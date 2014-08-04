@@ -5,8 +5,11 @@
 #
 # Explora Graphical User Interface (based on RGtk2)
 #------------------------------------------------------------------------------------------------------------------ 
-#' @include loader.r algorithms.r
-#' 
+#' @include init.r dialogs.r loader.r util.r algorithms.r
+
+require(gWidgets) 
+require(gWidgetsRGtk2) 
+
 #' @name explora
 #' @title explora
 #' @description Bioversity/CCAFS Seeds4Needs Explora germplasm selection tool
@@ -35,17 +38,15 @@ explora <- function() {
 	lytgb1[3,1] = (glabel = (""))
 	lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){data_set<<-load_dataset()})
 	
-	
-	
 	##Descriptive analysis
 	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
 	lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",cont=lyt2,expand=T,horizontal=F))
 	lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
 	lytg2[1,1] = glabel("Dataset for analysis  ",cont=lytg2)
-	lytg2[1,2] = (nom_data = gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
+	lytg2[1,2] = ( dataset_selection(analysis) = gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
 	lytgb1[3,1] = (glabel = (""))
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-	lytg2[4,2] = (ncon <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
+	lytg2[4,2] = (numContVar(analysis) <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
 	lytg2[5,1] = glabel("Number of categorical variables: ",cont=lytg2)
 	lytg2[5,2] = (ncat <-gedit("",cont=lyt2,width = 10,initial.msg=""))
 	
@@ -53,15 +54,15 @@ explora <- function() {
 	lytg2[6,1]=(glabel=(""))
 	lytg2[7,1]=(glabel=(""))
 	
-	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",cont=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue(nom_data)))))})
-	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",cont=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(nom_data)))))})
+	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",cont=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",cont=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(dataset_selection(analysis))))))})
 	
 	lytg2[11,1]=(glabel=(""))
 	lytg2[12,1]=(glabel=(""))
 	
 	lytg2[13,1] = glabel("Level of correlation: ",cont=lytg2)
 	lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, cont=lytg2)) 
-	lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(nom_data)))))})
+	lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(dataset_selection(analysis))))))})
 	
 	lytg2[15,1]=(glabel=(""))
 	lytg2[16,1]=(glabel=(""))
@@ -75,7 +76,7 @@ explora <- function() {
 	lytg2[20,1]=(glabel=(""))
 	
 	lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
-	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue(nom_data))))})
+	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue(dataset_selection(analysis)))))})
 	
 	
 	##Selection of preferred analysis
@@ -84,7 +85,7 @@ explora <- function() {
 	lytg5 = glayout(homogeneous = F,  container = g5, spacing = 1, expand = T) 
 	
 	lytg5[1,1] = glabel("Enter the number of solutions: ",  container = lytg5)
-	lytg5[1,2] = (Nsim = gedit("10000",  container = lytg5))
+	lytg5[1,2] = (numberSoln(analysis) = gedit("10000",  container = lytg5))
 	lytg5[2,1] = gbutton("Select the number of solutions",  container = lytg5, expand=F,
 			handler = function(h,...){print(number.solution())})
 	
@@ -93,13 +94,13 @@ explora <- function() {
 	
 	lytg5[5,1] = glabel("Optimization analysis: ",  container = lytg5)
 	lytg5[6,1] = gbutton("Select variables",  container = lytg5, expand=F,
-			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue(nom_data))))})
+			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue(dataset_selection(analysis)))))})
 	
 	lytg5[7,1] = (glabel=(""))
 	lytg5[8,1] = (glabel=(""))
 	
 	lytg5[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg5)
-	lytg5[9,2] = (npercen = gedit("1",  container = lytg5))
+	lytg5[9,2] = (percentSoln(analysis) = gedit("1",  container = lytg5))
 	lytg5[10,1] = gbutton("Select the percentage of solutions",  container = lytg5, expand=F,
 			handler = function(h,...){print(number.percent())})
 	

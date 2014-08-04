@@ -8,6 +8,9 @@
 
 #' @include init.r
 
+require(gWidgets) 
+require(gWidgetsRGtk2) 
+
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	
 	w<- gwindow("Alert",width=100,height=100)
@@ -65,7 +68,7 @@ SelectSolution <- function(solutions){## Function to select preference category
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds
 	
 	object.thresholds <- object
-	ncon <- as.numeric(svalue(ncon)) 
+	ncon <- as.numeric(svalue(numContVar(analysis))) 
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
 	object.complete <- object
@@ -201,7 +204,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = sapply(data.var.thresholds.final, des.continuous)
 		row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
 		d.thresholds = as.table(d.thresholds)
-		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue(nom_data)))
+		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue(dataset_selection(analysis))))
 		
 		DialogBox(paste("The results should be saved in",getwd(),"/Results"))
 

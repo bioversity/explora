@@ -9,7 +9,7 @@
 
 number.access <- function(h,...){## Function for selection of number of accessions in final set 
 	
-	object = eval(parse(text=svalue(nom_data)))
+	object = eval(parse(text=svalue(dataset_selection(analysis))))
 	num.access <- as.numeric(svalue(num.access))
 	
 	if(num.access <= dim(object)[1] & num.access > 0){
@@ -22,16 +22,16 @@ number.access <- function(h,...){## Function for selection of number of accessio
 }
 
 number.solution <- function(h,...){
-	Nsim <- as.numeric(svalue(Nsim))
-	if(Nsim > 0 & Nsim <= 1000000){
-		DialogBox(paste("The number of solution is: ", Nsim, sep=" "))
+	nsoln <- as.numeric(svalue(numberSoln(analysis)))
+	if(nsoln > 0 & nsoln <= 1000000){
+		DialogBox(paste("The number of solution is: ", nsoln, sep=" "))
 	}else{DialogBox("Error in the percentage of solutions")}
 
-	return(Nsim) 
+	return(nsoln) 
 }
 
 number.final <- function(h,...){## Function to selected number of final accessions
-	object = eval(parse(text=svalue(nom_data)))
+	object = eval(parse(text=svalue(dataset_selection(analysis))))
 	nfinal = as.numeric(svalue(nfinal))
 	
 	if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
