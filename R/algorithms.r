@@ -158,7 +158,7 @@ DialogSelectOptimization <- function(object){
   ncon <- as.numeric(svalue(numContVar(analysis))) 
   object.optimization <- object[,-1]
   object.continuous <- object.optimization[,1:ncon]
-  object.nominal <- object.optimization[,ncon+1):dim(object.optimization)[2]]
+  object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
   names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
   nsoln <- as.numeric(svalue(numberSoln(analysis)))
