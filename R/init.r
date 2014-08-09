@@ -6,6 +6,8 @@
 # Initialize Explora Environment
 #------------------------------------------------------------------------------------------------------------------ 
 
+require(gWidgets) 
+
 ## Clean work spaces
 rm(list=ls())
 
