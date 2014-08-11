@@ -1,0 +1,13 @@
+# Clean up release from github
+#
+.gitattributes export-ignore
+.RData  export-ignore
+.Rhistory  export-ignore
+.gitignore  export-ignore
+.project  export-ignore
+R/.Rhistory  export-ignore
+R/.gitignore  export-ignore
+man/.gitignore  export-ignore
+.Rproj.user  export-ignore
+.git  export-ignore
+.settings  export-ignore
