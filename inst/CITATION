@@ -4,11 +4,11 @@ citEntry(entry="Article",
   title = "Explora: a multiple-trait selection tool to identify promising crop germplasm for food security and high-value product development",
   author = personList(
             as.person("van Zonneveld M"),
-            as.person("Ospina J")
-            as.person("Petz M")
-            as.person("Meckelmann S")
-            as.person("Rios L")
-            as.person("Libreros D")
+            as.person("Ospina J"),
+            as.person("Petz M"),
+            as.person("Meckelmann S"),
+            as.person("Rios L"),
+            as.person("Libreros D"),
             as.person("Ramirez M")
   ),
   journal = "Under preparation",

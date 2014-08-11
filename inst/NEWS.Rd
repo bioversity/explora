@@ -16,7 +16,7 @@
 
     \itemize{
     
-      \item \code{explora()} is the function entry point for the Explora tool.
+      \item \code{workbench()} is the function entry point for the Explora tool.
 
     }
 

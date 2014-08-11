@@ -24,20 +24,20 @@ library ("gWidgetsRGtk2")
 #' @importFrom gWidgets visible
 
 
-#' @name explora
-#' @title explora
+#' @name workbench
+#' @title Explora germplasm selection tool
 #' @description Bioversity/CCAFS Seeds4Needs Explora germplasm selection tool
 #' @details  The main purpose of Explora is to select a set of promising accessions 
 #' from genebank collections that meet the interests of the user. Explora allows 
 #' 1) selection of germplasm from big characterization and/or evaluation data sets; 
 #' 2) consideration of more than one trait and trade-offs between different traits of interests; and 
 #' 3) maximization of diversity for specific traits of interests.
-#' @aliases explora
+#' @aliases workbench
 #' @author Maarten van Zonneveld,  Johannes Ospina and Richard Bruskiewich
-#' @export explora
+#' @export workbench
 #' @examples 
-#' explora()
-explora <- function() {
+#' workbench()
+workbench <- function() {
 	
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
@@ -90,7 +90,6 @@ explora <- function() {
 	
 	lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
 	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue(dataset_selection(analysis)))))})
-	
 	
 	##Selection of preferred analysis
 	lyt5 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)

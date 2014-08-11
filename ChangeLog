@@ -4,6 +4,14 @@ items to be listed in this document will be the major changes to the
 Explora package. For fine grained changes, please see the project
 Git commit graphs at https://github.com/bioversity/germplasm-selection-tool.
 
-2014-07-18  Richard Bruskiewich  <richard.bruskiewich@cropinformatics.com>
+2014-11-18  v0.0.3 - Richard Bruskiewich  <richard.bruskiewich@cropinformatics.com>
+
+* Initial "alpha" release of the package for further testing.
+
+2014-09-18  v0.0.2 - Richard Bruskiewich  <richard.bruskiewich@cropinformatics.com>
+
+* Cleaned up git archive export. Some package development changes, but still not ready.
+
+2014-07-18  v0.0.1 - Richard Bruskiewich  <richard.bruskiewich@cropinformatics.com>
 
 * Initial baseline Explora CRAN package structure designed and implemented.

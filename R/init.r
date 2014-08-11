@@ -10,7 +10,8 @@
 # what am I cleaning here? Is it necessary?
 rm(list=ls())
 
-#' @import gWidgetsRGtk2 
+#' @import gWidgetsRGtk2
+library ("gWidgetsRGtk2")
 
 ## select tools for GUI
 options("guiToolkit"="RGtk2")
