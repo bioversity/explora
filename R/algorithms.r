@@ -5,12 +5,7 @@
 #------------------------------------------------------------------------------------------------------------------ 
 #' @include util.r
 
-require(vegan) 
-require(ade4)
-require(plyr)
-require(cluster)
-require(grid)
-require(gridExtra)
+#' @import cluster ade4 grid gridExtra 
 
 des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)
@@ -124,12 +119,7 @@ correlation <- function(object){## Correlation analysis
   
 }
 
-
-
-
-
-
-
+#' @importFrom gWidgets gdroplist
 
 select.functions <- function(fitems, f){## Function to select the objective function for nominal variables
   win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
@@ -137,10 +127,6 @@ select.functions <- function(fitems, f){## Function to select the objective func
   function.optimize <- gdroplist(fitems, expand = T, editable = F,  container = g, handler = f)
   visible(win)<-TRUE
 }
-
-
-
-
 
 DialogSelectOptimization <- function(object){
   
@@ -162,11 +148,12 @@ DialogSelectOptimization <- function(object){
   names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
   nsoln <- as.numeric(svalue(numberSoln(analysis)))
-  pcategory.v1 <<- 0
-  pcategory.v2 <<- 0
-  pcategory.v3 <<- 0
-  pcategory.v4 <<- 0
-  pcategory.v5 <<- 0
+  
+  pcategory.v1 <- 0
+  pcategory.v2 <- 0
+  pcategory.v3 <- 0
+  pcategory.v4 <- 0
+  pcategory.v5 <- 0
   
   win <- gbasicdialog("Selection variable for optmization", visible = F , width = 700, height = 450,
                       handler = function(h,...){varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
@@ -193,19 +180,19 @@ DialogSelectOptimization <- function(object){
   
   lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[7,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[8,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[9,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuous),  container = lytg4))
   lytg4[10,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   
   
   lytg4[11,1]=(glabel=(""))
@@ -219,23 +206,23 @@ DialogSelectOptimization <- function(object){
   lytg4[16,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4))
   lytg4[16,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop1n)])))))}}))
-  lytg4[16,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[16,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[17,1] = (varop2n = gdroplist(c("NA",names.nominal),  container = lytg4))
   lytg4[17,2] = (fvarop2n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop2n)])))))}}))
-  lytg4[17,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[17,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[18,1] = (varop3n = gdroplist(c("NA",names.nominal),  container = lytg4))
   lytg4[18,2] = (fvarop3n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop3n)])))))}}))
-  lytg4[18,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[18,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[19,1] = (varop4n = gdroplist(c("NA",names.nominal),  container = lytg4))
   lytg4[19,2] = (fvarop4n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop4n)])))))}}))
-  lytg4[19,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[19,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   lytg4[20,1] = (varop5n = gdroplist(c("NA",names.nominal),  container = lytg4))
   lytg4[20,2] = (fvarop5n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
     if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop5n)])))))}}))
-  lytg4[20,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, cont=lytg4)) 
+  lytg4[20,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
   
   lytg4[21,1]=(glabel=(""))
   lytg4[22,1]=(glabel=(""))
@@ -244,17 +231,13 @@ DialogSelectOptimization <- function(object){
   
   lytg4[25,2] = gbutton("Optimization",  container = lytg4,
                         handler = function(h,...){
-                          output.opt <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
+                          optimization(analysis) <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
                                                         fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
                                                         varop1n, varop2n, varop3n, varop4n, varop5n,
                                                         fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                                                         pcategory.v1, pcategory.v2, pcategory.v3,
                                                         pcategory.v4,pcategory.v5)}) 
-  
-  
-  
-  
-  
+
   visible(win)<-TRUE
   
   RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
@@ -268,12 +251,8 @@ DialogSelectOptimization <- function(object){
   varop1n; varop2n; varop3n; varop4n; varop5n
   fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
   ri1n; ri2n; ri3n; ri4n; ri5n
-  
-  
+
   write.csv(RI, paste(getwd(),"/Results/RI.csv", sep = ""), row.names = FALSE)
-  
-  
-  
 }
 
 number.percent <- function(h,...){
@@ -406,12 +385,12 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   fvarop4n <- svalue(fvarop4n)
   fvarop5c <- svalue(fvarop5c)
   fvarop5n <- svalue(fvarop5n)
+  
   pcategory.v1 <- svalue(pcategory.v1)
   pcategory.v2 <- svalue(pcategory.v2)
   pcategory.v3 <- svalue(pcategory.v3)
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
-  
   
   if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
     Data.Thresholds <- read.csv(paste(getwd(), "/Results/Data.Thresholds.csv", sep=""))

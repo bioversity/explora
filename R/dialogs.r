@@ -8,8 +8,20 @@
 
 #' @include init.r
 
-require(gWidgets) 
-require(gWidgetsRGtk2) 
+library ("gWidgets")
+
+#' @importFrom gWidgets gwindow
+#' @importFrom gWidgets gnotebook
+#' @importFrom gWidgets glayout
+#' @importFrom gWidgets glabel
+#' @importFrom gWidgets gradio
+#' @importFrom gWidgets ginput
+#' @importFrom gWidgets gedit
+#' @importFrom gWidgets gdroplist
+#' @importFrom gWidgets gbutton
+#' @importFrom gWidgets ggroup
+#' @importFrom gWidgets gbasicdialog
+#' @importFrom gWidgets gimage
 
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	
@@ -30,7 +42,7 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 
 DialogBoxDTree <- function(items) {## This function make a dialog box
 	
-	
+	out <- ""
 	w <-  gbasicdialog("", 
 			handler = function(h,...){out <<- svalue(txt)})
 	
@@ -38,31 +50,36 @@ DialogBoxDTree <- function(items) {## This function make a dialog box
 	glabel(" ",  container = w)
 	txt <- gradio(items,  container = w)
 	visible(w, set = T)
-	out
+	return(out)
 	
 }  
 
 
 DialogSelect <- function(items){## Function to select preference category
 	
+  out.category <- ""
+  
 	w <-  gbasicdialog("Select the category of preference", 
 			handler = function(h,...){out.category <<- svalue(txt.category)})
 	
 	txt.category <- gdroplist(items,  container = w)
 	visible(w, set = T)
-	out.category 
+	
+  return(out.category) 
 	
 }
 
-
 SelectSolution <- function(solutions){## Function to select preference category
 	
+  out.solution <- ""
+  
 	w <-  gbasicdialog("Select the solutions", 
 			handler = function(h,...){out.solution <<- svalue(txt.solution)})
 	
 	txt.solution <- gdroplist(solutions,  container = w)
 	visible(w, set = T)
-	out.solution
+  
+	return(out.solution)
 }
 
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds

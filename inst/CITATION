@@ -1,0 +1,23 @@
+citHeader("To cite Explora in publications use the following reference:")
+
+citEntry(entry="Article",
+  title = "Explora: a multiple-trait selection tool to identify promising crop germplasm for food security and high-value product development",
+  author = personList(
+            as.person("van Zonneveld M"),
+            as.person("Ospina J")
+            as.person("Petz M")
+            as.person("Meckelmann S")
+            as.person("Rios L")
+            as.person("Libreros D")
+            as.person("Ramirez M")
+  ),
+  journal = "Under preparation",
+  year = "2014",
+  textVersion = 
+        paste(
+          "van Zonneveld M, Ospina J, Petz M, Meckelmann S, Rios L, Libreros D, Ramirez M.",
+          "(2014)", 
+          "Explora: a multiple-trait selection tool to identify promising crop germplasm for food security and high-value product development.",
+          "Under preparation.",
+          sep="")
+)

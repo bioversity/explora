@@ -6,9 +6,23 @@
 # Explora Graphical User Interface (based on RGtk2)
 #------------------------------------------------------------------------------------------------------------------ 
 #' @include init.r dialogs.r loader.r util.r algorithms.r
+#' 
+library ("gWidgets")
+library ("gWidgetsRGtk2")
 
-require(gWidgets) 
-require(gWidgetsRGtk2) 
+#' @importFrom gWidgets gwindow
+#' @importFrom gWidgets gnotebook
+#' @importFrom gWidgets gframe
+#' @importFrom gWidgets glayout
+#' @importFrom gWidgets glabel
+#' @importFrom gWidgets gbutton
+#' @importFrom gWidgets gdroplist
+#' @importFrom gWidgets gedit
+#' @importFrom gWidgets gspinbutton
+#' @importFrom gWidgets ggroup
+#' @importFrom gWidgets gimage
+#' @importFrom gWidgets visible
+
 
 #' @name explora
 #' @title explora
@@ -27,7 +41,7 @@ explora <- function() {
 	
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
-	nb <- gnotebook( container = win, expand = T, tab.pos = 2)
+	nb  <- gnotebook( container = win, expand = T, tab.pos = 2)
 	
 	##Load dataset
 	lyt1 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Load dataset", expand = T) 
@@ -40,29 +54,28 @@ explora <- function() {
 	
 	##Descriptive analysis
 	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
-	lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",cont=lyt2,expand=T,horizontal=F))
+	lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",container = lyt2,expand=T,horizontal=F))
 	lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
-	lytg2[1,1] = glabel("Dataset for analysis  ",cont=lytg2)
-	lytg2[1,2] = ( dataset_selection(analysis) = gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
+	lytg2[1,1] = glabel("Dataset for analysis  ",container = lytg2)
+	lytg2[1,2] = ( dataset_selection(analysis) <- gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
 	lytgb1[3,1] = (glabel = (""))
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-	lytg2[4,2] = (numContVar(analysis) <-gedit("",cont=lyt2,width = 10,initial.msg="")) 
-	lytg2[5,1] = glabel("Number of categorical variables: ",cont=lytg2)
-	lytg2[5,2] = (ncat <-gedit("",cont=lyt2,width = 10,initial.msg=""))
-	
+	lytg2[4,2] = (numContVar(analysis) <-gedit("",container = lyt2,width = 10,initial.msg="")) 
+	lytg2[5,1] = glabel("Number of categorical variables: ",container = lytg2)
+	lytg2[5,2] = (ncat <-gedit("",container=lyt2,width = 10,initial.msg=""))
 	
 	lytg2[6,1]=(glabel=(""))
 	lytg2[7,1]=(glabel=(""))
 	
-	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",cont=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue(dataset_selection(analysis))))))})
-	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",cont=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",container=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",container=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(dataset_selection(analysis))))))})
 	
 	lytg2[11,1]=(glabel=(""))
 	lytg2[12,1]=(glabel=(""))
 	
-	lytg2[13,1] = glabel("Level of correlation: ",cont=lytg2)
-	lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, cont=lytg2)) 
-	lytg2[14,1] = gbutton("Correlation analysis",cont=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[13,1] = glabel("Level of correlation: ",container=lytg2)
+	lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, container=lytg2)) 
+	lytg2[14,1] = gbutton("Correlation analysis",container=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(dataset_selection(analysis))))))})
 	
 	lytg2[15,1]=(glabel=(""))
 	lytg2[16,1]=(glabel=(""))
@@ -124,16 +137,16 @@ explora <- function() {
 	lytg5[18,2] = (btn <- gbutton("Run",  container = lytg5))
 	
 	addHandlerChanged(btn, handler = function(h,...){
-				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(output.opt)}
-				if(svalue(option.preferred) == "Principal components"){PCA.type.opt(output.opt)}
-				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(output.opt)}
-				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(output.opt)}
+				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(optimization(analysis))}
+				if(svalue(option.preferred) == "Principal components"){PCA.type.opt(optimization(analysis))}
+				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(optimization(analysis))}
+				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(optimization(analysis))}
 			})
 
 	## Principal windows
-	gwelcome = ggroup(cont=nb,horizontal = F,label="About the Application")
+	welcome = ggroup(container = nb,horizontal = F,label="About the Application")
 	
-	gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = gwelcome) 
+	gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
 	
 	visible(win) <- TRUE
 

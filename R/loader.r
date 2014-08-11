@@ -5,7 +5,8 @@
 #
 # Explora Data Loaders
 #------------------------------------------------------------------------------------------------------------------ 
-#' @include init.r
+
+#' @importFrom gWidgets gfile
 
 load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
 
