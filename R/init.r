@@ -36,36 +36,42 @@ image_dir <- paste(script_dir,"../inst/image")
 
 # Global class for application variables
 
+#require("methods")
+
 #' @importClassesFrom gWidgets gCombobox
 #' @importClassesFrom gWidgets guiComponent
 
 setClass( "ExploraAnalysis", 
           representation(
-            dataset_selection = "gCombobox",    # formerly nom_data
-            numContVar        = "guiComponent", # formerly ncon
-            percentSoln       = "guiComponent", # formerly npercen
-            numberSoln        = "guiComponent", # formerly Nsim
-            optimizationResult      = "list"          # output.opt from algorithm$f.optimizationResult
+            dataset_selection  = "gCombobox",    # formerly nom_data
+            numContVar         = "guiComponent", # formerly ncon
+            percentSoln        = "guiComponent", # formerly npercen
+            numberSoln         = "guiComponent", # formerly Nsim
+            optimizationResult = "list",         # output.opt from algorithm$f.optimization
+            currentDataSet     = "data.frame"    # data_set loaded (in gui.R)
           )
         )
 
-setGeneric("dataset_selection", function(x) standardGeneric("dataset_selection"))
-setGeneric("numContVar",        function(x) standardGeneric("numContVar"))
-setGeneric("percentSoln",       function(x) standardGeneric("percentSoln"))
-setGeneric("numberSoln",        function(x) standardGeneric("numberSoln"))
-setGeneric("optimizationResult",      function(x) standardGeneric("optimizationResult"))
+setGeneric("dataset_selection",  function(x) standardGeneric("dataset_selection"))
+setGeneric("numContVar",         function(x) standardGeneric("numContVar"))
+setGeneric("percentSoln",        function(x) standardGeneric("percentSoln"))
+setGeneric("numberSoln",         function(x) standardGeneric("numberSoln"))
+setGeneric("optimizationResult", function(x) standardGeneric("optimizationResult"))
+setGeneric("currentDataSet",     function(x) standardGeneric("currentDataSet"))
 
-setMethod("dataset_selection","ExploraAnalysis",function(x) x@dataset_selection )
-setMethod("numContVar",       "ExploraAnalysis",function(x) x@numContVar )
-setMethod("percentSoln",      "ExploraAnalysis",function(x) x@percentSoln )
-setMethod("numberSoln",       "ExploraAnalysis",function(x) x@numberSoln )
-setMethod("optimizationResult",     "ExploraAnalysis",function(x) x@optimizationResult )
+setMethod("dataset_selection",  "ExploraAnalysis",function(x) x@dataset_selection )
+setMethod("numContVar",         "ExploraAnalysis",function(x) x@numContVar )
+setMethod("percentSoln",        "ExploraAnalysis",function(x) x@percentSoln )
+setMethod("numberSoln",         "ExploraAnalysis",function(x) x@numberSoln )
+setMethod("optimizationResult", "ExploraAnalysis",function(x) x@optimizationResult )
+setMethod("currentDataSet",     "ExploraAnalysis",function(x) x@currentDataSet )
 
-setGeneric("dataset_selection<-", function(x,value) standardGeneric("dataset_selection<-"))
-setGeneric("numContVar<-",        function(x,value) standardGeneric("numContVar<-"))
-setGeneric("percentSoln<-",       function(x,value) standardGeneric("percentSoln<-"))
-setGeneric("numberSoln<-",        function(x,value) standardGeneric("numberSoln<-"))
-setGeneric("optimizationResult<-",      function(x,value) standardGeneric("optimizationResult<-"))
+setGeneric("dataset_selection<-",  function(x,value) standardGeneric("dataset_selection<-"))
+setGeneric("numContVar<-",         function(x,value) standardGeneric("numContVar<-"))
+setGeneric("percentSoln<-",        function(x,value) standardGeneric("percentSoln<-"))
+setGeneric("numberSoln<-",         function(x,value) standardGeneric("numberSoln<-"))
+setGeneric("optimizationResult<-", function(x,value) standardGeneric("optimizationResult<-"))
+setGeneric("currentDataSet<-",     function(x,value) standardGeneric("currentDataSet<-"))
 
 setReplaceMethod(
   "dataset_selection",
@@ -102,6 +108,7 @@ setReplaceMethod(
     return(x)
   }
 )
+
 setReplaceMethod(
   "optimizationResult",
   "ExploraAnalysis",
@@ -110,4 +117,14 @@ setReplaceMethod(
     return(x)
   }
 )
+
+setReplaceMethod(
+  "currentDataSet",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@currentDataSet <- value
+    return(x)
+  }
+)
+
 analysis = new("ExploraAnalysis")
