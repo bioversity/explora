@@ -21,7 +21,8 @@ Author: Maarten van Zonneveld, Johannes Ospina and Richard Bruskiewich with
     contributions from the Bioversity Seeds4Needs team
 Maintainer: Maarten van Zonneveld  <m.vanzonneveld@cgiar.org>
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.1.0),
+    methods
 Description: The "Explora" package is an R statistical application
     implementing a suite of algorithms, with associated user interfaces,
     which assist the selection of crop plant genetic resources for

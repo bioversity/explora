@@ -6,6 +6,8 @@
 #' @include util.r
 
 #' @import cluster ade4 grid gridExtra 
+#' @importFrom plyr ldply
+#' @importFrom vegan diversity
 
 des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)

@@ -38,6 +38,8 @@ library ("gWidgetsRGtk2")
 #' @examples 
 #' workbench()
 workbench <- function() {
+  
+  print(paste("workbench guidToolkit: ",getOption("guiToolkit")))
 	
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
@@ -50,7 +52,7 @@ workbench <- function() {
 	lytgb1[1,1] = (glabel = (""))
 	lytgb1[2,1] = (h = gbutton("Change directory",  container = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
 	lytgb1[3,1] = (glabel = (""))
-	lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){data_set<<-load_dataset()})
+	lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){ currentDataSet(analysis) <- load_dataset()})
 	
 	##Descriptive analysis
 	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)

@@ -11,10 +11,12 @@
 load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
 
 load_dataset <- function(){## Load dataset
-	data_set = load(gfile(""))
+  
+	data_set <- load(gfile(""))
 	
 	ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
 	write.csv(data_set, file = paste(getwd(),"/Results/data_set.csv", sep = ""),
 			row.names = FALSE)
+  
 	return(data_set)
 }
