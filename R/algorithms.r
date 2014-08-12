@@ -231,7 +231,7 @@ DialogSelectOptimization <- function(object){
   
   lytg4[25,2] = gbutton("Optimization",  container = lytg4,
                         handler = function(h,...){
-                          optimization(analysis) <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
+                          optimizationResult(analysis) <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
                                                         fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
                                                         varop1n, varop2n, varop3n, varop4n, varop5n,
                                                         fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,

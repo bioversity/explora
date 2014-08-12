@@ -45,7 +45,7 @@ setClass( "ExploraAnalysis",
             numContVar        = "guiComponent", # formerly ncon
             percentSoln       = "guiComponent", # formerly npercen
             numberSoln        = "guiComponent", # formerly Nsim
-            optimization      = "list"          # output.opt from algorithm$f.optimization
+            optimizationResult      = "list"          # output.opt from algorithm$f.optimizationResult
           )
         )
 
@@ -53,19 +53,19 @@ setGeneric("dataset_selection", function(x) standardGeneric("dataset_selection")
 setGeneric("numContVar",        function(x) standardGeneric("numContVar"))
 setGeneric("percentSoln",       function(x) standardGeneric("percentSoln"))
 setGeneric("numberSoln",        function(x) standardGeneric("numberSoln"))
-setGeneric("optimization",      function(x) standardGeneric("optimization"))
+setGeneric("optimizationResult",      function(x) standardGeneric("optimizationResult"))
 
 setMethod("dataset_selection","ExploraAnalysis",function(x) x@dataset_selection )
 setMethod("numContVar",       "ExploraAnalysis",function(x) x@numContVar )
 setMethod("percentSoln",      "ExploraAnalysis",function(x) x@percentSoln )
 setMethod("numberSoln",       "ExploraAnalysis",function(x) x@numberSoln )
-setMethod("optimization",     "ExploraAnalysis",function(x) x@optimization )
+setMethod("optimizationResult",     "ExploraAnalysis",function(x) x@optimizationResult )
 
 setGeneric("dataset_selection<-", function(x,value) standardGeneric("dataset_selection<-"))
 setGeneric("numContVar<-",        function(x,value) standardGeneric("numContVar<-"))
 setGeneric("percentSoln<-",       function(x,value) standardGeneric("percentSoln<-"))
 setGeneric("numberSoln<-",        function(x,value) standardGeneric("numberSoln<-"))
-setGeneric("optimization<-",      function(x,value) standardGeneric("optimization<-"))
+setGeneric("optimizationResult<-",      function(x,value) standardGeneric("optimizationResult<-"))
 
 setReplaceMethod(
   "dataset_selection",
@@ -103,10 +103,10 @@ setReplaceMethod(
   }
 )
 setReplaceMethod(
-  "optimization",
+  "optimizationResult",
   "ExploraAnalysis",
   function(x,value) { 
-    x@optimization <- value
+    x@optimizationResult <- value
     return(x)
   }
 )

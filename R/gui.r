@@ -136,10 +136,10 @@ workbench <- function() {
 	lytg5[18,2] = (btn <- gbutton("Run",  container = lytg5))
 	
 	addHandlerChanged(btn, handler = function(h,...){
-				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(optimization(analysis))}
-				if(svalue(option.preferred) == "Principal components"){PCA.type.opt(optimization(analysis))}
-				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(optimization(analysis))}
-				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(optimization(analysis))}
+				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(optimizationResult(analysis))}
+				if(svalue(option.preferred) == "Principal components"){PCA.type.opt(optimizationResult(analysis))}
+				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(optimizationResult(analysis))}
+				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(optimizationResult(analysis))}
 			})
 
 	## Principal windows
