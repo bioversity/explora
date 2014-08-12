@@ -1,10 +1,10 @@
-#------------------------------------------------------------------------------------------------------------------
-# APPLICATION BIOVERSITY                                                                                           #
-# AUTHORS: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
-# VERSION 2.0 - AUGUST-04-2014 
-#
-# gui.r - Explora Graphical User Interface (based on RGtk2)
-#------------------------------------------------------------------------------------------------------------------ 
+#-----------------------------------------------------------------------------------------------#
+# APPLICATION BIOVERSITY                                                                        #
+# AUTHORS: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM #
+# VERSION 2.0 - AUGUST-04-2014                                                                  #
+#                                                                                               #
+# gui.r - Explora Graphical User Interface (based on RGtk2)                                     #
+#-----------------------------------------------------------------------------------------------#
 #' @include configuration.r dialogs.r loader.r util.r algorithms.r
 
 #' @importFrom gWidgets gwindow
@@ -21,10 +21,7 @@
 #' @importFrom gWidgets visible
 #' @importMethodsFrom gWidgets addHandlerChanged
 #' 
-library ("gWidgets")
-
 #' @import gWidgetsRGtk2
-library ("gWidgetsRGtk2")
 
 #' @name workbench
 #' @title Explora germplasm selection tool
@@ -37,6 +34,8 @@ library ("gWidgetsRGtk2")
 #' @aliases workbench
 #' @author Maarten van Zonneveld,  Johannes Ospina and Richard Bruskiewich
 #' @export workbench
+#' @examples
+#' workbench()
 workbench <- function() {
   
   ## Clean work spaces
@@ -72,12 +71,22 @@ workbench <- function() {
 	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
 	lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",container = lyt2,expand=T,horizontal=F))
 	lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
-	lytg2[1,1] = glabel("Dataset for analysis  ",container = lytg2)
+  
+  lytgb1[1,1] = (glabel = (""))
+  lytg2[2,1] = glabel("Dataset for analysis  ",container = lytg2)
   
   ####################
   # TODO - FIX THIS! selection of the data_set doesn't really work; use of the "attach(eval(parse(text=svalue(h$obj)))" in the handler also seems a bit strange
   ####################
-  lytg2[1,2] = ( dataset_selection(analysis) <- gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
+  lytg2[2,2] = ( 
+      dataset_selection(analysis) <- gdroplist( 
+            c("data_set"), 
+            selected = 0,  
+            container = lytg2, 
+            expand = T, 
+            handler = function(h,...){ attach(eval(parse(text=svalue(h$obj)))) }
+      )
+  )
 
   lytgb1[3,1] = (glabel = (""))
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
@@ -167,7 +176,6 @@ workbench <- function() {
 	welcome = ggroup(container = nb,horizontal = F,label="About the Application")
 	
   image_dir <- paste(path.package("explora"),"/images/",sep="")
-  print(paste("Images Directory: ",image_dir))
   gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
 	
 	visible(win) <- TRUE

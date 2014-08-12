@@ -7,8 +7,6 @@
 #------------------------------------------------------------------------------------------------------------------ 
 #' @include configuration.r
 
-library ("gWidgets")
-
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
 #' @importFrom gWidgets glayout
@@ -26,6 +24,8 @@ library ("gWidgets")
 #' @importMethodsFrom gWidgets svalue<-
 #' @importMethodsFrom gWidgets addSpring
 #' @importMethodsFrom gWidgets dispose
+
+#' @import gWidgetsRGtk2
 
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	
