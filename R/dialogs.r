@@ -3,10 +3,9 @@
 #AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 #VERSION 2.0 - AUGUST-04-2014 
 #
-# Dialog Boxes used by Explora
+# dialogs.r - Smaller GUI Dialog Boxes used by Explora
 #------------------------------------------------------------------------------------------------------------------ 
-
-#' @include init.r
+#' @include configuration.r
 
 library ("gWidgets")
 
@@ -22,6 +21,11 @@ library ("gWidgets")
 #' @importFrom gWidgets ggroup
 #' @importFrom gWidgets gbasicdialog
 #' @importFrom gWidgets gimage
+
+#' @importMethodsFrom gWidgets svalue
+#' @importMethodsFrom gWidgets svalue<-
+#' @importMethodsFrom gWidgets addSpring
+#' @importMethodsFrom gWidgets dispose
 
 DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 	

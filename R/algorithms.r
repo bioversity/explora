@@ -1,11 +1,15 @@
-#------------------------------------------------------------------------------------------------------------------
-#APPLICATION BIOVERSITY                                                                                           #
-#AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
-#VERSION 1.0 - FEBRARY-09-2014                                                                                    #
-#------------------------------------------------------------------------------------------------------------------ 
-#' @include util.r
+#----------------------------------------------------------------------------------------------
+#APPLICATION BIOVERSITY                                                                       #
+#AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM #
+#VERSION 2.0 - AUGUST-04-2014                                                                 #
+#                                                                                             #
+#---------------------------------------------------------------------------------------------- 
+#' @include configuration.r dialogs.r
 
-#' @import cluster ade4 grid gridExtra 
+# ' @import cluster 
+#' @import ade4
+#' @import grid
+#' @import gridExtra 
 #' @importFrom plyr ldply
 #' @importFrom vegan diversity
 
@@ -122,6 +126,7 @@ correlation <- function(object){## Correlation analysis
 }
 
 #' @importFrom gWidgets gdroplist
+#' @importMethodsFrom gWidgets visible<-
 
 select.functions <- function(fitems, f){## Function to select the objective function for nominal variables
   win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
@@ -849,7 +854,7 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
 }
 
 
-TableChart <- function(out.solution, i){
+chart <- function(out.solution, i){
   
   Table.Results <- as.data.frame(cbind(round(apply(out.solution$Data.cluster.sol1[,-1],2,median),2),
                                        round(apply(out.solution$Data.cluster.sol2[,-1],2,median),2)))
@@ -862,7 +867,8 @@ TableChart <- function(out.solution, i){
   
   colnames(Table.Results) <- c("Cluster 1", "Cluster 2")
   
-  windows()
+  grDevices::windows()
+  
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw(tableGrob(Table.Results))
   
@@ -969,7 +975,7 @@ DTree.type.opt <- function(output.opt0){
     #step 1
     out.solution.tree <- list()
     out.solution.tree[[1]] <- fcluster(object, mean.result, data.HighestStandardizedValues)
-    TableChart(out.solution.tree[[1]],1) 
+    chart(out.solution.tree[[1]],1) 
     
     ## Initialized values
     Decision <- NA
@@ -993,7 +999,7 @@ DTree.type.opt <- function(output.opt0){
       
       graphics.off() 
       if(choose == "Yes"){
-        TableChart(out.solution.tree[[w]],w) 
+        chart(out.solution.tree[[w]],w) 
         Decision <- NA
         Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="ginput", icon="question")
         Decision <- as.numeric(svalue(Decision))
@@ -1047,10 +1053,3 @@ DTree.type.opt <- function(output.opt0){
     
   }
 }
-
-
-## Delete auxiliary files
-if(file.exists(paste(getwd(),"/Results/RI.csv", sep = "")) == TRUE){
-  unlink(paste(getwd(),"/Results/RI.csv", sep = ""))
-}  
-

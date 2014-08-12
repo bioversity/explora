@@ -1,5 +1,5 @@
 Package: explora
-Version: 0.0-3
+Version: 0.0-4
 Date: 2014-07-11
 Title: Bioversity Seed4Needs Explora Germplasm Selection Tool
 Authors@R: c( person(given="Maarten", family = "van Zonneveld", role = c("aut",
@@ -39,14 +39,13 @@ Imports:
     gWidgetsRGtk2,
     plyr,
     vegan,
-    cluster,
     ade4,
     grid,
     gridExtra
 Collate:
-    'init.r'
+    'configuration.r'
     'dialogs.r'
-    'util.r'
     'algorithms.r'
+    'util.r'
     'loader.r'
     'gui.r'

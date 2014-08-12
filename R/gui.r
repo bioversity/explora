@@ -3,12 +3,9 @@
 # AUTHORS: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 # VERSION 2.0 - AUGUST-04-2014 
 #
-# Explora Graphical User Interface (based on RGtk2)
+# gui.r - Explora Graphical User Interface (based on RGtk2)
 #------------------------------------------------------------------------------------------------------------------ 
-#' @include init.r dialogs.r loader.r util.r algorithms.r
-#' 
-library ("gWidgets")
-library ("gWidgetsRGtk2")
+#' @include configuration.r dialogs.r loader.r util.r algorithms.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -22,7 +19,12 @@ library ("gWidgetsRGtk2")
 #' @importFrom gWidgets ggroup
 #' @importFrom gWidgets gimage
 #' @importFrom gWidgets visible
+#' @importMethodsFrom gWidgets addHandlerChanged
+#' 
+library ("gWidgets")
 
+#' @import gWidgetsRGtk2
+library ("gWidgetsRGtk2")
 
 #' @name workbench
 #' @title Explora germplasm selection tool
@@ -35,12 +37,24 @@ library ("gWidgetsRGtk2")
 #' @aliases workbench
 #' @author Maarten van Zonneveld,  Johannes Ospina and Richard Bruskiewich
 #' @export workbench
-#' @examples 
-#' workbench()
 workbench <- function() {
   
-  print(paste("workbench guidToolkit: ",getOption("guiToolkit")))
-	
+  ## Clean work spaces
+  # what am I cleaning here? Is it necessary?
+  rm(list=ls())
+  
+  ## select tools for GUI
+  options("guiToolkit"="RGtk2")
+  
+  ## Change locale for message in english
+  Sys.setlocale(category = "LC_ALL", locale = "English")
+  Sys.setenv(LANG = "en")
+  
+  ## Clean up old analysis files(?)
+  if(file.exists(paste(getwd(),"/Results/RI.csv", sep = "")) == TRUE){
+    unlink(paste(getwd(),"/Results/RI.csv", sep = ""))
+  }
+
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
 	nb  <- gnotebook( container = win, expand = T, tab.pos = 2)
@@ -59,8 +73,13 @@ workbench <- function() {
 	lyt2[1,1:6] = (g1 <- gframe("Descriptive analysis",container = lyt2,expand=T,horizontal=F))
 	lytg2 = glayout(homogeneous = F,  container = g1, spacing = 1, expand = T) 
 	lytg2[1,1] = glabel("Dataset for analysis  ",container = lytg2)
-	lytg2[1,2] = ( dataset_selection(analysis) <- gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
-	lytgb1[3,1] = (glabel = (""))
+  
+  ####################
+  # TODO - FIX THIS! selection of the data_set doesn't really work; use of the "attach(eval(parse(text=svalue(h$obj)))" in the handler also seems a bit strange
+  ####################
+  lytg2[1,2] = ( dataset_selection(analysis) <- gdroplist(c("data_set"), selected = 0,  container = lytg2, expand = T, handler = function(h,...){attach(eval(parse(text=svalue(h$obj))))}))
+
+  lytgb1[3,1] = (glabel = (""))
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
 	lytg2[4,2] = (numContVar(analysis) <-gedit("",container = lyt2,width = 10,initial.msg="")) 
 	lytg2[5,1] = glabel("Number of categorical variables: ",container = lytg2)
@@ -147,7 +166,9 @@ workbench <- function() {
 	## Principal windows
 	welcome = ggroup(container = nb,horizontal = F,label="About the Application")
 	
-	gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
+  image_dir <- paste(path.package("explora"),"/images/",sep="")
+  print(paste("Images Directory: ",image_dir))
+  gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
 	
 	visible(win) <- TRUE
 

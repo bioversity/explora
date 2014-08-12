@@ -3,12 +3,12 @@
 # AUTHORS: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 # VERSION 2.0 - AUGUST-04-2014 
 #
-# Explora Data Loaders
+# loader.r - Explora Data Loaders
 #------------------------------------------------------------------------------------------------------------------ 
 
 #' @importFrom gWidgets gfile
 
-load = function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
+load <- function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
 
 load_dataset <- function(){## Load dataset
   

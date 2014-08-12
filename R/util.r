@@ -3,9 +3,12 @@
 # AUTHORS: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
 # VERSION 2.0 - AUGUST-04-2014 
 #
-# Explora Utility Functions
+# util.r - Explora Utility Functions
 #------------------------------------------------------------------------------------------------------------------ 
+
 #' @include dialogs.r
+#' 
+#' @importMethodsFrom gWidgets svalue
 
 number.access <- function(h,...){## Function for selection of number of accessions in final set 
 	
