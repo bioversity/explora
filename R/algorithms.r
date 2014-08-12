@@ -6,12 +6,11 @@
 #---------------------------------------------------------------------------------------------- 
 #' @include configuration.r dialogs.r
 
-# ' @import cluster 
-#' @import ade4
-#' @import grid
-#' @import gridExtra 
-#' @importFrom plyr ldply
-#' @importFrom vegan diversity
+########################################################################
+# Not sure how the previously included "cluster" package for 
+# Cluster Analysis Extended Rousseeuw et al. is being used 
+# in this module since check()does not complain if it is removed...
+########################################################################
 
 des.continuous <- function(object){## Descriptive analysis for continuous variables
   n = length(object)
@@ -57,6 +56,7 @@ des.nominal <- function(object){## Descriptive analysis for nominal variables
   result=cbind(n, category, frecuence, percentage, NA.Data, NA.Percent)
 }
 
+#' @importFrom plyr ldply
 
 descriptives.nominal=function(object){## Used to function 'des.nominal'
   ncon <-as.numeric(svalue(numContVar(analysis)))
@@ -271,6 +271,8 @@ number.percent <- function(h,...){
   
 }
 
+#' @importFrom vegan diversity
+
 optimization <- function(data, option1, option2, num.access){ ## calculate 'optimization'
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
@@ -332,8 +334,6 @@ optimization <- function(data, option1, option2, num.access){ ## calculate 'opti
     
     name.var.func.nom <- rep(NA, dim(option2)[1])
     val.var.func.nom <- rep(NA, dim(option2)[1])
-    
-    
     
     for(i in 1:dim(option2)[1]){  
       if(option2[i,2] == "MAX.PROP: Maximize proportion"){
@@ -536,6 +536,9 @@ MAXVAR.type.opt <- function(output.opt0){
             row.names = FALSE)
 }
 
+#' @importFrom ade4 dudi.pca
+#' @importFrom ade4 s.label
+#' @importFrom ade4 s.corcircle
 
 PCA.type.opt <- function(output.opt0){
   
@@ -853,6 +856,10 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
   return(result)
 }
 
+#' @importFrom grid grid.text
+#' @importFrom grid gpar
+#' @importFrom grid grid.draw
+#' @importFrom gridExtra tableGrob
 
 chart <- function(out.solution, i){
   
