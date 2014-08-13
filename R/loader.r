@@ -28,14 +28,8 @@ load_dataset <- function(){
   )
   
 	write.csv(data_set, file = file.path(project_dir,paste(data_set_name,".csv"), sep = ""), row.names = FALSE)
-  
-  datasetCatalog(analysis) <- data_set_name
-  
-  print(paste("Datasets: ",datasetCatalog(analysis)))
-  
-	return(data_set)
-}
 
-setDataSession <- function(session) {
-  environment(load_dataset) <- session
+  attr(data_set,"identifier") <- data_set_name
+  
+	return( data_set )
 }

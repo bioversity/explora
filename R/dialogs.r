@@ -302,10 +302,4 @@ number.percent <- function(h,...){
   
 }
 
-setDialogSession <- function(session) {
-  environment(DialogSelectThresholds) <- session
-  environment(number.solution)        <- session
-  environment(number.final)           <- session
-  environment(number.percent)         <- session
-}
 

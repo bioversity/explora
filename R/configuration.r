@@ -1,10 +1,10 @@
-#------------------------------------------------------------------------------------------------------------------
-#APPLICATION BIOVERSITY                                                                                           #
-#AUTHOR: RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
-#VERSION 2.0 - AUGUST-04-2014 
-#
-# configuration.r - Explora Configuration is stored in the ExploraAnalysis class
-#------------------------------------------------------------------------------------------------------------------ 
+#---------------------------------------------------------------------------------
+#APPLICATION BIOVERSITY                                                          #                                 #
+#AUTHOR: RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                               #
+#VERSION 2.0 - AUGUST-04-2014                                                    #
+#                                                                                #
+# configuration.r - Explora Configuration is stored in the ExploraAnalysis class #
+#--------------------------------------------------------------------------------- 
   
 # Class for global configuration variables
 
@@ -24,7 +24,7 @@ setClass( "ExploraAnalysis",
               percentSoln        = "guiComponent", # formerly npercen
               numberSoln         = "guiComponent", # formerly Nsim
               optimizationResult = "list",         # output.opt from algorithm$f.optimization
-              datasetCatalog     = "vector",       # new way of tracking dataset names
+              datasetCatalog     = "list",         # new way of tracking dataset names
               currentDataSet     = "data.frame"    # data_set loaded (in gui.R)
           )
         )
@@ -102,7 +102,8 @@ setReplaceMethod(
   "datasetCatalog",
   "ExploraAnalysis",
   function(x,value) { 
-    x@datasetCatalog <- c( x@datasetCatalog, value) 
+    x@datasetCatalog <- c( x@datasetCatalog, list(value)) 
+    print(paste("datasetCatalog: ",x@datasetCatalog))
     return(x)
   }
 )

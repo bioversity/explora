@@ -1053,16 +1053,3 @@ DTree.type.opt <- function(output.opt0){
   }
 
 }
-
-setAnalysisSession <- function(session) {
-  
-  environment(descriptives.continuous) <- session
-  environment(descriptives.nominal)    <- session
-  environment(correlation)             <- session
-  environment(f.optimization)          <- session
-  environment(MAXVAR.type.opt)         <- session
-  environment(PCA.type.opt)            <- session
-  environment(WSM.type.opt)            <- session
-  environment(DTree.type.opt)          <- session
-  
-}
