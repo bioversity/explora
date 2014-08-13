@@ -46,6 +46,5 @@ Collate:
     'configuration.r'
     'dialogs.r'
     'algorithms.r'
-    'util.r'
     'loader.r'
     'gui.r'

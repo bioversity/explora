@@ -29,13 +29,13 @@ des.continuous <- function(object){## Descriptive analysis for continuous variab
 
 descriptives.continuous = function(object){## Used to function 'des.continuous' 
   
-  ncon <- as.numeric(svalue(numContVar(analysis)))
+  ncon <- as.numeric( svalue( numContVar(analysis) ))
   object <- object[,-1]
   object <- object[,1:ncon]
   d = sapply(object, des.continuous)
   row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   d = as.table(d)
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
@@ -58,28 +58,29 @@ des.nominal <- function(object){## Descriptive analysis for nominal variables
 
 #' @importFrom plyr ldply
 
-descriptives.nominal=function(object){## Used to function 'des.nominal'
-  ncon <-as.numeric(svalue(numContVar(analysis)))
+## Used to function 'des.nominal'
+descriptives.nominal <- function(object){
+  
+  ncon <-as.numeric(svalue( numContVar(analysis) ))
   ncat <-as.numeric(svalue(ncat))
   object <- object[,-1]
   object <- object[,(ncon+1):dim(object)[2]]
   d=lapply(object, des.nominal)
   d=ldply(d, data.frame)
   colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
   write.csv(d, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisNominalVariables.csv", sep=""),
             row.names = FALSE)
-  
-  
   return(d)
-  
+
 }
 
 correlation <- function(object){## Correlation analysis
-  ncon <-as.numeric(svalue(numContVar(analysis)))
+  
+  ncon <-as.numeric( svalue(numContVar(analysis) ))
   
   object <- object[,-1]
   object <- object[,1:ncon]
@@ -96,7 +97,7 @@ correlation <- function(object){## Correlation analysis
   
   correlation = cbind(correlation, direction)
   colnames(correlation) <- c("Variable 1", "Variable 2", "Correlation", "Direction") 
-  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue(dataset_selection(analysis))))
+  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
   cat("\n")
   cat("\n")
   
@@ -148,13 +149,13 @@ DialogSelectOptimization <- function(object){
   
   f.items.nom <- c("NA", "SHANNON: Maximize Shannon index", "MAX.PROP: Maximize proportion")
   
-  ncon <- as.numeric(svalue(numContVar(analysis))) 
+  ncon <- as.numeric(svalue( numContVar(analysis) )) 
   object.optimization <- object[,-1]
   object.continuous <- object.optimization[,1:ncon]
   object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
   names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
-  nsoln <- as.numeric(svalue(numberSoln(analysis)))
+  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   
   pcategory.v1 <- 0
   pcategory.v2 <- 0
@@ -262,15 +263,6 @@ DialogSelectOptimization <- function(object){
   write.csv(RI, paste(getwd(),"/Results/RI.csv", sep = ""), row.names = FALSE)
 }
 
-number.percent <- function(h,...){
-  npercent <- as.numeric(svalue(percentSoln(analysis)))
-  if( npercent > 0 & npercent <= 100){
-    DialogBox(paste("The percentage of solutions is: ", npercent, "%", sep=" "))
-  }else{DialogBox("Error in the percentage of solutions")}
-  return(npercent) 
-  
-}
-
 #' @importFrom vegan diversity
 
 optimization <- function(data, option1, option2, num.access){ ## calculate 'optimization'
@@ -366,10 +358,10 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
-  object = eval(parse(text=svalue(dataset_selection(analysis))))
-  ncon <- as.numeric(svalue(numContVar(analysis))) 
+  object = eval(parse(text=svalue( dataset_selection(analysis) )))
+  ncon <- as.numeric(svalue( numContVar(analysis) )) 
   ncat <- as.numeric(svalue(ncat)) 
-  nsoln <- as.numeric(svalue(numberSoln(analysis))) 
+  nsoln <- as.numeric(svalue( numberSoln(analysis) )) 
   num.access <- as.numeric(svalue(num.access)) 
   
   varop1c <- svalue(varop1c)
@@ -436,11 +428,11 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
 
 MAXVAR.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue(numberSoln(analysis)))
-  npercent <- as.numeric(svalue(percentSoln(analysis)))
+  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
+  npercent <- as.numeric(svalue( percentSoln(analysis) ))
   nfinal <- as.numeric(svalue(nfinal))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text=svalue(dataset_selection(analysis))))
+  object <- eval(parse(text=svalue( dataset_selection(analysis) )))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -542,10 +534,10 @@ MAXVAR.type.opt <- function(output.opt0){
 
 PCA.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue(numberSoln(analysis)))
-  npercent <- as.numeric(svalue(percentSoln(analysis)))
+  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
+  npercent <- as.numeric(svalue( percentSoln(analysis) ))
   nfinal <- as.numeric(svalue(nfinal))
-  object <- eval(parse(text=svalue(dataset_selection(analysis))))
+  object <- eval(parse(text=svalue( dataset_selection(analysis) )))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -691,10 +683,10 @@ PCA.type.opt <- function(output.opt0){
 
 WSM.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue(numberSoln(analysis)))
-  npercent <- as.numeric(svalue(percentSoln(analysis)))
+  nsoln <- as.numeric( svalue(numberSoln(analysis) ))
+  npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue(dataset_selection(analysis))))
+  object <- eval(parse(text = svalue( dataset_selection(analysis) )))
   
   ## Read ranking 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
@@ -887,10 +879,10 @@ chart <- function(out.solution, i){
 
 DTree.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue(numberSoln(analysis)))
-  npercent <- as.numeric(svalue(percentSoln(analysis)))
+  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
+  npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue(dataset_selection(analysis))))
+  object <- eval(parse(text = svalue( dataset_selection(analysis) )))
   
   ## Read ranking importance 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
@@ -1059,4 +1051,18 @@ DTree.type.opt <- function(output.opt0){
     cat(paste("Process completed.................")) 
     
   }
+
+}
+
+setAnalysisSession <- function(session) {
+  
+  environment(descriptives.continuous) <- session
+  environment(descriptives.nominal)    <- session
+  environment(correlation)             <- session
+  environment(f.optimization)          <- session
+  environment(MAXVAR.type.opt)         <- session
+  environment(PCA.type.opt)            <- session
+  environment(WSM.type.opt)            <- session
+  environment(DTree.type.opt)          <- session
+  
 }

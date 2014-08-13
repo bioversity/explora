@@ -89,7 +89,7 @@ SelectSolution <- function(solutions){## Function to select preference category
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds
 	
 	object.thresholds <- object
-	ncon <- as.numeric(svalue(numContVar(analysis))) 
+	ncon <- as.numeric( svalue(numContVar(analysis) )) 
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
 	object.complete <- object
@@ -225,7 +225,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = sapply(data.var.thresholds.final, des.continuous)
 		row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
 		d.thresholds = as.table(d.thresholds)
-		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue(dataset_selection(analysis))))
+		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( dataset_selection(analysis) )))
 		
 		DialogBox(paste("The results should be saved in",getwd(),"/Results"))
 
@@ -250,3 +250,62 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	max.var1; max.var2; max.var3; max.var4; max.var5; max.var6; max.var7; max.var8; max.var9; max.var10
 	
 }
+
+number.access <- function(h,...){## Function for selection of number of accessions in final set 
+  
+  object = eval(parse(text=svalue( dataset_selection(analysis) )))
+  num.access <- as.numeric(svalue(num.access))
+  
+  if(num.access <= dim(object)[1] & num.access > 0){
+    DialogBox(paste("Number of accessions in the final set: ", num.access, sep=" "))
+  } else {
+    DialogBox("Error in the accession number")
+  }
+  
+  return(num.access) 
+}
+
+number.solution <- function(h,...){
+  nsoln <- as.numeric( svalue(numberSoln(analysis) ))
+  if(nsoln > 0 & nsoln <= 1000000){
+    DialogBox(paste("The number of solution is: ", nsoln, sep=" "))
+  }else{DialogBox("Error in the percentage of solutions")}
+  
+  return(nsoln) 
+}
+
+## Function to selected number of final accessions
+number.final <- function(h,...){
+  object = eval(parse(text=svalue( dataset_selection(analysis) )))
+  nfinal = as.numeric(svalue(nfinal))
+  
+  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
+    Data.Thresholds <- read.csv(paste(getwd(), "/Results/Data.Thresholds.csv", sep=""))
+    Data <- Data.Thresholds
+  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+    Data <- object
+  } 
+  
+  if(nfinal <= dim(Data)[1] & nfinal > 0){
+    DialogBox(paste("Size of the final subset of the accessions: ", nfinal, sep=" "))
+  }else{DialogBox("Error in the size of the final subset")}
+  
+  return(nfinal)
+}
+
+number.percent <- function(h,...){
+  npercent <- as.numeric(svalue( percentSoln(analysis) ))
+  if( npercent > 0 & npercent <= 100){
+    DialogBox(paste("The percentage of solutions is: ", npercent, "%", sep=" "))
+  } else {DialogBox("Error in the percentage of solutions")}
+  return(npercent) 
+  
+}
+
+setDialogSession <- function(session) {
+  environment(DialogSelectThresholds) <- session
+  environment(number.solution)        <- session
+  environment(number.final)           <- session
+  environment(number.percent)         <- session
+}
+

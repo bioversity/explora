@@ -5,7 +5,7 @@
 #                                                                                               #
 # gui.r - Explora Graphical User Interface (based on RGtk2)                                     #
 #-----------------------------------------------------------------------------------------------#
-#' @include configuration.r dialogs.r loader.r util.r algorithms.r
+#' @include configuration.r dialogs.r loader.r algorithms.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -54,6 +54,16 @@ workbench <- function() {
     unlink(paste(getwd(),"/Results/RI.csv", sep = ""))
   }
 
+  # Global analysis parameters are kept in an S4 class instance of class "ExploraAnalysis"
+  # and propagated into a special environment
+  analysis <- new("ExploraAnalysis")
+  session  <- new.env()
+  session$analysis <- analysis 
+
+  setDialogSession(session)
+  setDataSession(session)
+  setAnalysisSession(session)
+  
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
 	nb  <- gnotebook( container = win, expand = T, tab.pos = 2)
@@ -63,9 +73,9 @@ workbench <- function() {
 	lyt1[1,1:3] = (g = gframe("Load dataset",  container = lyt1, horizontal = T))
 	lytgb1 = glayout(homogeneous = F, container = g, spacing = 1, expand = T) 
 	lytgb1[1,1] = (glabel = (""))
-	lytgb1[2,1] = (h = gbutton("Change directory",  container = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
+	lytgb1[2,1] = (h = gbutton("Set Output Directory",  container = lytgb1, handler = function(h,...)setwd(gfile(text = "Select directory", type = "selectdir"))))
 	lytgb1[3,1] = (glabel = (""))
-	lytgb1[4,1] = gbutton("Data set",  container = lytgb1, expand = F, handler = function(h,...){ currentDataSet(analysis) <- load_dataset()})
+	lytgb1[4,1] = gbutton("Load Data Set",  container = lytgb1, expand = F, handler = function(h,...){ currentDataSet(analysis) <- load_dataset()})
 	
 	##Descriptive analysis
 	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptive analysis", expand = T)
@@ -80,7 +90,7 @@ workbench <- function() {
   ####################
   lytg2[2,2] = ( 
       dataset_selection(analysis) <- gdroplist( 
-            c("data_set"), 
+            datasetCatalog(analysis), 
             selected = 0,  
             container = lytg2, 
             expand = T, 
@@ -90,22 +100,22 @@ workbench <- function() {
 
   lytgb1[3,1] = (glabel = (""))
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-	lytg2[4,2] = (numContVar(analysis) <-gedit("",container = lyt2,width = 10,initial.msg="")) 
+	lytg2[4,2] = ( numContVar(analysis) <-gedit("",container = lyt2,width = 10,initial.msg="") ) 
 	lytg2[5,1] = glabel("Number of categorical variables: ",container = lytg2)
 	lytg2[5,2] = (ncat <-gedit("",container=lyt2,width = 10,initial.msg=""))
 	
 	lytg2[6,1]=(glabel=(""))
 	lytg2[7,1]=(glabel=(""))
 	
-	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",container=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue(dataset_selection(analysis))))))})
-	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",container=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",container=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue( dataset_selection(analysis) )))))})
+	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",container=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue( dataset_selection(analysis) )))))})
 	
 	lytg2[11,1]=(glabel=(""))
 	lytg2[12,1]=(glabel=(""))
 	
 	lytg2[13,1] = glabel("Level of correlation: ",container=lytg2)
 	lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, container=lytg2)) 
-	lytg2[14,1] = gbutton("Correlation analysis",container=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue(dataset_selection(analysis))))))})
+	lytg2[14,1] = gbutton("Correlation analysis",container=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue( dataset_selection(analysis) )))))})
 	
 	lytg2[15,1]=(glabel=(""))
 	lytg2[16,1]=(glabel=(""))
@@ -119,7 +129,7 @@ workbench <- function() {
 	lytg2[20,1]=(glabel=(""))
 	
 	lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
-	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue(dataset_selection(analysis)))))})
+	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue( dataset_selection(analysis) ))))})
 	
 	##Selection of preferred analysis
 	lyt5 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)
@@ -127,7 +137,7 @@ workbench <- function() {
 	lytg5 = glayout(homogeneous = F,  container = g5, spacing = 1, expand = T) 
 	
 	lytg5[1,1] = glabel("Enter the number of solutions: ",  container = lytg5)
-	lytg5[1,2] = (numberSoln(analysis) = gedit("10000",  container = lytg5))
+	lytg5[1,2] = ( numberSoln(analysis) <- gedit("10000",  container = lytg5))
 	lytg5[2,1] = gbutton("Select the number of solutions",  container = lytg5, expand=F,
 			handler = function(h,...){print(number.solution())})
 	
@@ -136,13 +146,13 @@ workbench <- function() {
 	
 	lytg5[5,1] = glabel("Optimization analysis: ",  container = lytg5)
 	lytg5[6,1] = gbutton("Select variables",  container = lytg5, expand=F,
-			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue(dataset_selection(analysis)))))})
+			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue( dataset_selection(analysis) ))))})
 	
 	lytg5[7,1] = (glabel=(""))
 	lytg5[8,1] = (glabel=(""))
 	
 	lytg5[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg5)
-	lytg5[9,2] = (percentSoln(analysis) = gedit("1",  container = lytg5))
+	lytg5[9,2] = ( percentSoln(analysis) <- gedit("1",  container = lytg5))
 	lytg5[10,1] = gbutton("Select the percentage of solutions",  container = lytg5, expand=F,
 			handler = function(h,...){print(number.percent())})
 	
@@ -166,10 +176,10 @@ workbench <- function() {
 	lytg5[18,2] = (btn <- gbutton("Run",  container = lytg5))
 	
 	addHandlerChanged(btn, handler = function(h,...){
-				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt(optimizationResult(analysis))}
-				if(svalue(option.preferred) == "Principal components"){PCA.type.opt(optimizationResult(analysis))}
-				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt(optimizationResult(analysis))}
-				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt(optimizationResult(analysis))}
+				if(svalue(option.preferred) == "Maximum variation"){MAXVAR.type.opt( optimizationResult(analysis) )}
+				if(svalue(option.preferred) == "Principal components"){PCA.type.opt( optimizationResult(analysis) )}
+				if(svalue(option.preferred) == "Weighted sum model"){WSM.type.opt( optimizationResult(analysis) )}
+				if(svalue(option.preferred) == "Decision tree"){DTree.type.opt( optimizationResult(analysis) )}
 			})
 
 	## Principal windows

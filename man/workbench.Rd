@@ -15,6 +15,9 @@ from genebank collections that meet the interests of the user. Explora allows
 2) consideration of more than one trait and trade-offs between different traits of interests; and
 3) maximization of diversity for specific traits of interests.
 }
+\examples{
+workbench()
+}
 \author{
 Maarten van Zonneveld,  Johannes Ospina and Richard Bruskiewich
 }

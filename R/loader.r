@@ -6,17 +6,36 @@
 # loader.r - Explora Data Loaders
 #------------------------------------------------------------------------------------------------------------------ 
 
+#' @include configuration.r
+
 #' @importFrom gWidgets gfile
 
-load <- function(file){file = read.csv(file, header = T, sep = ",")}## This function used to load csv files
-
-load_dataset <- function(){## Load dataset
+## This function used to load csv files
+load_dataset <- function(){
   
-	data_set <- load(gfile(""))
+  data_file_name <- gfile("")
+  data_set_name <- sub("\\.csv$","", basename(data_file_name), ignore.case = TRUE)
+
+  print(paste("Loading dataset: ",data_set_name))
+  
+	data_set <- read.csv(data_file_name, header = T, sep = ",") 
 	
-	ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
-	write.csv(data_set, file = paste(getwd(),"/Results/data_set.csv", sep = ""),
-			row.names = FALSE)
+  project_dir = file.path(getwd(),data_set_name,sep="")
+  ifelse( 
+      file.exists(project_dir)=="FALSE", 
+      dir.create(project_dir,recursive=TRUE), 
+      paste("Project folder '",project_dir,"' already exists?") 
+  )
+  
+	write.csv(data_set, file = file.path(project_dir,paste(data_set_name,".csv"), sep = ""), row.names = FALSE)
+  
+  datasetCatalog(analysis) <- data_set_name
+  
+  print(paste("Datasets: ",datasetCatalog(analysis)))
   
 	return(data_set)
+}
+
+setDataSession <- function(session) {
+  environment(load_dataset) <- session
 }
