@@ -44,7 +44,7 @@ Imports:
     gridExtra
 Collate:
     'configuration.r'
+    'projects.r'
     'dialogs.r'
     'algorithms.r'
-    'loader.r'
     'gui.r'

@@ -4,7 +4,7 @@
 #VERSION 2.0 - AUGUST-04-2014                                                                 #
 #                                                                                             #
 #---------------------------------------------------------------------------------------------- 
-#' @include configuration.r dialogs.r
+#' @include configuration.r dialogs.r projects.r
 
 ########################################################################
 # Not sure how the previously included "cluster" package for 
@@ -32,14 +32,14 @@ descriptives.continuous = function(object){## Used to function 'des.continuous'
   ncon <- as.numeric( svalue( numContVar(analysis) ))
   object <- object[,-1]
   object <- object[,1:ncon]
+  
   d = sapply(object, des.continuous)
+  
   row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   d = as.table(d)
   names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-  ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
-  write.csv(d, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisContinuousVariables.csv", sep=""))
+  saveResults( d, currentProjectDir(analysis), "ResultsDescriptiveAnalysisContinuousVariables" )   	
   
   return(d)
   
@@ -70,12 +70,9 @@ descriptives.nominal <- function(object){
   colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
   names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-  ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
-  write.csv(d, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisNominalVariables.csv", sep=""),
-            row.names = FALSE)
+  saveResults( d, currentProjectDir(analysis), "ResultsDescriptiveAnalysisNominalVariables", row.names = FALSE )     
+  
   return(d)
-
 }
 
 correlation <- function(object){## Correlation analysis
@@ -104,19 +101,19 @@ correlation <- function(object){## Correlation analysis
   ncor <-as.numeric(svalue(ncor))
   ncor <- abs(ncor)
   
+  project_dir <- currentProjectDir(analysis)
+  
   if(ncor==0){
     
-    DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    write.csv(correlation, file = paste(getwd(),"/Results/ResultsCorrelationAnalysisGlobal.csv", sep=""), 
-              row.names = FALSE)
+    saveResults( correlation, project_dir, "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
     
     return(correlation)
     
   }else if(ncor>0){
+    
     correlation.ncor <- subset(correlation, abs(correlation$Correlation)>=ncor)
-    DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    write.csv(correlation.ncor, file = paste(getwd(),"/Results/ResultsCorrelationAnalysisLevel",ncor,".csv", sep=""),
-              row.names = FALSE)
+    
+    saveResults( correlation.ncor, project_dir, paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
     
     cat("\n")
     cat("\n")
@@ -137,7 +134,6 @@ select.functions <- function(fitems, f){## Function to select the objective func
 }
 
 DialogSelectOptimization <- function(object){
-  
   
   f.items.cont <- c("NA","CV: Maximize coefficient of variation",
                     "MAX.AV: Maximize average", 
@@ -240,12 +236,12 @@ DialogSelectOptimization <- function(object){
   lytg4[25,2] = gbutton("Optimization",  container = lytg4,
                         handler = function(h,...){
                           optimizationResult(analysis) <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
-                                                        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
-                                                        varop1n, varop2n, varop3n, varop4n, varop5n,
-                                                        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
-                                                        pcategory.v1, pcategory.v2, pcategory.v3,
-                                                        pcategory.v4,pcategory.v5)}) 
-
+                                                                          fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
+                                                                          varop1n, varop2n, varop3n, varop4n, varop5n,
+                                                                          fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
+                                                                          pcategory.v1, pcategory.v2, pcategory.v3,
+                                                                          pcategory.v4,pcategory.v5)}) 
+  
   visible(win)<-TRUE
   
   RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
@@ -259,8 +255,8 @@ DialogSelectOptimization <- function(object){
   varop1n; varop2n; varop3n; varop4n; varop5n
   fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
   ri1n; ri2n; ri3n; ri4n; ri5n
-
-  write.csv(RI, paste(getwd(),"/Results/RI.csv", sep = ""), row.names = FALSE)
+  
+  saveResults( RI, currentProjectDir(analysis), paste("RI", sep=""), row.names = FALSE )     
 }
 
 #' @importFrom vegan diversity
@@ -281,8 +277,8 @@ optimization <- function(data, option1, option2, num.access){ ## calculate 'opti
     
     name.var.func.con <- rep(NA,dim(option1)[1])
     val.var.func.con <- rep(NA,dim(option1)[1]) 
-
-	for(i in 1:dim(option1)[1]){ 
+    
+    for(i in 1:dim(option1)[1]){ 
       
       if(option1[i,2] == "CV: Maximize coefficient of variation"){
         data1 <- data0[is.element(data$n_acces,subset0),as.character(option1[i,1])]
@@ -391,10 +387,15 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
   
-  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-    Data.Thresholds <- read.csv(paste(getwd(), "/Results/Data.Thresholds.csv", sep=""))
+  project_dir <- currentProjectDir(analysis)
+  
+  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+    
+    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
     Data <- Data.Thresholds
-  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+    
+  } else {
+    
     Data <- object
   } 
   
@@ -450,19 +451,24 @@ MAXVAR.type.opt <- function(output.opt0){
   pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
-  result.mean.acces <- mean.result$accessions[pos,]
-  colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
-  rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
-
+  result.mean.accessions <- mean.result$accessions[pos,]
+  colnames(result.mean.accessions)<-rep(paste("acces",1:dim(result.mean.accessions)[2],sep=""))
+  rownames(result.mean.accessions)<-rep(paste("sol",1:dim(result.mean.accessions)[1],sep=""))
+  
   paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues",sep="")
   cat(paste("#Subset of accessions with ",npercent,"%"," highest standardized mean values#",sep=""))
   cat("\n")
-  print(result.mean.acces)
+  print(result.mean.accessions)
   cat("\n")
   cat("\n")
   
-  write.csv(result.mean.acces, 
-            file = paste(getwd(),"/Results/","SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues.csv", sep=""))
+  project_dir <- currentProjectDir(analysis)
+  
+  saveResults( 
+    result.mean.accessions, 
+    project_dir, 
+    paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
+  )     
   
   cat("\n")
   result.scale <- result[pos,]
@@ -474,10 +480,9 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  write.csv(result.scale, file = paste(getwd(),"/Results/HighestStandardizedValuesOfSubset_MV.csv", sep=""),
-            row.names = FALSE)
-
-##11)  Selection of final set of optimal solutions: 
+  saveResults( result.scale, project_dir, "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
+  
+  ##11)  Selection of final set of optimal solutions: 
   
   ## Generate all pairs of solutions
   c <- t(combn(as.character(result.scale[,1]),2)) 
@@ -503,11 +508,15 @@ MAXVAR.type.opt <- function(output.opt0){
   pos.nfinal <- order(variance[,3],decreasing=T)
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
-
-  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-    Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
+  
+  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ) {
+    
+    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
+    
     DataFinal <- Data.Thresholds
-  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+    
+  } else {
+    
     DataFinal <- object
   } 
   
@@ -522,10 +531,14 @@ MAXVAR.type.opt <- function(output.opt0){
   print(final.subset.max.var) 
   cat("\n")
   cat("\n")
-  DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-  ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "Folder already exists 'Results' ")
-  write.csv(final.subset.max.var, file = paste(getwd(),"/Results/subset_optimal_solution_by_MaXVAR","_Solution(",pos.max.var,")",".csv", sep=""),
-            row.names = FALSE)
+  
+  saveResults( 
+      final.subset.max.var, 
+      project_dir, 
+      paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
+      row.names = FALSE 
+  )     
+  
 }
 
 #' @importFrom ade4 dudi.pca
@@ -533,6 +546,8 @@ MAXVAR.type.opt <- function(output.opt0){
 #' @importFrom ade4 s.corcircle
 
 PCA.type.opt <- function(output.opt0){
+  
+  project_dir <- currentProjectDir(analysis)
   
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
@@ -546,12 +561,12 @@ PCA.type.opt <- function(output.opt0){
   ##Drop columns with NA's
   result <- as.data.frame(result)
   result <- result[sapply(result, function(x) !all(is.na(x)))]
-
+  
   mean.result <- list("standardized.means" = apply(result, MARGIN = 1, FUN = mean),"accessions"=t(sapply(output.opt0, "[[", 2)))
   pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
-  result.mean.acces <- mean.result$accessions[pos,]
-  colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
-  rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
+  result.mean.accessions <- mean.result$accessions[pos,]
+  colnames(result.mean.accessions)<-rep(paste("acces",1:dim(result.mean.accessions)[2],sep=""))
+  rownames(result.mean.accessions)<-rep(paste("sol",1:dim(result.mean.accessions)[1],sep=""))
   
   result.scale <- result[pos,]
   result.scale <- cbind("solutions" = pos,result.scale)
@@ -573,8 +588,8 @@ PCA.type.opt <- function(output.opt0){
     row.names(result.scale.pca) <- label.row 
     
     ##Export data for PCA analysis
-    write.csv(result.scale, file = paste(getwd(),"/Results/HighestStandardizedValuesOfSubset_PCA.csv", sep=""), row.names = FALSE)
-    
+    saveResults( result.scale, project_dir, "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
+      
     cat("\n")
     cat("\n")
     cat("Scale result for PCA analysis")
@@ -584,13 +599,12 @@ PCA.type.opt <- function(output.opt0){
     ##Define object PCA
     pca <- NA
     
-    if(dim(result.scale.pca)[2] == 2){ 
+    if(dim(result.scale.pca)[2] == 2) {
+      
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 2, center = FALSE, scale = FALSE)
       
-      DialogBox(paste("The graphics should be saved in",getwd(),"/Results"))
-      ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
+      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_2" )
       
-      png("Results/Optimal_solution_PCA_1_Vs_PCA_2.png", width = 2000, height = 1000, res = NA)
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 1, yax = 2, clabel=1.5)
@@ -601,28 +615,29 @@ PCA.type.opt <- function(output.opt0){
       cat("\n")
       cat("List of solutions \n")
       print(as.numeric(label.row))
-
-  } else if(dim(result.scale.pca)[2] > 2){
+      
+    } else if(dim(result.scale.pca)[2] > 2){
+ 
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 3, center = FALSE, scale = FALSE)
       
-      DialogBox(paste("The graphics should be saved in",getwd(),"/Results"))
-      ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
+      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_2" )
       
-      png("Results/Optimal_solution_PCA_1_Vs_PCA_2.png", width = 2000, height = 1000, res = NA)
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 1, yax = 2, clabel = 1.5)
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot=T, clabel = 1.5)
       dev.off()  
       
-      png("Results/Optimal_solution_PCA_1_Vs_PCA_3.png", width = 2000, height = 1000, res = NA)
+      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_3" )
+      
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 1, yax = 3, clabel = 1.5)
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 3, add.plot = T, clabel = 1.5)
       dev.off()  
       
-      png("Results/Optimal_solution_PCA_2_Vs_PCA_3.png", width = 2000, height = 1000, res = NA)
+      plotImage( project_dir, "Optimal_solution_PCA_2_Vs_PCA_3" )
+      
       s.label(pca$li,sub=paste("PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 2, yax = 3, clabel = 1.5)
@@ -651,15 +666,19 @@ PCA.type.opt <- function(output.opt0){
     
     print(nsol.pca)
     
-    if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-      Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
+    if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+      
+      Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
+
       DataFinal <- Data.Thresholds
-    }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+      
+    } else {
+      
       DataFinal <- object
     } 
     
     final.subset.pca <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.pca,]),]
-     
+    
     ##Selection of preferred set by PCA   
     cat("\n")
     cat("\n")
@@ -669,11 +688,14 @@ PCA.type.opt <- function(output.opt0){
     print(final.subset.pca) 
     cat("\n")
     cat("\n")
-    DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "'Results' folder already exists?")
-    write.csv(final.subset.pca, file = paste(getwd(),"/Results/subset_optimal_solution_by_final_subset_PCA","_Solution(",nsol.pca,")",".csv", sep=""),
-              row.names = FALSE)
-    
+
+    saveResults( 
+          final.subset.pca, 
+          project_dir, 
+          paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
+          row.names = FALSE
+    )     
+
     cat("\n")
     cat("\n")
     cat(paste("Processing completed.................")) 
@@ -688,9 +710,11 @@ WSM.type.opt <- function(output.opt0){
   num.access <- as.numeric(svalue(num.access))
   object <- eval(parse(text = svalue( datasetSelector(analysis) )))
   
-  ## Read ranking 
-  RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
+  ## Read ranking
   
+  project_dir <- currentProjectDir(analysis)
+
+  RI <- readResults( project_dir, "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -719,7 +743,7 @@ WSM.type.opt <- function(output.opt0){
                weight4c, weight5c, weight1n,
                weight2n, weight3n, weight4n, weight5n)
   
-    
+  
   ##Exclude zero-valued weights
   weights <- weights[weights != 0]
   cat("\n")
@@ -746,31 +770,37 @@ WSM.type.opt <- function(output.opt0){
   pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
-  result.mean.acces <- mean.result$accessions[pos,]
-  colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
-  rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
+  result.mean.accessions <- mean.result$accessions[pos,]
+  colnames(result.mean.accessions)<-rep(paste("acces",1:dim(result.mean.accessions)[2],sep=""))
+  rownames(result.mean.accessions)<-rep(paste("sol",1:dim(result.mean.accessions)[1],sep=""))
   
   paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues",sep="")
   cat(paste("#Subset of accessions with ",npercent,"%"," highest standardized mean values#",sep=""))
   cat("\n")
-  print(result.mean.acces)
+  print(result.mean.accessions)
   cat("\n")
   cat("\n")
   
   cat("\n")
+  
   result.scale <- result[pos,]
   
   result.scale <- cbind("solutions" = pos,result.scale)
+  
   cat("#Highest standardized values of subset#")
   cat("\n")
   cat("\n")
   print(result.scale)
   cat("\n")
   cat("\n")
-  
-  write.csv(result.scale, file = paste(getwd(),"/Results/HighestStandardizedValuesOfSubset_WSM.csv", sep=""),
-            row.names = FALSE)
-  
+
+  saveResults( 
+    result.scale, 
+    project_dir, 
+    "HighestStandardizedValuesOfSubset_WSM",
+    row.names = FALSE
+  )     
+
   result.scale.values <- as.matrix(abs(result.scale[,-1]))
   weights <- as.matrix(weights, ncol = 1)
   WSM <- as.numeric(result.scale.values%*%weights) #Compute WSM
@@ -789,10 +819,13 @@ WSM.type.opt <- function(output.opt0){
   
   cat(paste("Solution by WSM: ", nsol.wsm, sep = ""))
   
-  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-    Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
+  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+    
+    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
     DataFinal <- Data.Thresholds
-  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+    
+  } else {
+    
     DataFinal <- object
   } 
   
@@ -805,13 +838,17 @@ WSM.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  print(final.subset.wsm) 
+  print(final.subset.wsm)
+  
   cat("\n")
   cat("\n")
-  DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-  ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "Folder already exists 'Results' ")
-  write.csv(final.subset.wsm , file = paste(getwd(),"/Results/subset_optimal_solution_by_final_subset_WSM","_Solution(",nsol.wsm,")",".csv", sep=""),
-            row.names = FALSE)
+  
+  saveResults( 
+    final.subset.wsm, 
+    project_dir, 
+    paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
+    row.names = FALSE
+  ) 
   
   cat("\n")
   cat("\n")
@@ -871,21 +908,24 @@ chart <- function(out.solution, i){
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw(tableGrob(Table.Results))
   
-  png(paste("Results/Summary_Cluster1_Cluster2_Step",i,".png",sep=""))
+  plotImage( currentProjectDir(analysis), paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
+  
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
-  grid.draw(tableGrob(Table.Results))
+  grid.draw( tableGrob(Table.Results) )
   dev.off()
 }
 
 DTree.type.opt <- function(output.opt0){
   
+  project_dir <- currentProjectDir(analysis)
+  
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
   object <- eval(parse(text = svalue( datasetSelector(analysis) )))
-  
+
   ## Read ranking importance 
-  RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
+  RI <- readResults( project_dir, "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -939,9 +979,9 @@ DTree.type.opt <- function(output.opt0){
   pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
-  result.mean.acces <- mean.result$accessions[pos,]
-  colnames(result.mean.acces)<-rep(paste("acces",1:dim(result.mean.acces)[2],sep=""))
-  rownames(result.mean.acces)<-rep(paste("sol",1:dim(result.mean.acces)[1],sep=""))
+  result.mean.accessions <- mean.result$accessions[pos,]
+  colnames(result.mean.accessions)<-rep(paste("acces",1:dim(result.mean.accessions)[2],sep=""))
+  rownames(result.mean.accessions)<-rep(paste("sol",1:dim(result.mean.accessions)[1],sep=""))
   
   result.scale <- result[pos,]
   result.scale <- cbind("solutions" = pos, result.scale)
@@ -1012,22 +1052,21 @@ DTree.type.opt <- function(output.opt0){
       
     }
     
-    DialogBox(paste("The graphics should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
-    
     nsol.DTree <- as.numeric(solution[length(solution)])
     cat("\n")
     cat("\n")
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
-    
-    if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-      Data.Thresholds <- read.csv(paste(getwd(),"/Results/Data.Thresholds.csv", sep=""))
+
+    if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+      
+      Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
       DataFinal <- Data.Thresholds
-    }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+      
+    } else {
+      
       DataFinal <- object
     } 
-    
     
     final.subset.DTree <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.DTree,]),]
     
@@ -1041,15 +1080,18 @@ DTree.type.opt <- function(output.opt0){
     print(final.subset.DTree) 
     cat("\n")
     cat("\n")
-    DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-    ifelse(file.exists("Results") == "FALSE", dir.create("Results"), "'Results' folder already exists?")
-    write.csv(final.subset.DTree , file = paste(getwd(),"/Results/subset_optimal_solution_by_final_subset_DTree","_Solution(",nsol.DTree,")",".csv", sep=""),
-              row.names = FALSE)
+    
+    saveResults( 
+      final.subset.DTree, 
+      project_dir, 
+      paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
+      row.names = FALSE
+    ) 
     
     cat("\n")
     cat("\n")
     cat(paste("Process completed.................")) 
     
   }
-
+  
 }

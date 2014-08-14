@@ -5,7 +5,7 @@
 #                                                                                               #
 # gui.r - Explora Graphical User Interface (based on RGtk2)                                     #
 #-----------------------------------------------------------------------------------------------#
-#' @include configuration.r dialogs.r loader.r algorithms.r
+#' @include configuration.r dialogs.r projects.r algorithms.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -100,8 +100,8 @@ workbench <- function() {
                   handler = function(h,...){ 
                                 dataset <- load_dataset()
                                 if( ! is.na(dataset) ) {
-                                  addDataset(session$analysis) <- attr(dataset,"identifier")
-                                  currentDataSet(session$analysis) <- dataset
+                                  addDataset(session$analysis)        <- attr(dataset,"identifier")
+                                  currentDataSet(session$analysis)    <- dataset
                                   datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
                                 }
                             }

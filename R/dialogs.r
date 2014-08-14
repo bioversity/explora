@@ -5,7 +5,7 @@
 #
 # dialogs.r - Smaller GUI Dialog Boxes used by Explora
 #------------------------------------------------------------------------------------------------------------------ 
-#' @include configuration.r
+#' @include configuration.r projects.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -88,8 +88,10 @@ SelectSolution <- function(solutions){## Function to select preference category
 
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds
 	
+  project_dir <- currentProjectDir(analysis)
+  
 	object.thresholds <- object
-	ncon <- as.numeric( svalue(numContVar(analysis) )) 
+	ncon <- as.numeric( svalue( numContVar(analysis) )) 
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
 	object.complete <- object
@@ -227,14 +229,10 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = as.table(d.thresholds)
 		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
 		
-		DialogBox(paste("The results should be saved in",getwd(),"/Results"))
-
-		ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"'Results' folder already exists?")
-
-		write.csv(d.thresholds, file = paste(getwd(),"/Results/ResultsDescriptiveAnalysisThresholds.csv", sep=""))
-		write.csv(Data.Thresholds, file = paste(getwd(),"/Results/Data.Thresholds.csv", sep=""), row.names = FALSE)
+		saveResults( d.thresholds,    project_dir, "ResultsDescriptiveAnalysisThresholds" )   	
+		saveResults( Data.Thresholds, project_dir, "Data.Thresholds", row.names = FALSE )   	
 		
-		print(d.thresholds)
+    print(d.thresholds)
 		
 		output <- list("Threshold.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
 		
@@ -276,14 +274,22 @@ number.solution <- function(h,...){
 
 ## Function to selected number of final accessions
 number.final <- function(h,...){
+  
+  project_dir <- currentProjectDir(analysis)
+    
   object = eval(parse(text=svalue( datasetSelector(analysis) )))
   nfinal = as.numeric(svalue(nfinal))
   
-  if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){
-    Data.Thresholds <- read.csv(paste(getwd(), "/Results/Data.Thresholds.csv", sep=""))
+  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+    
+    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
+    
     Data <- Data.Thresholds
-  }else if(any(dir("Results") == "Data.Thresholds.csv") == FALSE){
+    
+  } else {
+    
     Data <- object
+    
   } 
   
   if(nfinal <= dim(Data)[1] & nfinal > 0){
