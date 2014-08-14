@@ -14,6 +14,9 @@
 load_dataset <- function(){
   
   data_file_name <- gfile(text="",filter = list("csv data files" = list(patterns = c("*.csv"))))
+  
+  if(is.na(data_file_name)){ return(NA) }
+  
   data_set_name <- sub("\\.csv$","", basename(data_file_name), ignore.case = TRUE)
 
   print(paste("Loading dataset: ",data_set_name))
