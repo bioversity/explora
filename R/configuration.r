@@ -24,7 +24,7 @@ setClass( "ExploraAnalysis",
               percentSoln        = "guiComponent", # formerly npercen
               numberSoln         = "guiComponent", # formerly Nsim
               optimizationResult = "list",         # output.opt from algorithm$f.optimization
-              datasetCatalog     = "list",         # new way of tracking dataset names
+              datasetCatalog     = "character",    # new way of tracking dataset names
               currentDataSet     = "data.frame"    # data_set loaded (in gui.R)
           )
         )
@@ -51,6 +51,7 @@ setGeneric("percentSoln<-",        function(x,value) standardGeneric("percentSol
 setGeneric("numberSoln<-",         function(x,value) standardGeneric("numberSoln<-"))
 setGeneric("optimizationResult<-", function(x,value) standardGeneric("optimizationResult<-"))
 setGeneric("datasetCatalog<-",     function(x,value) standardGeneric("datasetCatalog<-"))
+setGeneric("addDataset<-",     function(x,value) standardGeneric("addDataset<-"))
 setGeneric("currentDataSet<-",     function(x,value) standardGeneric("currentDataSet<-"))
 
 setReplaceMethod(
@@ -102,8 +103,16 @@ setReplaceMethod(
   "datasetCatalog",
   "ExploraAnalysis",
   function(x,value) { 
-    x@datasetCatalog <- c( x@datasetCatalog, list(value)) 
-    print(paste("datasetCatalog: ",x@datasetCatalog))
+    x@datasetCatalog <- as.character(value) 
+    return(x)
+  }
+)
+
+setReplaceMethod(
+  "addDataset",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@datasetCatalog <- c( x@datasetCatalog, as.character(value)) 
     return(x)
   }
 )

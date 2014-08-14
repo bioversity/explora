@@ -53,6 +53,8 @@ workbench <- function() {
   # and propagated into a special environment
   session  <- new.env()
   session$analysis <- new("ExploraAnalysis")
+  
+  datasetCatalog(session$analysis) <- getProjects() 
 
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
@@ -83,7 +85,10 @@ workbench <- function() {
                         container = lytgb1, 
                         handler = function(h,...) { 
                                     newdir <- gfile(text = "Select directory", type = "selectdir") 
-                                    if(! is.na(newdir) )  { setwd(newdir) } 
+                                    if(! is.na(newdir) )  { 
+                                      setwd(newdir)
+                                      datasetCatalog(session$analysis) <- getProjects() 
+                                    } 
                                   } 
                       )
                 )
@@ -94,8 +99,9 @@ workbench <- function() {
                   expand = F, 
                   handler = function(h,...){ 
                                 dataset <- load_dataset()
-                                datasetCatalog(session$analysis) <- attr(dataset,"identifier")
+                                addDataset(session$analysis) <- attr(dataset,"identifier")
                                 currentDataSet(session$analysis) <- dataset
+                                dataset_selection(session$analysis)[1] <- datasetCatalog(session$analysis)
                             }
                 )
 	
@@ -112,7 +118,7 @@ workbench <- function() {
   ####################
   lytg2[2,2] = ( 
       dataset_selection(session$analysis) <- gdroplist( 
-            datasetCatalog(session$analysis), 
+            c(), 
             selected = 0,  
             container = lytg2, 
             expand = T, 
