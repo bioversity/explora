@@ -225,7 +225,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = sapply(data.var.thresholds.final, des.continuous)
 		row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
 		d.thresholds = as.table(d.thresholds)
-		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( dataset_selection(analysis) )))
+		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
 		
 		DialogBox(paste("The results should be saved in",getwd(),"/Results"))
 
@@ -253,7 +253,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 
 number.access <- function(h,...){## Function for selection of number of accessions in final set 
   
-  object = eval(parse(text=svalue( dataset_selection(analysis) )))
+  object = eval(parse(text=svalue( datasetSelector(analysis) )))
   num.access <- as.numeric(svalue(num.access))
   
   if(num.access <= dim(object)[1] & num.access > 0){
@@ -276,7 +276,7 @@ number.solution <- function(h,...){
 
 ## Function to selected number of final accessions
 number.final <- function(h,...){
-  object = eval(parse(text=svalue( dataset_selection(analysis) )))
+  object = eval(parse(text=svalue( datasetSelector(analysis) )))
   nfinal = as.numeric(svalue(nfinal))
   
   if(any(dir("Results") == "Data.Thresholds.csv") == TRUE){

@@ -35,7 +35,7 @@ descriptives.continuous = function(object){## Used to function 'des.continuous'
   d = sapply(object, des.continuous)
   row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   d = as.table(d)
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
@@ -68,7 +68,7 @@ descriptives.nominal <- function(object){
   d=lapply(object, des.nominal)
   d=ldply(d, data.frame)
   colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
+  names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
   DialogBox(paste("The results should be saved in",getwd(),"/Results"))
   ifelse(file.exists("Results")=="FALSE",dir.create("Results"),"Folder already exists 'Results' ")
@@ -97,7 +97,7 @@ correlation <- function(object){## Correlation analysis
   
   correlation = cbind(correlation, direction)
   colnames(correlation) <- c("Variable 1", "Variable 2", "Correlation", "Direction") 
-  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( dataset_selection(analysis) )))
+  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   cat("\n")
   cat("\n")
   
@@ -358,10 +358,10 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
-  object = eval(parse(text=svalue( dataset_selection(analysis) )))
-  ncon <- as.numeric(svalue( numContVar(analysis) )) 
-  ncat <- as.numeric(svalue(ncat)) 
-  nsoln <- as.numeric(svalue( numberSoln(analysis) )) 
+  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
+  ncon   <- as.numeric(svalue( numContVar(analysis) )) 
+  ncat   <- as.numeric(svalue(ncat)) 
+  nsoln  <- as.numeric(svalue( numberSoln(analysis) )) 
   num.access <- as.numeric(svalue(num.access)) 
   
   varop1c <- svalue(varop1c)
@@ -432,7 +432,7 @@ MAXVAR.type.opt <- function(output.opt0){
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   nfinal <- as.numeric(svalue(nfinal))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text=svalue( dataset_selection(analysis) )))
+  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -537,7 +537,7 @@ PCA.type.opt <- function(output.opt0){
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   nfinal <- as.numeric(svalue(nfinal))
-  object <- eval(parse(text=svalue( dataset_selection(analysis) )))
+  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -686,7 +686,7 @@ WSM.type.opt <- function(output.opt0){
   nsoln <- as.numeric( svalue(numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue( dataset_selection(analysis) )))
+  object <- eval(parse(text = svalue( datasetSelector(analysis) )))
   
   ## Read ranking 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))
@@ -882,7 +882,7 @@ DTree.type.opt <- function(output.opt0){
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue( dataset_selection(analysis) )))
+  object <- eval(parse(text = svalue( datasetSelector(analysis) )))
   
   ## Read ranking importance 
   RI <- read.csv(paste(getwd(),"/Results/RI.csv", sep=""))

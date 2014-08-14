@@ -73,7 +73,7 @@ workbench <- function() {
   
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
-	nb  <- gnotebook( container = win, expand = T, tab.pos = 2)
+	nb  <- gnotebook( container = win, expand = T, tab.pos = 3)
 	
 	##Load dataset
 	lyt1 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Load dataset", expand = T) 
@@ -101,7 +101,7 @@ workbench <- function() {
                                 dataset <- load_dataset()
                                 addDataset(session$analysis) <- attr(dataset,"identifier")
                                 currentDataSet(session$analysis) <- dataset
-                                dataset_selection(session$analysis)[1] <- datasetCatalog(session$analysis)
+                                datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
                             }
                 )
 	
@@ -117,12 +117,15 @@ workbench <- function() {
   # TODO - FIX THIS! selection of the data_set doesn't really work; use of the "attach(eval(parse(text=svalue(h$obj)))" in the handler also seems a bit strange
   ####################
   lytg2[2,2] = ( 
-      dataset_selection(session$analysis) <- gdroplist( 
-            c(), 
+      datasetSelector(session$analysis) <- gdroplist( 
+            datasetCatalog(session$analysis), 
             selected = 0,  
             container = lytg2, 
             expand = T, 
-            handler = function(h,...){ attach(eval(parse(text=svalue(h$obj)))) }
+            handler = function(h,...){
+                        print("dataSelection.gdroplist(h$obj)")
+                        print(svalue(h$obj))  # attach( eval( parse( text=svalue(h$obj) ) ) ) 
+                      }
       )
   )
   
@@ -135,15 +138,15 @@ workbench <- function() {
 	lytg2[6,1]=(glabel=(""))
 	lytg2[7,1]=(glabel=(""))
 	
-	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",container=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue( dataset_selection(session$analysis) )))))})
-	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",container=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue( dataset_selection(session$analysis) )))))})
+	lytg2[9,1] = gbutton("Descriptive analysis for continuous variables",container=lytg2, handler=function(h,...){print(descriptives.continuous(eval(parse(text=svalue( datasetSelector(session$analysis) )))))})
+	lytg2[10,1] = gbutton("Descriptive analysis for nominal variables",container=lytg2, handler=function(h,...){print(descriptives.nominal(eval(parse(text=svalue( datasetSelector(session$analysis) )))))})
 	
 	lytg2[11,1]=(glabel=(""))
 	lytg2[12,1]=(glabel=(""))
 	
 	lytg2[13,1] = glabel("Level of correlation: ",container=lytg2)
 	lytg2[13,2] = (ncor <- gspinbutton(from=0, to = 1, by = 0.1, value=0, container=lytg2)) 
-	lytg2[14,1] = gbutton("Correlation analysis",container=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue( dataset_selection(session$analysis) )))))})
+	lytg2[14,1] = gbutton("Correlation analysis",container=lytg2, handler=function(h,...){print(correlation(eval(parse(text=svalue( datasetSelector(session$analysis) )))))})
 	
 	lytg2[15,1]=(glabel=(""))
 	lytg2[16,1]=(glabel=(""))
@@ -157,7 +160,7 @@ workbench <- function() {
 	lytg2[20,1]=(glabel=(""))
 	
 	lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
-	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue( dataset_selection(session$analysis) ))))})
+	lytg2[22,1] = gbutton("Select variables",  container = lytg2, handler = function(h,...){DialogSelectThresholds(eval(parse(text=svalue( datasetSelector(session$analysis) ))))})
 	
 	##Selection of preferred analysis
 	lyt5 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)
@@ -174,7 +177,7 @@ workbench <- function() {
 	
 	lytg5[5,1] = glabel("Optimization analysis: ",  container = lytg5)
 	lytg5[6,1] = gbutton("Select variables",  container = lytg5, expand=F,
-			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue( dataset_selection(session$analysis) ))))})
+			handler = function(h,...){DialogSelectOptimization(eval(parse(text=svalue( datasetSelector(session$analysis) ))))})
 	
 	lytg5[7,1] = (glabel=(""))
 	lytg5[8,1] = (glabel=(""))
