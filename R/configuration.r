@@ -57,7 +57,7 @@ setMethod(  "currentProjectFolder",
             } 
          )
 
-setGeneric("datasetSelector<-",  function(x,value) standardGeneric("datasetSelector<-"))
+setGeneric("datasetSelector<-",    function(x,value) standardGeneric("datasetSelector<-"))
 setGeneric("numContVar<-",         function(x,value) standardGeneric("numContVar<-"))
 setGeneric("percentSoln<-",        function(x,value) standardGeneric("percentSoln<-"))
 setGeneric("numberSoln<-",         function(x,value) standardGeneric("numberSoln<-"))

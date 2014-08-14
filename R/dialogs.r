@@ -24,6 +24,8 @@
 #' @importMethodsFrom gWidgets svalue<-
 #' @importMethodsFrom gWidgets addSpring
 #' @importMethodsFrom gWidgets dispose
+#' @importMethodsFrom gWidgets visible<-
+
 
 #' @import gWidgetsRGtk2
 
@@ -304,4 +306,10 @@ number.percent <- function(h,...){
   
 }
 
-
+## Function to select the objective function for nominal variables
+select.functions <- function(fitems, f){
+  win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
+  g   <- ggroup(horizontal=FALSE,  container = win)
+  function.optimize <- gdroplist(fitems, expand = T, editable = F,  container = g, handler = f)
+  visible(win)<-TRUE
+}

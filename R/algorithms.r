@@ -12,7 +12,8 @@
 # in this module since check()does not complain if it is removed...
 ########################################################################
 
-des.continuous <- function(object){## Descriptive analysis for continuous variables
+## Ddescriptor analysis for continuous variables
+des.continuous <- function(object){
   n = length(object)
   average = round(mean(object, na.rm=T),3)
   variance = round(var(object, na.rm=T),3)
@@ -26,58 +27,59 @@ des.continuous <- function(object){## Descriptive analysis for continuous variab
   result = cbind(n, min, max, average, variance, Est.Desv, median, Coef.Var, NA.Data, NA.Percent)
 }
 
-
-descriptives.continuous = function(object){## Used to function 'des.continuous' 
+## Used to function 'des.continuous' 
+descriptors.continuous = function(object){
   
   ncon <- as.numeric( svalue( numContVar(analysis) ))
   object <- object[,-1]
   object <- object[,1:ncon]
   
-  d = sapply(object, des.continuous)
+  results <- sapply(object, des.continuous)
   
-  row.names(d) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
-  d = as.table(d)
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
+  row.names(results) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
+  results <- as.table(results)
+  names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveResults( d, "ResultsDescriptiveAnalysisContinuousVariables" )   	
+  saveResults( results, "ResultsDdescriptorAnalysisContinuousVariables" )   	
   
-  return(d)
-  
+  return(results)
 }
 
 
-des.nominal <- function(object){## Descriptive analysis for nominal variables
+des.nominal <- function(object){## Ddescriptor analysis for nominal variables
   n=length(object)
-  category = names(table(object)) 
-  frecuence = table(object)
-  percentage = round((table(object)/sum(object))*100,2)
-  NA.Data = round(sum(is.na(object)),0)
-  NA.Percent = round((NA.Data/length(object))*100,2)
-  result=cbind(n, category, frecuence, percentage, NA.Data, NA.Percent)
+  category <- names(table(object)) 
+  frequence <- table(object)
+  percentage <- round((table(object)/sum(object))*100,2)
+  NA.Data <- round(sum(is.na(object)),0)
+  NA.Percent <- round((NA.Data/length(object))*100,2)
+  result<-cbind(n, category, frequence, percentage, NA.Data, NA.Percent)
 }
 
 #' @importFrom plyr ldply
 
 ## Used to function 'des.nominal'
-descriptives.nominal <- function(object){
+descriptors.nominal <- function(object){
   
   ncon <-as.numeric(svalue( numContVar(analysis) ))
   ncat <-as.numeric(svalue(ncat))
   object <- object[,-1]
   object <- object[,(ncon+1):dim(object)[2]]
-  d=lapply(object, des.nominal)
-  d=ldply(d, data.frame)
-  colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
-  names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveResults( d, "ResultsDescriptiveAnalysisNominalVariables", row.names = FALSE )     
+  results<-lapply(object, des.nominal)
+  results<-ldply(results, data.frame)
+  colnames(results) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
+  names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  return(d)
+  saveResults( results, "ResultsDdescriptorAnalysisNominalVariables", row.names = FALSE )     
+  
+  return(results)
 }
 
-correlation <- function(object){## Correlation analysis
+## Correlation analysis
+correlation <- function(object){
   
-  ncon <-as.numeric( svalue(numContVar(analysis) ))
+  ncon <-as.numeric( svalue( numContVar(analysis) ))
   
   object <- object[,-1]
   object <- object[,1:ncon]
@@ -93,8 +95,10 @@ correlation <- function(object){## Correlation analysis
   }
   
   correlation = cbind(correlation, direction)
+  
   colnames(correlation) <- c("Variable 1", "Variable 2", "Correlation", "Direction") 
   names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
+  
   cat("\n")
   cat("\n")
   
@@ -119,16 +123,6 @@ correlation <- function(object){## Correlation analysis
     return(correlation.ncor)
   }
   
-}
-
-#' @importFrom gWidgets gdroplist
-#' @importMethodsFrom gWidgets visible<-
-
-select.functions <- function(fitems, f){## Function to select the objective function for nominal variables
-  win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
-  g <- ggroup(horizontal=FALSE,  container = win)
-  function.optimize <- gdroplist(fitems, expand = T, editable = F,  container = g, handler = f)
-  visible(win)<-TRUE
 }
 
 DialogSelectOptimization <- function(object){
