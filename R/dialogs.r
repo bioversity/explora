@@ -88,8 +88,6 @@ SelectSolution <- function(solutions){## Function to select preference category
 
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds
 	
-  project_dir <- currentProjectDir(analysis)
-  
 	object.thresholds <- object
 	ncon <- as.numeric( svalue( numContVar(analysis) )) 
 	object.thresholds <- object.thresholds[,-1]
@@ -229,8 +227,8 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = as.table(d.thresholds)
 		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
 		
-		saveResults( d.thresholds,    project_dir, "ResultsDescriptiveAnalysisThresholds" )   	
-		saveResults( Data.Thresholds, project_dir, "Data.Thresholds", row.names = FALSE )   	
+		saveResults( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
+		saveResults( Data.Thresholds, "Data.Thresholds", row.names = FALSE )   	
 		
     print(d.thresholds)
 		
@@ -274,15 +272,13 @@ number.solution <- function(h,...){
 
 ## Function to selected number of final accessions
 number.final <- function(h,...){
-  
-  project_dir <- currentProjectDir(analysis)
     
   object = eval(parse(text=svalue( datasetSelector(analysis) )))
   nfinal = as.numeric(svalue(nfinal))
   
-  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
+  if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
-    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
+    Data.Thresholds <- readResults( "Data.Thresholds" )
     
     Data <- Data.Thresholds
     

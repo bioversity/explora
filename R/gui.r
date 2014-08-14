@@ -58,10 +58,13 @@ workbench <- function() {
 
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
+  environment(result.path)             <- session
+  
   environment(DialogSelectThresholds)  <- session
   environment(number.solution)         <- session
   environment(number.final)            <- session
   environment(number.percent)          <- session
+  
   environment(descriptives.continuous) <- session
   environment(descriptives.nominal)    <- session
   environment(correlation)             <- session

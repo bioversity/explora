@@ -39,7 +39,7 @@ descriptives.continuous = function(object){## Used to function 'des.continuous'
   d = as.table(d)
   names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveResults( d, currentProjectDir(analysis), "ResultsDescriptiveAnalysisContinuousVariables" )   	
+  saveResults( d, "ResultsDescriptiveAnalysisContinuousVariables" )   	
   
   return(d)
   
@@ -70,7 +70,7 @@ descriptives.nominal <- function(object){
   colnames(d) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
   names(dimnames(d)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveResults( d, currentProjectDir(analysis), "ResultsDescriptiveAnalysisNominalVariables", row.names = FALSE )     
+  saveResults( d, "ResultsDescriptiveAnalysisNominalVariables", row.names = FALSE )     
   
   return(d)
 }
@@ -101,11 +101,9 @@ correlation <- function(object){## Correlation analysis
   ncor <-as.numeric(svalue(ncor))
   ncor <- abs(ncor)
   
-  project_dir <- currentProjectDir(analysis)
-  
   if(ncor==0){
     
-    saveResults( correlation, project_dir, "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
+    saveResults( correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
     
     return(correlation)
     
@@ -113,7 +111,7 @@ correlation <- function(object){## Correlation analysis
     
     correlation.ncor <- subset(correlation, abs(correlation$Correlation)>=ncor)
     
-    saveResults( correlation.ncor, project_dir, paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
+    saveResults( correlation.ncor,  paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
     
     cat("\n")
     cat("\n")
@@ -256,7 +254,7 @@ DialogSelectOptimization <- function(object){
   fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
   ri1n; ri2n; ri3n; ri4n; ri5n
   
-  saveResults( RI, currentProjectDir(analysis), paste("RI", sep=""), row.names = FALSE )     
+  saveResults( RI, paste("RI", sep=""), row.names = FALSE )     
 }
 
 #' @importFrom vegan diversity
@@ -347,6 +345,20 @@ optimization <- function(data, option1, option2, num.access){ ## calculate 'opti
   
 } 
 
+#
+# This function retrieves any available data threshold values for the current project
+#
+getDataThresholds <- function() {
+  
+  if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
+    
+    return( readResults(  "Data.Thresholds" ) )
+    
+  } else {
+    
+    return(NA)
+  }
+}
 
 f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,                           
@@ -387,18 +399,8 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
   
-  project_dir <- currentProjectDir(analysis)
-  
-  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
-    
-    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
-    Data <- Data.Thresholds
-    
-  } else {
-    
-    Data <- object
-  } 
-  
+  Data <- getDataThresholds()
+  if( is.na(Data) ) { Data <- object } 
   
   option.objective.con <- matrix(c(varop1c, varop2c, varop3c, varop4c, varop5c,
                                    fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c),
@@ -462,11 +464,9 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  project_dir <- currentProjectDir(analysis)
-  
   saveResults( 
     result.mean.accessions, 
-    project_dir, 
+     
     paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
   )     
   
@@ -480,7 +480,7 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( result.scale, project_dir, "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
+  saveResults( result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
   
   ##11)  Selection of final set of optimal solutions: 
   
@@ -509,16 +509,8 @@ MAXVAR.type.opt <- function(output.opt0){
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
   
-  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ) {
-    
-    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
-    
-    DataFinal <- Data.Thresholds
-    
-  } else {
-    
-    DataFinal <- object
-  } 
+  DataFinal <- getDataThresholds()
+  if( is.na(DataFinal) ) { DataFinal <- object } 
   
   final.subset.max.var <- DataFinal[is.element(DataFinal$n_acces,unique(mean.result$accessions[pos.variance.aux,1])[1:num.access]),]
   
@@ -534,7 +526,7 @@ MAXVAR.type.opt <- function(output.opt0){
   
   saveResults( 
       final.subset.max.var, 
-      project_dir, 
+       
       paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
       row.names = FALSE 
   )     
@@ -546,8 +538,6 @@ MAXVAR.type.opt <- function(output.opt0){
 #' @importFrom ade4 s.corcircle
 
 PCA.type.opt <- function(output.opt0){
-  
-  project_dir <- currentProjectDir(analysis)
   
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
@@ -588,7 +578,7 @@ PCA.type.opt <- function(output.opt0){
     row.names(result.scale.pca) <- label.row 
     
     ##Export data for PCA analysis
-    saveResults( result.scale, project_dir, "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
+    saveResults( result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
       
     cat("\n")
     cat("\n")
@@ -603,7 +593,7 @@ PCA.type.opt <- function(output.opt0){
       
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 2, center = FALSE, scale = FALSE)
       
-      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_2" )
+      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -620,7 +610,7 @@ PCA.type.opt <- function(output.opt0){
  
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 3, center = FALSE, scale = FALSE)
       
-      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_2" )
+      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -628,7 +618,7 @@ PCA.type.opt <- function(output.opt0){
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot=T, clabel = 1.5)
       dev.off()  
       
-      plotImage( project_dir, "Optimal_solution_PCA_1_Vs_PCA_3" )
+      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_3" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -636,7 +626,7 @@ PCA.type.opt <- function(output.opt0){
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 3, add.plot = T, clabel = 1.5)
       dev.off()  
       
-      plotImage( project_dir, "Optimal_solution_PCA_2_Vs_PCA_3" )
+      plotImage(  "Optimal_solution_PCA_2_Vs_PCA_3" )
       
       s.label(pca$li,sub=paste("PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -666,16 +656,8 @@ PCA.type.opt <- function(output.opt0){
     
     print(nsol.pca)
     
-    if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
-      
-      Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
-
-      DataFinal <- Data.Thresholds
-      
-    } else {
-      
-      DataFinal <- object
-    } 
+    DataFinal <- getDataThresholds()
+    if( is.na(DataFinal) ) { DataFinal <- object } 
     
     final.subset.pca <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.pca,]),]
     
@@ -691,7 +673,7 @@ PCA.type.opt <- function(output.opt0){
 
     saveResults( 
           final.subset.pca, 
-          project_dir, 
+           
           paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
           row.names = FALSE
     )     
@@ -712,9 +694,7 @@ WSM.type.opt <- function(output.opt0){
   
   ## Read ranking
   
-  project_dir <- currentProjectDir(analysis)
-
-  RI <- readResults( project_dir, "RI" )  
+  RI <- readResults(  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -796,7 +776,7 @@ WSM.type.opt <- function(output.opt0){
 
   saveResults( 
     result.scale, 
-    project_dir, 
+     
     "HighestStandardizedValuesOfSubset_WSM",
     row.names = FALSE
   )     
@@ -819,15 +799,8 @@ WSM.type.opt <- function(output.opt0){
   
   cat(paste("Solution by WSM: ", nsol.wsm, sep = ""))
   
-  if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
-    
-    Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
-    DataFinal <- Data.Thresholds
-    
-  } else {
-    
-    DataFinal <- object
-  } 
+  DataFinal <- getDataThresholds()
+  if( is.na(DataFinal) ) {DataFinal <- object } 
   
   final.subset.wsm <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.wsm,]),]
   
@@ -845,7 +818,7 @@ WSM.type.opt <- function(output.opt0){
   
   saveResults( 
     final.subset.wsm, 
-    project_dir, 
+     
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
     row.names = FALSE
   ) 
@@ -908,7 +881,7 @@ chart <- function(out.solution, i){
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw(tableGrob(Table.Results))
   
-  plotImage( currentProjectDir(analysis), paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
+  plotImage( paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
   
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw( tableGrob(Table.Results) )
@@ -917,15 +890,13 @@ chart <- function(out.solution, i){
 
 DTree.type.opt <- function(output.opt0){
   
-  project_dir <- currentProjectDir(analysis)
-  
   nsoln <- as.numeric(svalue( numberSoln(analysis) ))
   npercent <- as.numeric(svalue( percentSoln(analysis) ))
   num.access <- as.numeric(svalue(num.access))
   object <- eval(parse(text = svalue( datasetSelector(analysis) )))
 
   ## Read ranking importance 
-  RI <- readResults( project_dir, "RI" )  
+  RI <- readResults(  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -1058,15 +1029,8 @@ DTree.type.opt <- function(output.opt0){
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
 
-    if( any( dir( project_dir ) == "Data.Thresholds.csv") == TRUE ){
-      
-      Data.Thresholds <- readResults( project_dir, "Data.Thresholds" )
-      DataFinal <- Data.Thresholds
-      
-    } else {
-      
-      DataFinal <- object
-    } 
+    DataFinal <- getDataThresholds()
+    if( is.na(DataFinal) ) { DataFinal <- object } 
     
     final.subset.DTree <- DataFinal[is.element(DataFinal$n_acces,mean.result$accessions[nsol.DTree,]),]
     
@@ -1082,8 +1046,7 @@ DTree.type.opt <- function(output.opt0){
     cat("\n")
     
     saveResults( 
-      final.subset.DTree, 
-      project_dir, 
+      final.subset.DTree,
       paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
       row.names = FALSE
     ) 

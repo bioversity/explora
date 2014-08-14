@@ -36,7 +36,7 @@ setGeneric("numberSoln",         function(x) standardGeneric("numberSoln"))
 setGeneric("optimizationResult", function(x) standardGeneric("optimizationResult"))
 setGeneric("datasetCatalog",     function(x) standardGeneric("datasetCatalog"))
 setGeneric("currentDataSet",     function(x) standardGeneric("currentDataSet"))
-setGeneric("currentProjectDir",  function(x) standardGeneric("currentProjectDir"))
+setGeneric("currentProjectFolder",  function(x) standardGeneric("currentProjectFolder"))
 
 setMethod("datasetSelector",  "ExploraAnalysis",function(x) x@datasetSelector )
 setMethod("numContVar",         "ExploraAnalysis",function(x) x@numContVar )
@@ -46,7 +46,7 @@ setMethod("optimizationResult", "ExploraAnalysis",function(x) x@optimizationResu
 setMethod("datasetCatalog",     "ExploraAnalysis",function(x) x@datasetCatalog )
 setMethod("currentDataSet",     "ExploraAnalysis",function(x) x@currentDataSet )
 
-setMethod(  "currentProjectDir",  
+setMethod(  "currentProjectFolder",  
             "ExploraAnalysis", 
             function(x) { 
                 if(!is.null(attr(x@currentDataSet,"projectFolder"))) {

@@ -25,13 +25,14 @@ load_dataset <- function(){
 	
   projectFolder = file.path(getwd(),paste(data_set_name,".explora",sep=""))
   print(paste("Creating project directory: ", projectFolder))
+  
   ifelse( 
       file.exists(projectFolder)=="FALSE", 
       dir.create(projectFolder,recursive=TRUE), 
       paste("Project folder '",projectFolder,"' already exists?") 
   )
   
-	write.csv(data_set, file = file.path(projectFolder,paste(data_set_name,".csv"), sep = ""), row.names = FALSE)
+	write.csv(data_set, file = file.path( projectFolder, paste(data_set_name,".csv"), sep = ""), row.names = FALSE)
 
   attr(data_set,"identifier")    <- data_set_name
   attr(data_set,"projectFolder") <- projectFolder
@@ -40,22 +41,27 @@ load_dataset <- function(){
 }
 
 getProjects <- function() {
+  
   dirs <- list.dirs(getwd(),full.names=FALSE, recursive=FALSE)
   dirs <- dirs[length(dirs)>0 & grepl("\\.explora$",dirs)]
+  
   return(dirs)
 }
 
 #
-# The results.exist function tests the availability of a previously saved result file
+# The result.path function tests the 
+# availability of a file
 #
-results.exist <- function( project_dir, filename, filext ) {
+result.path <- function( filename, filext ) {
   
-  if(   nchar(project_dir)>0 & 
-          file.exists(project_dir) & 
-          nchar(filename)>0 
+  projectFolder <- currentProjectFolder(analysis)
+  
+  if( nchar(projectFolder)>0 & 
+      file.exists(projectFolder) & 
+      nchar(filename)>0 
   ) {
     
-    path = file.path( project_dir, paste( filename, ".", filext, sep="") )
+    path = file.path( projectFolder, paste( filename, ".", filext, sep="") )
     
     if( file.exists(path) ) {
       return(path) 
@@ -63,22 +69,21 @@ results.exist <- function( project_dir, filename, filext ) {
   }
   
   return(FALSE)
-  
 }
 
 #
 # This function serves as a common mechanism 
 # for saving project analysis results as a CSV file
 #
-# Data, project_dire and filename are assumed 
+# Results and filename are assumed non-empty
 # to be set to valid values here(?). A simple
 # sanity check made to test this assumption
 #
-saveResults <- function( results, project_dir, filename, row.names = TRUE ) {
+saveResults <- function( results, filename, row.names = TRUE ) {
   
   if( is.data.frame(results) ) {
     
-    path <- results.exist( project_dir, filename, "csv" )
+    path <- result.path( filename, "csv" )
     
     if( path ) {
       
@@ -90,7 +95,7 @@ saveResults <- function( results, project_dir, filename, row.names = TRUE ) {
     }
   } 
   
-  DialogBox(paste("Warning: could not save analysis results '", filename,"' to '",project_dir,"'?", sep="" ))
+  DialogBox(paste("Error: could not save analysis results for '", filename,"'?", sep="" ))
   
   return(FALSE)
 }
@@ -98,9 +103,9 @@ saveResults <- function( results, project_dir, filename, row.names = TRUE ) {
 #
 # opens up a PNG device to the specified file
 #
-plotImage <- function( project_dir, filename, width = 2000, height = 1000, res = NA ) {
+plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
   
-  path <- results.exist( project_dir, filename, "png" )
+  path <- result.path( filename, "png" )
   
   if( path ) {
     
@@ -111,7 +116,7 @@ plotImage <- function( project_dir, filename, width = 2000, height = 1000, res =
     return(TRUE)
   }
   
-  DialogBox(paste("Warning: could not open image file '", filename,"' in '",project_dir,"'?", sep="" ))
+  DialogBox(paste("Warning: could not open plot image file '", filename,"'?", sep="" ))
   
   return(FALSE)
 }
@@ -122,9 +127,12 @@ plotImage <- function( project_dir, filename, width = 2000, height = 1000, res =
 # retrieves a previously saved result file;
 # Singular file assumed here(?)
 #
-readResults <- function( project_dir, filename ) {
-    path <- results.exist( project_dir, filename, "csv" )
+readResults <- function( filename ) {
+  
+    path <- result.path( filename, "csv" )
+    
     if( path ) {
+      
         data <- read.csv(path)
         return(data)
     }
