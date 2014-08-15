@@ -58,6 +58,7 @@ workbench <- function() {
 
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
+  environment(saveProjectFile)        <- session
   environment(result.path)            <- session
   
   environment(DialogSelectThresholds) <- session
@@ -70,6 +71,7 @@ workbench <- function() {
   environment(descriptors.nominal)    <- session
   environment(correlation)            <- session
   environment(f.optimization)         <- session
+  
   environment(MAXVAR.type.opt)        <- session
   environment(PCA.type.opt)           <- session
   environment(WSM.type.opt)           <- session
@@ -104,7 +106,8 @@ workbench <- function() {
                   expand = F, 
                   handler = function(h,...){ 
                                 dataset <- createProject()
-                                if( ! is.na(dataset) ) {
+                                dsl <- length(dataset)
+                                if( dsl > 0 && !(dsl == 1 && is.na(dataset)) ) {
                                   addDataset(session$analysis)        <- attr(dataset,"identifier")
                                   currentDataSet(session$analysis)    <- dataset
                                   datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
@@ -185,7 +188,7 @@ workbench <- function() {
 	lytg2[18,1] = gbutton(
                   "Select number of accessions",
                   container = lyt2, 
-                  expand=F,
+                  expand=FALSE,
 			            handler = function(h,...){ print(number.access()) }
                 )
 	

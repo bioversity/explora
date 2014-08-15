@@ -241,7 +241,7 @@ number.access <- function(h,...){## Function for selection of number of accessio
   
   object = currentDataSet(analysis)
   
-  num.access <- as.numeric(svalue(num.access))
+  num.access <- as.numeric(svalue( numberOfSolutions(analysis) ))
   
   if(num.access <= dim(object)[1] & num.access > 0){
     DialogBox(paste("Number of accessions in the final set: ", num.access, sep=" "))

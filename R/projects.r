@@ -242,8 +242,7 @@ getProjects <- function() {
 }
 
 #
-# The result.path function tests the 
-# availability of a file
+# The result.path function builds a valid project file path, if it can
 #
 result.path <- function( filename, filext ) {
   
@@ -255,13 +254,31 @@ result.path <- function( filename, filext ) {
   ) {
     
     path = file.path( projectFolder, paste( filename, ".", filext, sep="") )
-    
-    if( file.exists(path) ) {
-      return(path) 
-    }
+    return(path) 
   }
   
-  return(FALSE)
+  return(NA)
+}
+
+#
+# The result.path function checks the full 
+# existence of a csv data file in the projectFolder
+#
+result.path.exists <- function( filename, filext ) {
+  
+  path <- result.path( filename, filext )
+  
+  if( !is.na(path) ) {
+    
+    if(file.exists(path)) { 
+      
+      return(path) 
+      
+    }
+    
+  } 
+  return(NA)
+  
 }
 
 #
@@ -296,11 +313,11 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 #
 saveProjectFile <- function( results, filename, row.names = TRUE ) {
   
-  if( is.data.frame(results) ) {
+  if( is.table(results) | is.data.frame(results) ) {
     
     path <- result.path( filename, "csv" )
     
-    if( path ) {
+    if( !is.na(path) ) {
       
       DialogBox( paste("Result data posted to: ", path) )
       
@@ -322,7 +339,7 @@ plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
   
   path <- result.path( filename, "png" )
   
-  if( path ) {
+  if( !is.na(path) ) {
     
     DialogBox( paste("Result image posted to: ", path) )
     
@@ -340,18 +357,21 @@ plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
 #
 # Reciprocal of saveProjectFile, this readProjectFile function 
 # retrieves a previously saved csv project data file;
-# Singular file assumed here(?)
+# Singular file assumed here(?), should exists when this function is called
 #
 readProjectFile <- function( filename ) {
   
-    path <- result.path( filename, "csv" )
+    path <- result.path.exists( filename, "csv" )
     
-    if( path ) {
+    if( !is.na(path) ) {
       
         data <- read.csv(path)
         return(data)
+        
     } else {
+      
       return(NA)
+      
     }
 }
 
@@ -371,9 +391,15 @@ loadDataset <- function( datasetId ) {
     
     # third, check if the file exists
     if( file.exists(path) ) {
+      
       # if so, then read it in!
-      data <- read.csv(path)
-      return(data)
+      dataset <- read.csv(path)
+      
+      # don't forget to annotate it a bit
+      attr(dataset,"identifier")    <- datasetId
+      attr(dataset,"projectFolder") <- projectFolder
+      
+      return(dataset)
     }
   }
   # otherwise, fail to return the dataset
@@ -390,9 +416,7 @@ setReplaceMethod(
   "currentDataSet",
   signature(x="ExploraAnalysis", value="character"),
   function(x,value) { 
-    dataset <- loadDataset( value )
-    attr(dataset,"identifier") <- value
-    x@currentDataSet <- dataset 
+    x@currentDataSet <- loadDataset( value )
     return(x)
   }
 )

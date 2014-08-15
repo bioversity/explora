@@ -12,7 +12,7 @@
 # in this module since check()does not complain if it is removed...
 ########################################################################
 
-## Ddescriptor analysis for continuous variables
+## Descriptor analysis for continuous variables
 des.continuous <- function(object){
   n <- length(object)
   average <- round(mean(object, na.rm = TRUE),3)
@@ -40,13 +40,13 @@ descriptors.continuous <- function(object){
   results <- as.table(results)
   names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveProjectFile( results, "ResultsDdescriptorAnalysisContinuousVariables" )   	
+  saveProjectFile( results, "ResultsDescriptorAnalysisContinuousVariables" )   	
   
   return(results)
 }
 
 
-des.nominal <- function(object){## Ddescriptor analysis for nominal variables
+des.nominal <- function(object){## Descriptor analysis for nominal variables
   n<-length(object)
   category   <- names(table(object)) 
   frequence  <- table(object)
@@ -73,7 +73,7 @@ descriptors.nominal <- function(object){
   
   names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(analysis) )))
   
-  saveProjectFile( results, "ResultsDdescriptorAnalysisNominalVariables", row.names = FALSE )     
+  saveProjectFile( results, "ResultsDescriptorAnalysisNominalVariables", row.names = FALSE )     
   
   return(results)
 }
@@ -912,7 +912,6 @@ DTree.type.opt <- function(output.opt0){
   ri4n <- RI[4,2]
   ri5n <- RI[5,2]
   
-  
   ##Weights
   weight1c <- ri1c/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
   weight2c <- ri2c/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
@@ -925,21 +924,16 @@ DTree.type.opt <- function(output.opt0){
   weight4n <- ri4n/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
   weight5n <- ri5n/sum(ri1c, ri2c, ri3c, ri4c, ri5c, ri1n, ri2n, ri3n, ri4n, ri5n)
   
-  
   weights <- c(weight1c, weight2c, weight3c, 
                weight4c, weight5c, weight1n,
                weight2n, weight3n, weight4n, weight5n)
   
-  
-  
   ##Exclude zero-valued weights
   weights <- weights[weights != 0]
-  
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
   colnames(result) <- as.character(output.opt0[[1]]$names)
-  
   
   ##Drop columns with NA's
   result <- as.data.frame(result)
