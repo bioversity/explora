@@ -5,7 +5,7 @@
 #                                                                                             #
 # dialogs.r - Smaller GUI Dialog Boxes used by Explora                                        #
 #---------------------------------------------------------------------------------------------- 
-#' @include configuration.r projects.r
+#' @include projects.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -28,22 +28,6 @@
 #' @importMethodsFrom gWidgets visible<-
 
 #' @import gWidgetsRGtk2
-
-DialogBox <- function(message, handler=NULL) {## This function make a dialog box
-	
-	w<- gwindow("Alert",width=100,height=100)
-	g <- ggroup( container = w)
-	gimage("info", dirname="stock", size="large_toolbar",  container = g)
-	
-	ig <- ggroup(horizontal = FALSE,  container = g)
-	glabel(message,  container = ig, expand = TRUE)
-	
-	bg <- ggroup( container = ig)
-	addSpring(bg)
-	gbutton("Ok", handler = function(h,...) dispose(w),  container = bg)
-	
-	return()
-}  
 
 
 DialogBoxDTree <- function(items) {## This function make a dialog box
@@ -233,8 +217,8 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = as.table(d.thresholds)
 		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
 		
-		saveResults( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
-		saveResults( Data.Thresholds, "Data.Thresholds", row.names = FALSE )   	
+		saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
+		saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE )   	
 		
     print(d.thresholds)
 		
@@ -268,11 +252,15 @@ number.access <- function(h,...){## Function for selection of number of accessio
   return(num.access) 
 }
 
-number.solution <- function(h,...){
+number.solutions <- function(h,...) {
+  
   nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  
   if(nsoln > 0 & nsoln <= 1000000){
     DialogBox(paste("The number of solution is: ", nsoln, sep=" "))
-  }else{DialogBox("Error in the percentage of solutions")}
+  } else { 
+    DialogBox("Error in the percentage of solutions")
+  }
   
   return(nsoln) 
 }
@@ -286,7 +274,7 @@ number.final <- function(h,...){
   
   if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
-    Data.Thresholds <- readResults( "Data.Thresholds" )
+    Data.Thresholds <- readProjectFile( "Data.Thresholds" )
     
     Data <- Data.Thresholds
     

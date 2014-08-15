@@ -4,7 +4,7 @@
 #VERSION 2.0 - AUGUST-04-2014                                                                 #
 #                                                                                             #
 #---------------------------------------------------------------------------------------------- 
-#' @include configuration.r dialogs.r projects.r
+#' @include projects.r dialogs.r 
 
 ########################################################################
 # Not sure how the previously included "cluster" package for 
@@ -40,7 +40,7 @@ descriptors.continuous <- function(object){
   results <- as.table(results)
   names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
   
-  saveResults( results, "ResultsDdescriptorAnalysisContinuousVariables" )   	
+  saveProjectFile( results, "ResultsDdescriptorAnalysisContinuousVariables" )   	
   
   return(results)
 }
@@ -73,7 +73,7 @@ descriptors.nominal <- function(object){
   
   names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(analysis) )))
   
-  saveResults( results, "ResultsDdescriptorAnalysisNominalVariables", row.names = FALSE )     
+  saveProjectFile( results, "ResultsDdescriptorAnalysisNominalVariables", row.names = FALSE )     
   
   return(results)
 }
@@ -109,7 +109,7 @@ correlation <- function(object){
   
   if(ncor==0){
     
-    saveResults( correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
+    saveProjectFile( correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
     
     return(correlation)
     
@@ -117,7 +117,7 @@ correlation <- function(object){
     
     correlation.ncor <- subset(correlation, abs(correlation$Correlation)>=ncor)
     
-    saveResults( correlation.ncor,  paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
+    saveProjectFile( correlation.ncor,  paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
     
     cat("\n")
     cat("\n")
@@ -250,7 +250,7 @@ DialogSelectOptimization <- function(object){
   fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
   ri1n; ri2n; ri3n; ri4n; ri5n
   
-  saveResults( RI, paste("RI", sep=""), row.names = FALSE )     
+  saveProjectFile( RI, paste("RI", sep=""), row.names = FALSE )     
 }
 
 #' @importFrom vegan diversity
@@ -351,7 +351,7 @@ getDataThresholds <- function() {
   
   if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
-    return( readResults(  "Data.Thresholds" ) )
+    return( readProjectFile(  "Data.Thresholds" ) )
     
   } else {
     
@@ -466,7 +466,7 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( 
+  saveProjectFile( 
     result.mean.accessions, 
     
     paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
@@ -482,7 +482,7 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
+  saveProjectFile( result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
   
   ##11)  Selection of final set of optimal solutions: 
   
@@ -526,7 +526,7 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( 
+  saveProjectFile( 
     final.subset.max.var, 
     
     paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
@@ -581,7 +581,7 @@ PCA.type.opt <- function(output.opt0){
     row.names(result.scale.pca) <- label.row 
     
     ##Export data for PCA analysis
-    saveResults( result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
+    saveProjectFile( result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
     
     cat("\n")
     cat("\n")
@@ -674,7 +674,7 @@ PCA.type.opt <- function(output.opt0){
     cat("\n")
     cat("\n")
     
-    saveResults( 
+    saveProjectFile( 
       final.subset.pca, 
       
       paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
@@ -697,7 +697,7 @@ WSM.type.opt <- function(output.opt0){
   
   ## Read ranking
   
-  RI <- readResults(  "RI" )  
+  RI <- readProjectFile(  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -777,7 +777,7 @@ WSM.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( 
+  saveProjectFile( 
     result.scale, 
     
     "HighestStandardizedValuesOfSubset_WSM",
@@ -819,7 +819,7 @@ WSM.type.opt <- function(output.opt0){
   cat("\n")
   cat("\n")
   
-  saveResults( 
+  saveProjectFile( 
     final.subset.wsm, 
     
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
@@ -899,7 +899,7 @@ DTree.type.opt <- function(output.opt0){
   object     <- currentDataSet(analysis) 
   
   ## Read ranking importance 
-  RI <- readResults(  "RI" )  
+  RI <- readProjectFile(  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -1048,7 +1048,7 @@ DTree.type.opt <- function(output.opt0){
     cat("\n")
     cat("\n")
     
-    saveResults( 
+    saveProjectFile( 
       final.subset.DTree,
       paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
       row.names = FALSE

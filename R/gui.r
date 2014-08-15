@@ -5,7 +5,7 @@
 #                                                                                               #
 # gui.r - Explora Graphical User Interface (based on RGtk2)                                     #
 #-----------------------------------------------------------------------------------------------#
-#' @include configuration.r dialogs.r projects.r algorithms.r
+#' @include projects.r dialogs.r algorithms.r
 
 #' @importFrom gWidgets gwindow
 #' @importFrom gWidgets gnotebook
@@ -58,21 +58,22 @@ workbench <- function() {
 
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
-  environment(result.path)             <- session
+  environment(result.path)            <- session
   
-  environment(DialogSelectThresholds)  <- session
-  environment(number.solution)         <- session
-  environment(number.final)            <- session
-  environment(number.percent)          <- session
+  environment(DialogSelectThresholds) <- session
+  environment(number.access)          <- session
+  environment(number.solutions)       <- session
+  environment(number.final)           <- session
+  environment(number.percent)         <- session
   
   environment(descriptors.continuous) <- session
   environment(descriptors.nominal)    <- session
-  environment(correlation)             <- session
-  environment(f.optimization)          <- session
-  environment(MAXVAR.type.opt)         <- session
-  environment(PCA.type.opt)            <- session
-  environment(WSM.type.opt)            <- session
-  environment(DTree.type.opt)          <- session 
+  environment(correlation)            <- session
+  environment(f.optimization)         <- session
+  environment(MAXVAR.type.opt)        <- session
+  environment(PCA.type.opt)           <- session
+  environment(WSM.type.opt)           <- session
+  environment(DTree.type.opt)         <- session 
   
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
@@ -83,14 +84,15 @@ workbench <- function() {
 	lyt1[1,1:3] = (g1 = gframe("Projects",  container = lyt1, horizontal = T))
 	lytg1 = glayout(homogeneous = F, container = g1, spacing = 1, expand = T) 
 	lytg1[1,1] = (glabel( text = ""))
-	lytg1[2,1] = (h = gbutton(
+	lytg1[2,1] = ( h = gbutton(
                         "Set folder for results...",  
                         container = lytg1, 
                         handler = function(h,...) { 
                                     newdir <- gfile(text = "Select directory", type = "selectdir") 
                                     if(! is.na(newdir) )  { 
                                       setwd(newdir)
-                                      datasetCatalog(session$analysis) <- getProjects() 
+                                      datasetCatalog(session$analysis)    <- getProjects()
+                                      datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
                                     } 
                                   } 
                       )
@@ -101,7 +103,7 @@ workbench <- function() {
                   container = lytg1, 
                   expand = F, 
                   handler = function(h,...){ 
-                                dataset <- load_dataset()
+                                dataset <- createProject()
                                 if( ! is.na(dataset) ) {
                                   addDataset(session$analysis)        <- attr(dataset,"identifier")
                                   currentDataSet(session$analysis)    <- dataset
@@ -113,29 +115,30 @@ workbench <- function() {
   lytg1[5,1] = (glabel( text = "", container = lytg1))
   lytg1[6,1] = glabel("Select project for analysis:", container = lytg1)
   
-  ####################
-  # TODO - FIX THIS! selection of the data_set doesn't really work; 
-  # use of the "attach(eval(parse(text=svalue(h$obj)))" 
-  # in the handler also seems a bit strange
-  ####################
   lytg1[6,2] = ( 
     datasetSelector(session$analysis) <- gdroplist( 
       datasetCatalog(session$analysis), 
       selected = 0,  
       container = lytg1, 
-      expand = T, 
+      expand = TRUE, 
       handler = function(h,...){
-        print("dataSelection.gdroplist(h$obj)")
-        print(svalue(h$obj))  # attach( eval( parse( text=svalue(h$obj) ) ) ) 
+        datasetId <- svalue( h$obj )
+        print(paste("dataSelection.gdroplist.handler('", datasetId,"')", sep=""))
+        if( length(datasetId) > 0 ) {
+          if( nchar(datasetId) > 0 ) {
+            if( !( datasetId == EMPTY_CATALOG() ) ) {
+                currentDataSet(session$analysis) <- datasetId
+            }
+          }
+        }
       }
     )
   )
-  
 	
 	##Descriptor analysis
-	lyt2 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Descriptor analysis", expand = T)
-	lyt2[1,1:6] = (g2 <- gframe("Descriptor analysis",container = lyt2,expand=T,horizontal=F))
-	lytg2 = glayout(homogeneous = F,  container = g2, spacing = 1, expand = T) 
+	lyt2 = glayout( homogeneous = FALSE,  container = nb, spacing = 1, label = "Descriptor analysis", expand = TRUE)
+	lyt2[1,1:6] = (g2 <- gframe("Descriptor Analysis",container = lyt2,expand = TRUE,horizontal=F))
+	lytg2 = glayout( homogeneous = FALSE,  container = g2, spacing = 1, expand = TRUE) 
   
   lytg2[2,1] = (glabel( text = "",  container = lytg2))
   lytg2[3,1] = (glabel( text = "",  container = lytg2))
@@ -180,7 +183,7 @@ workbench <- function() {
 	lytg2[17,1] = glabel("Number accessions in final dataset: ",  container = lytg2)
 	lytg2[17,2] = ( numberOfAccessions(session$analysis) <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
 	lytg2[18,1] = gbutton(
-                  "Select number accessions",
+                  "Select number of accessions",
                   container = lyt2, 
                   expand=F,
 			            handler = function(h,...){ print(number.access()) }
@@ -205,7 +208,7 @@ workbench <- function() {
 	lytg3[1,1] = glabel("Enter the number of solutions: ",  container = lytg3)
 	lytg3[1,2] = ( numberOfSolutions(session$analysis) <- gedit("10000",  container = lytg3))
 	lytg3[2,1] = gbutton("Select the number of solutions",  container = lytg3, expand=F,
-			handler = function(h,...){print(number.solution())})
+			handler = function(h,...){ print( number.solutions() )})
 	
 	lytg3[3,1] = (glabel( text = "", container = lytg3))
 	lytg3[4,1] = (glabel( text = "", container = lytg3))
