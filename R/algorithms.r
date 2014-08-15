@@ -436,7 +436,7 @@ MAXVAR.type.opt <- function(output.opt0){
   nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   
-  nfinal     <- as.numeric( svalue( numberOfFinalSolutions(session$analysis) ))
+  nfinal     <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
   num.access <- as.numeric( svalue( numberOfAccessions(analysis) ))
   
   ##8)  Standardize values in the sampled subsets:   
@@ -543,7 +543,7 @@ PCA.type.opt <- function(output.opt0){
   
   nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  nfinal   <- as.numeric( svalue( numberOfFinalSolutions(session$analysis) ))
+  nfinal   <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
   
   object   <- currentDataSet(analysis)
   

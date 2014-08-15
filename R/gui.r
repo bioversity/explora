@@ -82,14 +82,22 @@ workbench <- function() {
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
 	nb  <- gnotebook( container = win, expand = T, tab.pos = 3)
-	
-	##Load dataset
-	lyt1 = glayout(homogeneous = F,  container = nb, spacing = 1, label = "Projects", expand = T) 
-	lyt1[1,1:3] = (g1 = gframe("Projects",  container = lyt1, horizontal = T))
-	lytg1 = glayout(homogeneous = F, container = g1, spacing = 1, expand = T) 
-	lytg1[1,1] = (glabel( text = ""))
-	lytg1[2,1] = ( h = gbutton(
-                        "Set folder for results...",  
+  
+  ## Welcome Window
+  welcome = ggroup(container = nb, horizontal = FALSE, label="Welcome")
+  
+  image_dir <- paste(path.package("explora"),"/images/",sep="")
+  gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
+  
+	## Load project datasets
+	lyt1 = glayout(homogeneous = FALSE,  container = nb, spacing = 10, label = "Projects", expand = TRUE) 
+	lyt1[1,1:3] = (g1 = gframe("Projects",  container = lyt1, horizontal = TRUE))
+	lytg1 = glayout(homogeneous = FALSE, container = g1, spacing = 10, expand = TRUE) 
+
+  lytg1[1:2,1:5] = (glabel( text = ""))
+  
+	lytg1[3,1] = ( h = gbutton(
+                        "Set Project Folder...",  
                         container = lytg1, 
                         handler = function(h,...) { 
                                     newdir <- gfile(text = "Select directory", type = "selectdir") 
@@ -101,9 +109,9 @@ workbench <- function() {
                                   } 
                       )
                 )
-	lytg1[3,1] = (glabel( text = "", container = lytg1 ))
-	lytg1[4,1] = gbutton(
-                  "Load datasets as projects...",  
+	lytg1[3,2] = (glabel( text = "", container = lytg1 ))
+	lytg1[3,3] = gbutton(
+                  "Load Datasets as Projects...",  
                   container = lytg1, 
                   expand = F, 
                   handler = function(h,...){ 
@@ -117,10 +125,11 @@ workbench <- function() {
                             }
                 )
   
-  lytg1[5,1] = (glabel( text = "", container = lytg1))
-  lytg1[6,1] = glabel("Select project for analysis:", container = lytg1)
+  lytg1[4,1:5] = (glabel( text = "", container = lytg1))
   
-  lytg1[6,2] = ( 
+  lytg1[9,1] = glabel("Select Active Project for Analysis:", container = lytg1)
+  lytg1[9,2] = (glabel( text = "", container = lytg1))
+  lytg1[9,3] = ( 
     datasetSelector(session$analysis) <- gdroplist( 
       datasetCatalog(session$analysis), 
       selected = 0,  
@@ -141,119 +150,118 @@ workbench <- function() {
   )
 	
 	##Descriptor analysis
-	lyt2 = glayout( homogeneous = FALSE,  container = nb, spacing = 1, label = "Descriptor analysis", expand = TRUE)
-	lyt2[1,1:6] = (g2 <- gframe("Descriptor Analysis",container = lyt2,expand = TRUE,horizontal=F))
-	lytg2 = glayout( homogeneous = FALSE,  container = g2, spacing = 1, expand = TRUE) 
+	lyt2 = glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Descriptor analysis", expand = TRUE)
+	lyt2[1,1:6] = (g2 <- gframe("General Descriptor Analysis",container = lyt2, expand = TRUE, horizontal=FALSE) )
+	lytg2 = glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE) 
   
-  lytg2[2,1] = (glabel( text = "",  container = lytg2))
-  lytg2[3,1] = (glabel( text = "",  container = lytg2))
+  lytg2[1:2,1:5] = (glabel( text = "",  container = lytg2))
   
-	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-	lytg2[4,2] = ( numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lyt2, width = 10, initial.msg="" )) 
+	lytg2[4,1] = glabel("Number of Continuous Variables (CV): ",  container = lytg2)
+  lytg2[4,2]=( glabel( text = "", container=lytg2) )
+	lytg2[4,3] = ( numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lyt2, width = 10, initial.msg="" )) 
+  lytg2[4,4]=( glabel( text = "", container=lytg2) )
+  lytg2[4,5] = gbutton(
+                    "Run CV Analysis",
+                    container = lytg2, 
+                    handler=function(h,...){ print( descriptors.continuous( currentDataSet(session$analysis) ))
+                  }
+                )
   
-	lytg2[5,1] = glabel("Number of categorical variables: ", container = lytg2)
-	lytg2[5,2] = ( numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lyt2, width = 10, initial.msg="" ))
+  lytg2[5:6,1:5]=( glabel( text = "", container=lytg2) )
   
-	lytg2[6,1]=(glabel( text = "", container=lytg2))
-	lytg2[7,1]=(glabel( text = "", container=lytg2))
-	
-	lytg2[9,1] = gbutton(
-                  "Descriptor analysis for continuous variables",
-                  container = lytg2, 
-                  handler=function(h,...){ print( descriptors.continuous( currentDataSet(session$analysis) ))}
-               )
-  
-	lytg2[10,1] = gbutton(
-                  "Descriptor analysis for nominal variables",
-                  container = lytg2, 
-                  handler=function(h,...){ print( descriptors.nominal( currentDataSet(session$analysis) ))
+	lytg2[7,1] = glabel("Number of Nominal Variables (NV): ", container = lytg2)
+  lytg2[7,2]=( glabel( text = "", container=lytg2) )
+  lytg2[7,3] = ( numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lyt2, width = 10, initial.msg="" ))
+  lytg2[7,4]=( glabel( text = "", container=lytg2) )
+  lytg2[7,5] = gbutton(
+                    "Run NV Analysis",
+                    container = lytg2, 
+                    handler=function(h,...){ print( descriptors.nominal( currentDataSet(session$analysis) ))
                   }
                 )
 	
-	lytg2[11,1]=(glabel( text = "", container=lytg2))
-	lytg2[12,1]=(glabel( text = "", container=lytg2))
+	lytg2[8:9,1:5]=(glabel( text = "", container=lytg2))
 	
-	lytg2[13,1] = glabel("Level of correlation: ", container=lytg2)
-	lytg2[13,2] = (ncor <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)) 
-  
-	lytg2[14,1] = gbutton(
-                  "Correlation analysis",
+  lytg2[10,1:2] = glabel("Specify Coefficient of Correlation (CC):", container=lytg2)
+  lytg2[10,3] = (ncor <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)) 
+  lytg2[10,4]=( glabel( text = "", container=lytg2) )
+  lytg2[10,5] = gbutton(
+                  "Run CC Analysis",
                   container = lytg2,
                   handler=function(h,...){ print( correlation( currentDataSet(session$analysis) ))}
                 )
+  
+  
+	lytg2[11:12,1:5]=(glabel( text = "", container = lytg2))
 	
-	lytg2[15,1]=(glabel( text = "", container = lytg2))
-	lytg2[16,1]=(glabel( text = "", container = lytg2))
-	
-	lytg2[17,1] = glabel("Number accessions in final dataset: ",  container = lytg2)
-	lytg2[17,2] = ( numberOfAccessions(session$analysis) <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
-	lytg2[18,1] = gbutton(
-                  "Select number of accessions",
-                  container = lyt2, 
+  lytg2[13,1:2]=(glabel( text = "Number of Accessions in Final Dataset:", container = lytg2))
+  lytg2[13,3] = ( numberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" "))
+  lytg2[13,4]=( glabel( text = "", container=lytg2) )
+  lytg2[13,5] = gbutton(
+                  "Set",
+                  container = lytg2, 
                   expand=FALSE,
 			            handler = function(h,...){ print(number.access()) }
                 )
+  
+	lytg2[14:15,1:5]=(glabel( text = "", container=lytg2))
 	
-	lytg2[19,1]=(glabel( text = "", container=lytg2))
-	lytg2[20,1]=(glabel( text = "", container=lytg2))
-	
-	lytg2[21,1] = glabel("Threshold analysis: ",  container = lytg2)
-	lytg2[22,1] = gbutton(
-                  "Select variables",
+  lytg2[16,1:2]=(glabel( text = "Select Variables for Threshold Analysis:", container = lytg2))
+  lytg2[16,5] = gbutton(
+                  "Select...",
                   container = lytg2,
                   handler = function(h,...){ DialogSelectThresholds( currentDataSet(session$analysis) ) }
                 )
 	
   
 	##Selection of preferred analysis
-	lyt3 = glayout(homogeneous = F, container = nb , spacing=1,label="Selection of preferred analysis",expand=T)
-	lyt3[1,1:10] = (g3 = gframe("Type selection of preferred", container = lyt3, expand = T, horizontal = F))
-	lytg3 = glayout(homogeneous = F,  container = g3, spacing = 1, expand = T) 
+	lyt3 = glayout(homogeneous = F, container = nb , spacing=10,label="Optimization",expand=T)
+	lyt3[1,1:10] = (g3 = gframe("Optimization Analysis", container = lyt3, expand = TRUE, horizontal = FALSE))
+	lytg3 = glayout(homogeneous = FALSE,  container = g3, spacing = 10, expand = TRUE) 
 	
-	lytg3[1,1] = glabel("Enter the number of solutions: ",  container = lytg3)
-	lytg3[1,2] = ( numberOfSolutions(session$analysis) <- gedit("10000",  container = lytg3))
-	lytg3[2,1] = gbutton("Select the number of solutions",  container = lytg3, expand=F,
-			handler = function(h,...){ print( number.solutions() )})
+  lytg3[1,1:5] = (glabel( text = "",  container = lytg2))
+  
+  lytg3[2,1] = glabel("Specify Target Number of Solutions: ",  container = lytg3)
+  lytg3[2,2]=( glabel( text = "", container=lytg2) )
+  lytg3[2,3] = ( numberOfSolutions(session$analysis) <- gedit("10000",  container = lytg3))
+  lytg3[2,4] = gbutton("Set",  container = lytg3, expand=FALSE, handler = function(h,...){ print( number.solutions() )})
 	
-	lytg3[3,1] = (glabel( text = "", container = lytg3))
-	lytg3[4,1] = (glabel( text = "", container = lytg3))
+	lytg3[3,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[5,1] = glabel("Optimization analysis: ",  container = lytg3)
-	lytg3[6,1] = gbutton(
-                "Select variables",
+	lytg3[4,1] = glabel("Specify Optimization Analysis Variables:",  container = lytg3)
+  lytg3[4,2:3]=( glabel( text = "", container=lytg2) )
+  lytg3[4,4] = gbutton(
+                "Select...",
                 container = lytg3,
                 expand = FALSE,
                 handler = function(h,...){ DialogSelectOptimization( currentDataSet(session$analysis) )}
                )
 	
-	lytg3[7,1] = (glabel( text = "", container = lytg3))
-	lytg3[8,1] = (glabel( text = "", container = lytg3))
+	lytg3[5,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg3)
-	lytg3[9,2] = ( percentageOfSolutions(session$analysis) <- gedit("1",     container = lytg3))
-	lytg3[10,1] = gbutton(
-                  "Select the percentage of solutions",
+	lytg3[6,1:2] = glabel("Enter Target Percentage of Solutions (%):",  container = lytg3)
+  lytg3[6,3] = ( percentageOfSolutions(session$analysis) <- gedit("1",     container = lytg3))
+	lytg3[6,4] = gbutton(
+                  "Set",
                   container = lytg3,
                   expand = FALSE,
 		            	handler = function(h,...){ print( number.percent() )} 
                 )
 	
-	lytg3[11,1] = (glabel( text = "", container = lytg3))
-	lytg3[12,1] = (glabel( text = "", container = lytg3))
+	lytg3[7,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :",  container = lytg3)
-	lytg3[13,2] = ( numberOfFinalSolutions(session$analysis) = gedit("10", container = lytg3))
-	lytg3[14,1] = gbutton(
-                  "Select the number of final solutions",
+	lytg3[8,1:2] = glabel("Enter the number of final solutions for\nMaximum Variation or\nNumber of Principal Components):",  container = lytg3)
+	lytg3[8,3] = ( numberOfFinalSolutions(session$analysis) = gedit("10", container = lytg3))
+	lytg3[8,4] = gbutton(
+                  "Set",
                   container = lytg3,
                   expand = FALSE,
 			            handler = function(h,...){ print( number.final() ) }
                 )
 	
-	lytg3[15,1] = (glabel( text = "", container = lytg3))
-	lytg3[16,1] = (glabel( text = "", container = lytg3))
+	lytg3[9,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[17,1] = glabel("Select the type of selection of preferred: ",  container = lytg3, horizontal = FALSE)
+	lytg3[10,1] = glabel("Select Preferred Algorithm: ",  container = lytg3, horizontal = FALSE)
 	
 	items.option <- c(
                       " ", 
@@ -263,8 +271,8 @@ workbench <- function() {
                       "Decision tree"
                     )
 	
-	lytg3[18,1] = (option.preferred <- gdroplist(items.option,  container = lytg3))
-	lytg3[18,2] = (btn <- gbutton("Run",  container = lytg3))
+	lytg3[11,1] = (option.preferred <- gdroplist(items.option,  container = lytg3))
+	lytg3[11,2] = (btn <- gbutton("Run",  container = lytg3))
 	
 	addHandlerChanged(btn, handler = function(h,...){
 				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt( optimizationResult(session$analysis) )}
@@ -273,12 +281,8 @@ workbench <- function() {
 				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt(  optimizationResult(session$analysis) )}
 			})
 
-	## Principal windows
-	welcome = ggroup(container = nb, horizontal = FALSE, label="About the Application")
-	
-  image_dir <- paste(path.package("explora"),"/images/",sep="")
-  gimage("Explora_Logo.png", dirname = image_dir, size = "button",  container = welcome) 
-	
+  svalue(nb) <- 1
+  
 	visible(win) <- TRUE
 
 }

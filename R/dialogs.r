@@ -258,7 +258,7 @@ number.solutions <- function(h,...) {
   nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
   
   if(nsoln > 0 & nsoln <= 1000000){
-    DialogBox(paste("The number of solution is: ", nsoln, sep=" "))
+    DialogBox(paste("The number of solutions are: ", nsoln, sep=" "))
   } else { 
     DialogBox("Error in the percentage of solutions")
   }
@@ -295,7 +295,7 @@ number.final <- function(h,...){
 number.percent <- function(h,...){
   npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
   if( npercent > 0 & npercent <= 100){
-    DialogBox(paste("The percentage of solutions is: ", npercent, "%", sep=" "))
+    DialogBox(paste("Target percentage of solutions is: ", npercent, "%", sep=" "))
   } else {DialogBox("Error in the percentage of solutions")}
   return(npercent) 
   
