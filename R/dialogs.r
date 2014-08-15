@@ -237,9 +237,10 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	
 }
 
-number.access <- function(h,...){## Function for selection of number of accessions in final set 
+## Function for selection of number of accessions in final set 
+number.access <- function(h,...){
   
-  object = currentDataSet(analysis)
+  object     <- currentDataSet(analysis)
   
   num.access <- as.numeric(svalue( numberOfSolutions(analysis) ))
   
@@ -268,9 +269,9 @@ number.solutions <- function(h,...) {
 ## Function to selected number of final accessions
 number.final <- function(h,...){
     
-  object = currentDataSet(analysis)
+  object <- currentDataSet(analysis)
   
-  nfinal = as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
+  nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
   
   if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
