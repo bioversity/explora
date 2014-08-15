@@ -222,7 +222,7 @@ createProject <- function(){
       paste("Project folder '",projectFolder,"' already exists?") 
   )
   
-	write.csv(dataset, file = file.path( projectFolder, paste(dataset_name,".csv"), sep = ""), row.names = FALSE)
+	write.csv(dataset, file = file.path( projectFolder, paste(dataset_name,".csv", sep = "")), row.names = FALSE)
 
   attr(dataset,"identifier")    <- dataset_name
   attr(dataset,"projectFolder") <- projectFolder
@@ -361,7 +361,7 @@ readProjectFile <- function( filename ) {
 # unless this becomes an Explora performance issue)
 loadDataset <- function( datasetId ) {
   # first, manually build the expected project path
-  projectFolder = file.path( getwd(),paste( datasetId,".explora",sep="") )
+  projectFolder = file.path( getwd(),paste( datasetId,".explora", sep="") )
   
   # sanity check - does the project really exist at this location?
   if( file.exists(projectFolder) ) {
