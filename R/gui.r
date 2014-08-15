@@ -137,12 +137,15 @@ workbench <- function() {
 	lyt2[1,1:6] = (g2 <- gframe("Descriptor analysis",container = lyt2,expand=T,horizontal=F))
 	lytg2 = glayout(homogeneous = F,  container = g2, spacing = 1, expand = T) 
   
+  lytg2[2,1] = (glabel( text = "",  container = lytg2))
   lytg2[3,1] = (glabel( text = "",  container = lytg2))
+  
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
 	lytg2[4,2] = ( numContVar(session$analysis) <- gedit("", container = lyt2,width = 10,initial.msg="") ) 
+  
 	lytg2[5,1] = glabel("Number of categorical variables: ", container = lytg2)
-	lytg2[5,2] = (ncat <-gedit("",container=lyt2, width = 10,initial.msg=""))
-	
+	lytg2[5,2] = ( numCatVar(session$analysis)  <-gedit("",container=lyt2, width = 10,initial.msg=""))
+  
 	lytg2[6,1]=(glabel( text = "", container=lytg2))
 	lytg2[7,1]=(glabel( text = "", container=lytg2))
 	
@@ -257,9 +260,9 @@ workbench <- function() {
 	
 	addHandlerChanged(btn, handler = function(h,...){
 				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt( optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt( optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt( optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt( optimizationResult(session$analysis) )}
+				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt(    optimizationResult(session$analysis) )}
+				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt(    optimizationResult(session$analysis) )}
+				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt(  optimizationResult(session$analysis) )}
 			})
 
 	## Principal windows

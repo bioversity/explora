@@ -1,10 +1,10 @@
-#------------------------------------------------------------------------------------------------------------------
-#APPLICATION BIOVERSITY                                                                                           #
-#AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM                     #
-#VERSION 2.0 - AUGUST-04-2014 
-#
-# dialogs.r - Smaller GUI Dialog Boxes used by Explora
-#------------------------------------------------------------------------------------------------------------------ 
+#----------------------------------------------------------------------------------------------
+#APPLICATION BIOVERSITY                                                                       #
+#AUTHOR: JOHANN OSPINA FOR BIOVERSITY, REVISIONS BY RICHARD BRUSKIEWICH @ CROPINFORMATICS.COM #
+#VERSION 2.0 - AUGUST-04-2014                                                                 #
+#                                                                                             #
+# dialogs.r - Smaller GUI Dialog Boxes used by Explora                                        #
+#---------------------------------------------------------------------------------------------- 
 #' @include configuration.r projects.r
 
 #' @importFrom gWidgets gwindow
@@ -24,8 +24,8 @@
 #' @importMethodsFrom gWidgets svalue<-
 #' @importMethodsFrom gWidgets addSpring
 #' @importMethodsFrom gWidgets dispose
+#' @importMethodsFrom gWidgets visible
 #' @importMethodsFrom gWidgets visible<-
-
 
 #' @import gWidgetsRGtk2
 
@@ -49,13 +49,12 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 DialogBoxDTree <- function(items) {## This function make a dialog box
 	
 	out <- ""
-	w <-  gbasicdialog("", 
-			handler = function(h,...){out <<- svalue(txt)})
+	w <-  gbasicdialog("", handler = function(h,...){out <<- svalue(txt)})
 	
 	glabel("Do you want to continue?",  container = w)
 	glabel(" ",  container = w)
 	txt <- gradio(items,  container = w)
-	visible(w, set = T)
+	visible(w, set = TRUE)
 	return(out)
 	
 }  
@@ -65,11 +64,14 @@ DialogSelect <- function(items){## Function to select preference category
 	
   out.category <- ""
   
-	w <-  gbasicdialog("Select the category of preference", 
-			handler = function(h,...){out.category <<- svalue(txt.category)})
+	dlg <-  gbasicdialog(
+          "Select the category of preference", 
+			    handler = function(h,...){ out.category <<- svalue(txt.category) }
+        )
 	
-	txt.category <- gdroplist(items,  container = w)
-	visible(w, set = T)
+	txt.category <- gdroplist(items,  container = dlg)
+  
+	visible(dlg, set = TRUE)
 	
   return(out.category) 
 	
@@ -79,11 +81,13 @@ SelectSolution <- function(solutions){## Function to select preference category
 	
   out.solution <- ""
   
-	w <-  gbasicdialog("Select the solutions", 
-			handler = function(h,...){out.solution <<- svalue(txt.solution)})
+	dlg <-  gbasicdialog(
+            "Select the solutions", 
+			      handler = function(h,...){ out.solution <<- svalue(txt.solution) }
+          )
 	
-	txt.solution <- gdroplist(solutions,  container = w)
-	visible(w, set = T)
+	txt.solution <- gdroplist(solutions,  container = dlg)
+	visible(dlg, set = TRUE)
   
 	return(out.solution)
 }
@@ -91,10 +95,10 @@ SelectSolution <- function(solutions){## Function to select preference category
 DialogSelectThresholds <- function(object){## Function to select variables for thresholds
 	
 	object.thresholds <- object
-	ncon <- as.numeric( svalue( numContVar(analysis) )) 
+	ncon              <- as.numeric( svalue( numberOfContinuousVariables(analysis) )) 
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
-	object.complete <- object
+	object.complete   <- object
 
 	min.values <- matrix(round(as.table(sapply(object.thresholds, min)),3), ncol = 1)
 	max.values <- matrix(round(as.table(sapply(object.thresholds, max)),3), ncol = 1)
@@ -102,7 +106,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
 	
-	win <- gbasicdialog("Selection variable for threholds", visible = F , width = 700, height = 450,
+	win <- gbasicdialog("Selection variable for threholds", visible = FALSE , width = 700, height = 450,
 			handler = function(h,...){var1 <<- svalue(var1);var2 <<- svalue(var2);var3 <<- svalue(var3);var4 <<- svalue(var4);var5 <<- svalue(var5);
 				var6 <<- svalue(var6);var7 <<- svalue(var7);var8 <<- svalue(var8);var9 <<- svalue(var9);var10 <<- svalue(var10);
 				min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2));min.var3 <<- as.numeric(svalue(min.var3));min.var4 <<- as.numeric(svalue(min.var4));min.var5 <<- as.numeric(svalue(min.var5));
@@ -110,9 +114,9 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 				max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2));max.var3 <<- as.numeric(svalue(max.var3));max.var4 <<- as.numeric(svalue(max.var4));max.var5 <<- as.numeric(svalue(max.var5));
 				max.var6 <<- as.numeric(svalue(max.var6)); max.var7 <<- as.numeric(svalue(max.var7));max.var8 <<- as.numeric(svalue(max.var8));max.var9 <<- as.numeric(svalue(max.var9));max.var10 <<- as.numeric(svalue(max.var10))}) 
 	
-	nb <- gnotebook( container = win, expand = T, tab.pos = 3)
+	nb <- gnotebook( container = win, expand = TRUE, tab.pos = 3)
 	
-	lyt3 = glayout(homogeneous = F,  container = nb, spacing=1, label = "Threshold Analyses", expand = T)
+	lyt3 = glayout(homogeneous = FALSE,  container = nb, spacing=1, label = "Threshold Analyses", expand = TRUE)
 	
 	lyt3[3,1]=(glabel=(""))
 	
@@ -298,7 +302,7 @@ number.final <- function(h,...){
 }
 
 number.percent <- function(h,...){
-  npercent <- as.numeric(svalue( percentSoln(analysis) ))
+  npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
   if( npercent > 0 & npercent <= 100){
     DialogBox(paste("The percentage of solutions is: ", npercent, "%", sep=" "))
   } else {DialogBox("Error in the percentage of solutions")}
@@ -308,8 +312,8 @@ number.percent <- function(h,...){
 
 ## Function to select the objective function for nominal variables
 select.functions <- function(fitems, f){
-  win <- gwindow("Selection function", visible = F, width = 300, height = 100) 
+  win <- gwindow("Selection function", visible = FALSE, width = 300, height = 100) 
   g   <- ggroup(horizontal=FALSE,  container = win)
-  function.optimize <- gdroplist(fitems, expand = T, editable = F,  container = g, handler = f)
+  function.optimize <- gdroplist(fitems, expand = TRUE, editable = FALSE,  container = g, handler = f)
   visible(win)<-TRUE
 }

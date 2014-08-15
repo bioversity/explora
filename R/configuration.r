@@ -21,6 +21,7 @@ setClass( "ExploraAnalysis",
           representation(
               datasetSelector  = "gCombobox",    # formerly nom_data
               numContVar         = "guiComponent", # formerly ncon
+              numCatVar          = "guiComponent", # formerly ncat
               percentSoln        = "guiComponent", # formerly npercen
               numberSoln         = "guiComponent", # formerly Nsim
               optimizationResult = "list",         # output.opt from algorithm$f.optimization
@@ -29,84 +30,62 @@ setClass( "ExploraAnalysis",
           )
         )
 
-setGeneric("datasetSelector",  function(x) standardGeneric("datasetSelector"))
-setGeneric("numContVar",         function(x) standardGeneric("numContVar"))
-setGeneric("percentSoln",        function(x) standardGeneric("percentSoln"))
-setGeneric("numberSoln",         function(x) standardGeneric("numberSoln"))
-setGeneric("optimizationResult", function(x) standardGeneric("optimizationResult"))
-setGeneric("datasetCatalog",     function(x) standardGeneric("datasetCatalog"))
-setGeneric("currentDataSet",     function(x) standardGeneric("currentDataSet"))
-setGeneric("currentProjectFolder",  function(x) standardGeneric("currentProjectFolder"))
+#
+# Accessor Methods
+#
 
-setMethod("datasetSelector",  "ExploraAnalysis",function(x) x@datasetSelector )
-setMethod("numContVar",         "ExploraAnalysis",function(x) x@numContVar )
-setMethod("percentSoln",        "ExploraAnalysis",function(x) x@percentSoln )
-setMethod("numberSoln",         "ExploraAnalysis",function(x) x@numberSoln )
-setMethod("optimizationResult", "ExploraAnalysis",function(x) x@optimizationResult )
-setMethod("datasetCatalog",     "ExploraAnalysis",function(x) x@datasetCatalog )
-setMethod("currentDataSet",     "ExploraAnalysis",function(x) x@currentDataSet )
+setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
+setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
+setGeneric("currentDataSet",               function(x) standardGeneric("currentDataSet"))
+setGeneric("currentProjectFolder",         function(x) standardGeneric("currentProjectFolder"))
+
+setGeneric("numberOfContinuousVariables",  function(x) standardGeneric("numberOfContinuousVariables"))
+setGeneric("numberOfCategoricalVariables", function(x) standardGeneric("numberOfCategoricalVariables"))
+setGeneric("percentageOfSolutions",        function(x) standardGeneric("percentageOfSolutions"))
+setGeneric("numberOfSolutions",            function(x) standardGeneric("numberOfSolutions"))
+setGeneric("optimizationResult",           function(x) standardGeneric("optimizationResult"))
+
+setMethod("datasetSelector",              "ExploraAnalysis",function(x) x@datasetSelector )
+setMethod("datasetCatalog",               "ExploraAnalysis",function(x) x@datasetCatalog )
+setMethod("currentDataSet",               "ExploraAnalysis",function(x) x@currentDataSet )
 
 setMethod(  "currentProjectFolder",  
             "ExploraAnalysis", 
             function(x) { 
-                if(!is.null(attr(x@currentDataSet,"projectFolder"))) {
-                  return(attr(x@currentDataSet,"projectFolder"))
-                } else {
-                  return("")
-                }
+              if(!is.null(attr(x@currentDataSet,"projectFolder"))) {
+                return(attr(x@currentDataSet,"projectFolder"))
+              } else {
+                return(NA)
+              }
             } 
-         )
+)
 
-setGeneric("datasetSelector<-",    function(x,value) standardGeneric("datasetSelector<-"))
-setGeneric("numContVar<-",         function(x,value) standardGeneric("numContVar<-"))
-setGeneric("percentSoln<-",        function(x,value) standardGeneric("percentSoln<-"))
-setGeneric("numberSoln<-",         function(x,value) standardGeneric("numberSoln<-"))
-setGeneric("optimizationResult<-", function(x,value) standardGeneric("optimizationResult<-"))
-setGeneric("datasetCatalog<-",     function(x,value) standardGeneric("datasetCatalog<-"))
-setGeneric("addDataset<-",         function(x,value) standardGeneric("addDataset<-"))
-setGeneric("currentDataSet<-",     function(x,value) standardGeneric("currentDataSet<-"))
+setMethod("numberOfContinuousVariables",  "ExploraAnalysis",function(x) x@numberOfContinuousVariables )
+setMethod("numberOfCategoricalVariables", "ExploraAnalysis",function(x) x@numberOfCategoricalVariables )
+setMethod("percentageOfSolutions",        "ExploraAnalysis",function(x) x@percentageOfSolutions )
+setMethod("numberOfSolutions",            "ExploraAnalysis",function(x) x@numberOfSolutions )
+setMethod("optimizationResult",           "ExploraAnalysis",function(x) x@optimizationResult )
+
+#
+# Replacement Methods
+#
+
+setGeneric("datasetSelector<-",              function(x,value) standardGeneric("datasetSelector<-"))
+setGeneric("datasetCatalog<-",               function(x,value) standardGeneric("datasetCatalog<-"))
+setGeneric("addDataset<-",                   function(x,value) standardGeneric("addDataset<-"))
+setGeneric("currentDataSet<-",               function(x,value) standardGeneric("currentDataSet<-"))
+
+setGeneric("numberOfContinuousVariables<-",  function(x,value) standardGeneric("numberOfContinuousVariables<-"))
+setGeneric("numberOfCategoricalVariables<-", function(x,value) standardGeneric("numberOfCategoricalVariables<-"))
+setGeneric("percentageOfSolutions<-",        function(x,value) standardGeneric("percentageOfSolutions<-"))
+setGeneric("numberOfSolutions<-",            function(x,value) standardGeneric("numberOfSolutions<-"))
+setGeneric("optimizationResult<-",           function(x,value) standardGeneric("optimizationResult<-"))
 
 setReplaceMethod(
   "datasetSelector",
   "ExploraAnalysis", 
   function(x,value) { 
     x@datasetSelector <- value
-    return(x)
-  }
-)
-
-setReplaceMethod(
-  "numContVar",
-  "ExploraAnalysis",
-  function(x,value) { 
-    x@numContVar <- value
-    return(x)
-  }
-)
-
-setReplaceMethod(
-  "percentSoln",
-  "ExploraAnalysis",
-  function(x,value) { 
-    x@percentSoln <- value
-    return(x)
-  }
-)
-
-setReplaceMethod(
-  "numberSoln",
-  "ExploraAnalysis",
-  function(x,value) { 
-    x@numberSoln <- value
-    return(x)
-  }
-)
-
-setReplaceMethod(
-  "optimizationResult",
-  "ExploraAnalysis",
-  function(x,value) { 
-    x@optimizationResult <- value
     return(x)
   }
 )
@@ -135,6 +114,49 @@ setReplaceMethod(
   "ExploraAnalysis",
   function(x,value) { 
     x@currentDataSet <- value
+    return(x)
+  }
+)
+
+setReplaceMethod(
+  "numberOfContinuousVariables",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@numberOfContinuousVariables <- value
+    return(x)
+  }
+)
+setReplaceMethod(
+  "numberOfCategoricalVariables",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@numberOfCategoricalVariables <- value
+    return(x)
+  }
+)
+setReplaceMethod(
+  "percentageOfSolutions",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@percentageOfSolutions <- value
+    return(x)
+  }
+)
+
+setReplaceMethod(
+  "numberOfSolutions",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@numberOfSolutions <- value
+    return(x)
+  }
+)
+
+setReplaceMethod(
+  "optimizationResult",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@optimizationResult <- value
     return(x)
   }
 )

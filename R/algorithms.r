@@ -14,23 +14,23 @@
 
 ## Ddescriptor analysis for continuous variables
 des.continuous <- function(object){
-  n = length(object)
-  average = round(mean(object, na.rm=T),3)
-  variance = round(var(object, na.rm=T),3)
-  Est.Desv = round(sqrt(variance),3)
-  median = round(as.numeric(quantile(object,probs=0.5, na.rm=T)),3)
-  Coef.Var = round((sqrt(variance)/average)*100,3)
-  min = round(min(object,na.rm=T),3)
-  max = round(max(object,na.rm=T),3)
-  NA.Data =round(sum(is.na(object)),3)
-  NA.Percent = round((NA.Data/length(object))*100,3)
-  result = cbind(n, min, max, average, variance, Est.Desv, median, Coef.Var, NA.Data, NA.Percent)
+  n <- length(object)
+  average <- round(mean(object, na.rm = TRUE),3)
+  variance <- round(var(object, na.rm = TRUE),3)
+  Est.Desv <- round(sqrt(variance),3)
+  median <- round(as.numeric(quantile(object,probs=0.5, na.rm = TRUE)),3)
+  Coef.Var <- round((sqrt(variance)/average)*100,3)
+  min <- round(min(object,na.rm = TRUE),3)
+  max <- round(max(object,na.rm = TRUE),3)
+  NA.Data <-round(sum(is.na(object)),3)
+  NA.Percent <- round((NA.Data/length(object))*100,3)
+  result <- cbind(n, min, max, average, variance, Est.Desv, median, Coef.Var, NA.Data, NA.Percent)
 }
 
 ## Used to function 'des.continuous' 
-descriptors.continuous = function(object){
+descriptors.continuous <- function(object){
   
-  ncon <- as.numeric( svalue( numContVar(analysis) ))
+  ncon <- as.numeric( svalue( numberOfContinuousVariables(analysis) ))
   object <- object[,-1]
   object <- object[,1:ncon]
   
@@ -47,13 +47,13 @@ descriptors.continuous = function(object){
 
 
 des.nominal <- function(object){## Ddescriptor analysis for nominal variables
-  n=length(object)
-  category <- names(table(object)) 
-  frequence <- table(object)
+  n<-length(object)
+  category   <- names(table(object)) 
+  frequence  <- table(object)
   percentage <- round((table(object)/sum(object))*100,2)
-  NA.Data <- round(sum(is.na(object)),0)
+  NA.Data    <- round(sum(is.na(object)),0)
   NA.Percent <- round((NA.Data/length(object))*100,2)
-  result<-cbind(n, category, frequence, percentage, NA.Data, NA.Percent)
+  result     <-cbind(n, category, frequence, percentage, NA.Data, NA.Percent)
 }
 
 #' @importFrom plyr ldply
@@ -61,15 +61,17 @@ des.nominal <- function(object){## Ddescriptor analysis for nominal variables
 ## Used to function 'des.nominal'
 descriptors.nominal <- function(object){
   
-  ncon <-as.numeric(svalue( numContVar(analysis) ))
-  ncat <-as.numeric(svalue(ncat))
+  ncon <-as.numeric( svalue( numberOfContinuousVariables(analysis) ) )
+  ncat <-as.numeric( svalue( numberOfCategoricalVariables(analysis) ) )
+  
   object <- object[,-1]
   object <- object[,(ncon+1):dim(object)[2]]
   
   results<-lapply(object, des.nominal)
   results<-ldply(results, data.frame)
   colnames(results) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
-  names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
+  
+  names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(analysis) )))
   
   saveResults( results, "ResultsDdescriptorAnalysisNominalVariables", row.names = FALSE )     
   
@@ -79,19 +81,19 @@ descriptors.nominal <- function(object){
 ## Correlation analysis
 correlation <- function(object){
   
-  ncon <-as.numeric( svalue( numContVar(analysis) ))
+  ncon <-as.numeric( svalue( numberOfContinuousVariables(analysis) ))
   
-  object <- object[,-1]
-  object <- object[,1:ncon]
+  object      <- object[,-1]
+  object      <- object[,1:ncon]
   correlation <- round(cor(object),2)
-  correlation[lower.tri(correlation,diag=TRUE)]=NA 
+  correlation[ lower.tri(correlation,diag = TRUE) ] <- NA 
   correlation <- as.data.frame(as.table(correlation))
-  correlation=na.omit(correlation)        
-  direction <- rep("",times = dim(correlation)[1])
+  correlation <- na.omit(correlation)        
+  direction   <- rep("",times = dim(correlation)[1])
   
   for(i in 1:dim(correlation)[1]){ ## Direction of correlation
-    if(correlation[i,3]>=0 & correlation[i,3]<=1){direction[i]="positive"}
-    else if(correlation[i,3]<0 & correlation[i,3]>=-1){direction[i]="negative"}
+    if(correlation[i,3]>=0 & correlation[i,3]<=1)     { direction[i] <- "positive" }
+    else if(correlation[i,3]<0 & correlation[i,3]>=-1){ direction[i] <- "negative" }
   }
   
   correlation = cbind(correlation, direction)
@@ -137,13 +139,13 @@ DialogSelectOptimization <- function(object){
   
   f.items.nom <- c("NA", "SHANNON: Maximize Shannon index", "MAX.PROP: Maximize proportion")
   
-  ncon <- as.numeric(svalue( numContVar(analysis) )) 
+  ncon <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
   object.optimization <- object[,-1]
   object.continuous <- object.optimization[,1:ncon]
   object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
   names.continuous <- names(object.continuous)
   names.nominal <- names(object.nominal)
-  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
+  nsoln <- as.numeric(svalue( numberOfSolutions(analysis) ))
   
   pcategory.v1 <- 0
   pcategory.v2 <- 0
@@ -161,7 +163,7 @@ DialogSelectOptimization <- function(object){
   nb <- gnotebook( container = win, expand = T, tab.pos = 3)
   
   
-  lyt4=glayout(homogeneous = F, container = nb , spacing=1,label="Optimization",expand=T)
+  lyt4=glayout(homogeneous = F, container = nb , spacing=1,label="Optimization",expand = TRUE)
   lyt4[1,1:25] = (g4 = gframe("Optimization", container = lyt4, expand = T, horizontal = F))
   lytg4 = glayout(homogeneous = F,  container = g4, spacing = 1, expand = T) 
   lytg4[1,1]=(glabel=(""))
@@ -361,9 +363,12 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
   object <- eval(parse(text=svalue( datasetSelector(analysis) )))
-  ncon   <- as.numeric(svalue( numContVar(analysis) )) 
-  ncat   <- as.numeric(svalue(ncat)) 
-  nsoln  <- as.numeric(svalue( numberSoln(analysis) )) 
+  
+  ncon   <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
+  ncat   <- as.numeric(svalue( numberOfCategoricalVariables(analysis) ))
+  
+  nsoln  <- as.numeric(svalue( numberOfSolutions(analysis) )) 
+  
   num.access <- as.numeric(svalue(num.access)) 
   
   varop1c <- svalue(varop1c)
@@ -425,8 +430,9 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
 
 MAXVAR.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
-  npercent <- as.numeric(svalue( percentSoln(analysis) ))
+  nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  
   nfinal <- as.numeric(svalue(nfinal))
   num.access <- as.numeric(svalue(num.access))
   object <- eval(parse(text=svalue( datasetSelector(analysis) )))
@@ -444,7 +450,7 @@ MAXVAR.type.opt <- function(output.opt0){
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
   
-  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing = TRUE)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.accessions <- mean.result$accessions[pos,]
@@ -460,7 +466,7 @@ MAXVAR.type.opt <- function(output.opt0){
   
   saveResults( 
     result.mean.accessions, 
-     
+    
     paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
   )     
   
@@ -499,7 +505,7 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   print("Process completed.................")  
   
-  pos.nfinal <- order(variance[,3],decreasing=T)
+  pos.nfinal <- order(variance[,3],decreasing = TRUE)
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
   
@@ -519,10 +525,10 @@ MAXVAR.type.opt <- function(output.opt0){
   cat("\n")
   
   saveResults( 
-      final.subset.max.var, 
-       
-      paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
-      row.names = FALSE 
+    final.subset.max.var, 
+    
+    paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
+    row.names = FALSE 
   )     
   
 }
@@ -533,10 +539,10 @@ MAXVAR.type.opt <- function(output.opt0){
 
 PCA.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
-  npercent <- as.numeric(svalue( percentSoln(analysis) ))
-  nfinal <- as.numeric(svalue(nfinal))
-  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
+  nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  nfinal   <- as.numeric( svalue(nfinal))
+  object   <- eval(parse( text = svalue( datasetSelector(analysis) )))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -547,7 +553,7 @@ PCA.type.opt <- function(output.opt0){
   result <- result[sapply(result, function(x) !all(is.na(x)))]
   
   mean.result <- list("standardized.means" = apply(result, MARGIN = 1, FUN = mean),"accessions"=t(sapply(output.opt0, "[[", 2)))
-  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing = TRUE)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   result.mean.accessions <- mean.result$accessions[pos,]
   colnames(result.mean.accessions)<-rep(paste("acces",1:dim(result.mean.accessions)[2],sep=""))
   rownames(result.mean.accessions)<-rep(paste("sol",1:dim(result.mean.accessions)[1],sep=""))
@@ -573,7 +579,7 @@ PCA.type.opt <- function(output.opt0){
     
     ##Export data for PCA analysis
     saveResults( result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
-      
+    
     cat("\n")
     cat("\n")
     cat("Scale result for PCA analysis")
@@ -592,7 +598,7 @@ PCA.type.opt <- function(output.opt0){
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 1, yax = 2, clabel=1.5)
-      s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot=T, clabel=1.5)
+      s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot = TRUE, clabel=1.5)
       dev.off()
       
       cat("\n")
@@ -601,7 +607,7 @@ PCA.type.opt <- function(output.opt0){
       print(as.numeric(label.row))
       
     } else if(dim(result.scale.pca)[2] > 2){
- 
+      
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 3, center = FALSE, scale = FALSE)
       
       plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
@@ -609,7 +615,7 @@ PCA.type.opt <- function(output.opt0){
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
               xax = 1, yax = 2, clabel = 1.5)
-      s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot=T, clabel = 1.5)
+      s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot = TRUE, clabel = 1.5)
       dev.off()  
       
       plotImage(  "Optimal_solution_PCA_1_Vs_PCA_3" )
@@ -664,14 +670,14 @@ PCA.type.opt <- function(output.opt0){
     print(final.subset.pca) 
     cat("\n")
     cat("\n")
-
+    
     saveResults( 
-          final.subset.pca, 
-           
-          paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
-          row.names = FALSE
+      final.subset.pca, 
+      
+      paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
+      row.names = FALSE
     )     
-
+    
     cat("\n")
     cat("\n")
     cat(paste("Processing completed.................")) 
@@ -681,10 +687,10 @@ PCA.type.opt <- function(output.opt0){
 
 WSM.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric( svalue(numberSoln(analysis) ))
-  npercent <- as.numeric(svalue( percentSoln(analysis) ))
-  num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue( datasetSelector(analysis) )))
+  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  num.access <- as.numeric( svalue( num.access )) ///
+  object     <- currentDataSet(analysis) 
   
   ## Read ranking
   
@@ -741,7 +747,7 @@ WSM.type.opt <- function(output.opt0){
   
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
-  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing = TRUE)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.accessions <- mean.result$accessions[pos,]
@@ -767,14 +773,14 @@ WSM.type.opt <- function(output.opt0){
   print(result.scale)
   cat("\n")
   cat("\n")
-
+  
   saveResults( 
     result.scale, 
-     
+    
     "HighestStandardizedValuesOfSubset_WSM",
     row.names = FALSE
   )     
-
+  
   result.scale.values <- as.matrix(abs(result.scale[,-1]))
   weights <- as.matrix(weights, ncol = 1)
   WSM <- as.numeric(result.scale.values%*%weights) #Compute WSM
@@ -812,7 +818,7 @@ WSM.type.opt <- function(output.opt0){
   
   saveResults( 
     final.subset.wsm, 
-     
+    
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
     row.names = FALSE
   ) 
@@ -884,11 +890,11 @@ chart <- function(out.solution, i){
 
 DTree.type.opt <- function(output.opt0){
   
-  nsoln <- as.numeric(svalue( numberSoln(analysis) ))
-  npercent <- as.numeric(svalue( percentSoln(analysis) ))
+  nsoln      <- as.numeric(svalue( numberOfSolutions(analysis) ))
+  npercent   <- as.numeric(svalue( percentageOfSolutions(analysis) ))
   num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text = svalue( datasetSelector(analysis) )))
-
+  object     <- currentDataSet(analysis) 
+  
   ## Read ranking importance 
   RI <- readResults(  "RI" )  
   
@@ -941,7 +947,7 @@ DTree.type.opt <- function(output.opt0){
   
   
   ##10)  Selection of solutions with highest standardized mean values (1%) ##seleccionar el %
-  pos <- order(mean.result[[1]],decreasing=T)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
+  pos <- order(mean.result[[1]],decreasing = TRUE)[1:(nsoln*(npercent/100))] #save postion of solution with highest standardized mean values 
   
   cat("\n")
   result.mean.accessions <- mean.result$accessions[pos,]
@@ -1022,7 +1028,7 @@ DTree.type.opt <- function(output.opt0){
     cat("\n")
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
-
+    
     DataFinal <- getDataThresholds()
     if( is.na(DataFinal) ) { DataFinal <- object } 
     
