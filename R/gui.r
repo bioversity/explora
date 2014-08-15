@@ -61,6 +61,8 @@ workbench <- function() {
   environment(saveProjectFile)        <- session
   environment(result.path)            <- session
   
+  environment(getDataThresholds)      <- session
+  
   environment(DialogSelectThresholds) <- session
   environment(number.access)          <- session
   environment(number.solutions)       <- session
