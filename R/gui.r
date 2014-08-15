@@ -141,10 +141,10 @@ workbench <- function() {
   lytg2[3,1] = (glabel( text = "",  container = lytg2))
   
 	lytg2[4,1] = glabel("Number of continuous variables: ",  container = lytg2)
-	lytg2[4,2] = ( numContVar(session$analysis) <- gedit("", container = lyt2,width = 10,initial.msg="") ) 
+	lytg2[4,2] = ( numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lyt2, width = 10, initial.msg="" )) 
   
 	lytg2[5,1] = glabel("Number of categorical variables: ", container = lytg2)
-	lytg2[5,2] = ( numCatVar(session$analysis)  <-gedit("",container=lyt2, width = 10,initial.msg=""))
+	lytg2[5,2] = ( numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lyt2, width = 10, initial.msg="" ))
   
 	lytg2[6,1]=(glabel( text = "", container=lytg2))
 	lytg2[7,1]=(glabel( text = "", container=lytg2))
@@ -178,7 +178,7 @@ workbench <- function() {
 	lytg2[16,1]=(glabel( text = "", container = lytg2))
 	
 	lytg2[17,1] = glabel("Number accessions in final dataset: ",  container = lytg2)
-	lytg2[17,2] = (num.access <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
+	lytg2[17,2] = ( numberOfAccessions(session$analysis) <- gedit("10",  container = lyt2, width = 10, initial.msg =" "))
 	lytg2[18,1] = gbutton(
                   "Select number accessions",
                   container = lyt2, 
@@ -203,7 +203,7 @@ workbench <- function() {
 	lytg3 = glayout(homogeneous = F,  container = g3, spacing = 1, expand = T) 
 	
 	lytg3[1,1] = glabel("Enter the number of solutions: ",  container = lytg3)
-	lytg3[1,2] = ( numberSoln(session$analysis) <- gedit("10000",  container = lytg3))
+	lytg3[1,2] = ( numberOfSolutions(session$analysis) <- gedit("10000",  container = lytg3))
 	lytg3[2,1] = gbutton("Select the number of solutions",  container = lytg3, expand=F,
 			handler = function(h,...){print(number.solution())})
 	
@@ -222,7 +222,7 @@ workbench <- function() {
 	lytg3[8,1] = (glabel( text = "", container = lytg3))
 	
 	lytg3[9,1] = glabel("Enter the percentage of solutions (%):",  container = lytg3)
-	lytg3[9,2] = ( percentSoln(session$analysis) <- gedit("1",     container = lytg3))
+	lytg3[9,2] = ( percentageOfSolutions(session$analysis) <- gedit("1",     container = lytg3))
 	lytg3[10,1] = gbutton(
                   "Select the percentage of solutions",
                   container = lytg3,
@@ -234,7 +234,7 @@ workbench <- function() {
 	lytg3[12,1] = (glabel( text = "", container = lytg3))
 	
 	lytg3[13,1] = glabel("Enter the number of final solutions for \n (Maximum Variation or number of Principal Components) :",  container = lytg3)
-	lytg3[13,2] = (nfinal = gedit("10", container = lytg3))
+	lytg3[13,2] = ( numberOfFinalSolutions(session$analysis) = gedit("10", container = lytg3))
 	lytg3[14,1] = gbutton(
                   "Select the number of final solutions",
                   container = lytg3,

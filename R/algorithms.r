@@ -255,7 +255,10 @@ DialogSelectOptimization <- function(object){
 
 #' @importFrom vegan diversity
 
-optimization <- function(data, option1, option2, num.access){ ## calculate 'optimization'
+## calculate 'optimization'
+optimization <- function(data, option1, option2){ 
+  
+  num.access <- as.numeric(svalue( numberOfAccessions(analysis) )) 
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
   
@@ -362,14 +365,12 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
-  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
+  object <- currentDataSet(analysis)
   
   ncon   <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
   ncat   <- as.numeric(svalue( numberOfCategoricalVariables(analysis) ))
   
   nsoln  <- as.numeric(svalue( numberOfSolutions(analysis) )) 
-  
-  num.access <- as.numeric(svalue(num.access)) 
   
   varop1c <- svalue(varop1c)
   varop1n <- svalue(varop1n)
@@ -419,7 +420,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   ## Creates the progress bar
   ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
   for(j in 1:nsoln){
-    output.opt0[[j]] <- optimization(Data, option.objective.con, option.objective.nom, num.access)
+    output.opt0[[j]] <- optimization( Data, option.objective.con, option.objective.nom )
     setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "% progress"))
   }
   close(ProgressBar)
@@ -430,16 +431,17 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
 
 MAXVAR.type.opt <- function(output.opt0){
   
-  nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  object <- currentDataSet(analysis) 
+
+  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   
-  nfinal <- as.numeric(svalue(nfinal))
-  num.access <- as.numeric(svalue(num.access))
-  object <- eval(parse(text=svalue( datasetSelector(analysis) )))
+  nfinal     <- as.numeric( svalue( numberOfFinalSolutions(session$analysis) ))
+  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ))
   
   ##8)  Standardize values in the sampled subsets:   
-  result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
-  colnames(result) <- as.character(output.opt0[[1]]$names)
+  result           <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
+  colnames(result) <- as.character(output.opt0[[1]]$names )
   
   ##Drop columns with NA's
   result <- as.data.frame(result)
@@ -541,8 +543,9 @@ PCA.type.opt <- function(output.opt0){
   
   nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  nfinal   <- as.numeric( svalue(nfinal))
-  object   <- eval(parse( text = svalue( datasetSelector(analysis) )))
+  nfinal   <- as.numeric( svalue( numberOfFinalSolutions(session$analysis) ))
+  
+  object   <- currentDataSet(analysis)
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -689,7 +692,7 @@ WSM.type.opt <- function(output.opt0){
   
   nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  num.access <- as.numeric( svalue( num.access )) ///
+  num.access <- as.numeric( svalue( numberOfAccessions(analysis) )) 
   object     <- currentDataSet(analysis) 
   
   ## Read ranking
@@ -890,9 +893,9 @@ chart <- function(out.solution, i){
 
 DTree.type.opt <- function(output.opt0){
   
-  nsoln      <- as.numeric(svalue( numberOfSolutions(analysis) ))
-  npercent   <- as.numeric(svalue( percentageOfSolutions(analysis) ))
-  num.access <- as.numeric(svalue(num.access))
+  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ) )
+  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
+  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ) )
   object     <- currentDataSet(analysis) 
   
   ## Read ranking importance 

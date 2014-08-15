@@ -255,7 +255,8 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 
 number.access <- function(h,...){## Function for selection of number of accessions in final set 
   
-  object = eval(parse(text=svalue( datasetSelector(analysis) )))
+  object = currentDataSet(analysis)
+  
   num.access <- as.numeric(svalue(num.access))
   
   if(num.access <= dim(object)[1] & num.access > 0){
@@ -268,7 +269,7 @@ number.access <- function(h,...){## Function for selection of number of accessio
 }
 
 number.solution <- function(h,...){
-  nsoln <- as.numeric( svalue(numberSoln(analysis) ))
+  nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
   if(nsoln > 0 & nsoln <= 1000000){
     DialogBox(paste("The number of solution is: ", nsoln, sep=" "))
   }else{DialogBox("Error in the percentage of solutions")}
@@ -279,8 +280,9 @@ number.solution <- function(h,...){
 ## Function to selected number of final accessions
 number.final <- function(h,...){
     
-  object = eval(parse(text=svalue( datasetSelector(analysis) )))
-  nfinal = as.numeric(svalue(nfinal))
+  object = currentDataSet(analysis)
+  
+  nfinal = as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
   
   if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
