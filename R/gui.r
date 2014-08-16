@@ -58,26 +58,28 @@ workbench <- function() {
 
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
-  environment(saveProjectFile)        <- session
-  environment(result.path)            <- session
+  environment(saveProjectFile)          <- session
+  environment(result.path)              <- session
   
-  environment(getDataThresholds)      <- session
+  environment(getDataThresholds)        <- session
   
-  environment(DialogSelectThresholds) <- session
-  environment(number.access)          <- session
-  environment(number.solutions)       <- session
-  environment(number.final)           <- session
-  environment(number.percent)         <- session
+  environment(DialogSelectThresholds)   <- session
+  environment(DialogSelectOptimization) <- session
   
-  environment(descriptors.continuous) <- session
-  environment(descriptors.nominal)    <- session
-  environment(correlation)            <- session
-  environment(f.optimization)         <- session
+  environment(number.access)            <- session
+  environment(number.solutions)         <- session
+  environment(number.final)             <- session
+  environment(number.percent)           <- session
   
-  environment(MAXVAR.type.opt)        <- session
-  environment(PCA.type.opt)           <- session
-  environment(WSM.type.opt)           <- session
-  environment(DTree.type.opt)         <- session 
+  environment(descriptors.continuous)   <- session
+  environment(descriptors.nominal)      <- session
+  environment(correlation)              <- session
+  environment(f.optimization)           <- session
+  
+  environment(MAXVAR.type.opt)          <- session
+  environment(PCA.type.opt)             <- session
+  environment(WSM.type.opt)             <- session
+  environment(DTree.type.opt)           <- session 
   
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300) 
@@ -214,7 +216,7 @@ workbench <- function() {
                 )
 	
   
-	##Selection of preferred analysis
+	## Optimization Analysis
 	lyt3 = glayout(homogeneous = F, container = nb , spacing=10,label="Optimization",expand=T)
 	lyt3[1,1:10] = (g3 = gframe("Optimization Analysis", container = lyt3, expand = TRUE, horizontal = FALSE))
 	lytg3 = glayout(homogeneous = FALSE,  container = g3, spacing = 10, expand = TRUE) 
@@ -223,7 +225,7 @@ workbench <- function() {
   
   lytg3[2,1] = glabel("Specify Target Number of Solutions: ",  container = lytg3)
   lytg3[2,2]=( glabel( text = "", container=lytg2) )
-  lytg3[2,3] = ( numberOfSolutions(session$analysis) <- gedit("10000",  container = lytg3))
+  lytg3[2,3] = ( numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg3))
   lytg3[2,4] = gbutton("Set",  container = lytg3, expand=FALSE, handler = function(h,...){ print( number.solutions() )})
 	
 	lytg3[3,1:5] = (glabel( text = "", container = lytg3))
@@ -234,13 +236,13 @@ workbench <- function() {
                 "Select...",
                 container = lytg3,
                 expand = FALSE,
-                handler = function(h,...){ DialogSelectOptimization( currentDataSet(session$analysis) )}
+                handler = function(h,...){ DialogSelectOptimization()}
                )
 	
 	lytg3[5,1:5] = (glabel( text = "", container = lytg3))
 	
 	lytg3[6,1:2] = glabel("Enter Target Percentage of Solutions (%):",  container = lytg3)
-  lytg3[6,3] = ( percentageOfSolutions(session$analysis) <- gedit("1",     container = lytg3))
+  lytg3[6,3] = ( percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg3))
 	lytg3[6,4] = gbutton(
                   "Set",
                   container = lytg3,
@@ -250,8 +252,8 @@ workbench <- function() {
 	
 	lytg3[7,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[8,1:2] = glabel("Enter the number of final solutions for\nMaximum Variation or\nNumber of Principal Components):",  container = lytg3)
-	lytg3[8,3] = ( numberOfFinalSolutions(session$analysis) = gedit("10", container = lytg3))
+	lytg3[8,1:2] = glabel("Enter the number of final solutions for the\nMaximum Variation or the\nNumber of Principal Components:",  container = lytg3)
+	lytg3[8,3] = ( numberOfFinalSolutions(session$analysis) = gedit("10", width=7, container = lytg3))
 	lytg3[8,4] = gbutton(
                   "Set",
                   container = lytg3,
@@ -275,10 +277,10 @@ workbench <- function() {
 	lytg3[11,2] = (btn <- gbutton("Run",  container = lytg3))
 	
 	addHandlerChanged(btn, handler = function(h,...){
-				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt( optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt(    optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt(    optimizationResult(session$analysis) )}
-				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt(  optimizationResult(session$analysis) )}
+				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
+				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
+				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
+				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
 			})
 
   svalue(nb) <- 1

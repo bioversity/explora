@@ -41,6 +41,7 @@ setClass( "ExploraAnalysis",
 setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
 setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
 setGeneric("currentDataSet",               function(x) standardGeneric("currentDataSet"))
+setGeneric("currentProjectName",           function(x) standardGeneric("currentProjectName"))
 setGeneric("currentProjectFolder",         function(x) standardGeneric("currentProjectFolder"))
 
 setGeneric("numberOfAccessions",           function(x) standardGeneric("numberOfAccessions"))
@@ -65,7 +66,16 @@ setMethod(  "currentProjectFolder",
               }
             } 
 )
-
+setMethod(  "currentProjectName",  
+            "ExploraAnalysis", 
+            function(x) { 
+              if(!is.null(attr(x@currentDataSet,"projectFolder"))) {
+                return( attr(x@currentDataSet,"identifier") )
+              } else {
+                return(NA)
+              }
+            } 
+)
 setMethod("numberOfAccessions",           "ExploraAnalysis",function(x) x@numberOfAccessions )
 setMethod("numberOfContinuousVariables",  "ExploraAnalysis",function(x) x@numberOfContinuousVariables )
 setMethod("numberOfCategoricalVariables", "ExploraAnalysis",function(x) x@numberOfCategoricalVariables )
@@ -311,7 +321,7 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 # to be set to valid values here(?). A simple
 # sanity check made to test this assumption
 #
-saveProjectFile <- function( results, filename, row.names = TRUE ) {
+saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) {
   
   if( is.table(results) | is.data.frame(results) ) {
     
@@ -319,7 +329,11 @@ saveProjectFile <- function( results, filename, row.names = TRUE ) {
     
     if( !is.na(path) ) {
       
-      DialogBox( paste("Result data posted to: ", path) )
+      projectName <- currentProjectName(analysis)
+      
+      if(alert) { 
+        DialogBox( paste("'", filename,"'\n data file published in project folder '", projectName,"'") )
+      }
       
       write.csv( results, file = path, row.names = row.names)
       
@@ -341,7 +355,9 @@ plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
   
   if( !is.na(path) ) {
     
-    DialogBox( paste("Result image posted to: ", path) )
+    projectName <- currentProjectName(analysis)
+    
+    DialogBox( paste("'", filename,"'\n data image published to project folder '", projectName,"'") )
     
     png(path, width = width, height = height, res = res)
     

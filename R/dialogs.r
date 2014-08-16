@@ -90,7 +90,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
 	
-	win <- gbasicdialog("Selection variable for threholds", visible = FALSE , width = 700, height = 450,
+	win <- gbasicdialog("Specify threshold variables:", visible = FALSE , width = 700, height = 450,
 			handler = function(h,...){var1 <<- svalue(var1);var2 <<- svalue(var2);var3 <<- svalue(var3);var4 <<- svalue(var4);var5 <<- svalue(var5);
 				var6 <<- svalue(var6);var7 <<- svalue(var7);var8 <<- svalue(var8);var9 <<- svalue(var9);var10 <<- svalue(var10);
 				min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2));min.var3 <<- as.numeric(svalue(min.var3));min.var4 <<- as.numeric(svalue(min.var4));min.var5 <<- as.numeric(svalue(min.var5));
@@ -100,6 +100,9 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	
 	nb <- gnotebook( container = win, expand = TRUE, tab.pos = 3)
 	
+  ## TODO: to fix: this of variable thresholds is hard coded 
+  # to a specific size. What happens if there are more variables in the dataset?
+  
 	lyt3 = glayout(homogeneous = FALSE,  container = nb, spacing=1, label = "Threshold Analyses", expand = TRUE)
 	
 	lyt3[3,1]=(glabel=(""))
@@ -218,7 +221,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
 		
 		saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
-		saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE )   	
+		saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE, alert = FALSE )   	
 		
     print(d.thresholds)
 		
@@ -238,19 +241,28 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 }
 
 ## Function for selection of number of accessions in final set 
-number.access <- function(h,...){
+number.access <- function(...){
   
-  object     <- currentDataSet(analysis)
+  object <- currentDataSet(analysis)
   
-  num.access <- as.numeric(svalue( numberOfSolutions(analysis) ))
+  targetNumberOfAccessions    <- as.integer(svalue( numberOfAccessions(analysis) ))
   
-  if(num.access <= dim(object)[1] & num.access > 0){
-    DialogBox(paste("Number of accessions in the final set: ", num.access, sep=" "))
+  availableNumberOfAccessions <- as.integer(dim(object)[1])
+  
+  if(  targetNumberOfAccessions > 0 & 
+      targetNumberOfAccessions <= availableNumberOfAccessions 
+  ){
+    DialogBox(paste("Target number of accessions in the final set to", targetNumberOfAccessions, sep=" "))
   } else {
-    DialogBox("Error in the accession number")
+    DialogBox(
+      paste("Invalid number of accessions.\n",
+            "Target number must lie within the range of 1 to",
+            as.character(availableNumberOfAccessions),
+            sep=" ")
+    )
   }
   
-  return(num.access) 
+  return( targetNumberOfAccessions ) 
 }
 
 number.solutions <- function(h,...) {
@@ -258,9 +270,10 @@ number.solutions <- function(h,...) {
   nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
   
   if(nsoln > 0 & nsoln <= 1000000){
-    DialogBox(paste("The number of solutions are: ", nsoln, sep=" "))
+    DialogBox(paste("The target number of solutions to screen set to", nsoln, sep=" "))
   } else { 
-    DialogBox("Error in the percentage of solutions")
+    DialogBox("Invalid target number of solutions to screen.\n",
+              "Target number must lie within the range of 1 and 1000000")
   }
   
   return(nsoln) 
@@ -276,7 +289,6 @@ number.final <- function(h,...){
   if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
     
     Data.Thresholds <- readProjectFile( "Data.Thresholds" )
-    
     Data <- Data.Thresholds
     
   } else {
@@ -285,9 +297,15 @@ number.final <- function(h,...){
     
   } 
   
-  if(nfinal <= dim(Data)[1] & nfinal > 0){
-    DialogBox(paste("Size of the final subset of the accessions: ", nfinal, sep=" "))
-  }else{DialogBox("Error in the size of the final subset")}
+  availableNumberOfAccessions <- dim(Data)[1]
+  if(nfinal <= availableNumberOfAccessions & nfinal > 0){
+    DialogBox(paste("Size of the final subset of the accessions set to", nfinal, sep=" "))
+  } else {
+    DialogBox("Invalid size of the final subset.\n",
+              "Target number must lie within the range of 1 to",
+              as.character(availableNumberOfAccessions),
+              sep=" ")
+  }
   
   return(nfinal)
 }

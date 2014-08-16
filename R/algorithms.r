@@ -7,9 +7,10 @@
 #' @include projects.r dialogs.r 
 
 ########################################################################
-# Not sure how the previously included "cluster" package for 
-# Cluster Analysis Extended Rousseeuw et al. is being used 
-# in this module since check()does not complain if it is removed...
+# Note: I'm not sure how the previously included "cluster" package for 
+# Cluster Analysis Extended Rousseeuw et al. is being used in Explora
+# in this module since check() does not complain about missing symbols, 
+# if cluster is removed. Is the dependency within another included package?
 ########################################################################
 
 ## Descriptor analysis for continuous variables
@@ -27,7 +28,7 @@ des.continuous <- function(object){
   result <- cbind(n, min, max, average, variance, Est.Desv, median, Coef.Var, NA.Data, NA.Percent)
 }
 
-## Used to function 'des.continuous' 
+## applies function 'des.continuous' to whole dataset 
 descriptors.continuous <- function(object){
   
   ncon <- as.numeric( svalue( numberOfContinuousVariables(analysis) ))
@@ -127,7 +128,9 @@ correlation <- function(object){
   
 }
 
-DialogSelectOptimization <- function(object){
+DialogSelectOptimization <- function(){
+  
+  dataset <- currentDataSet(analysis)
   
   f.items.cont <- c("NA","CV: Maximize coefficient of variation",
                     "MAX.AV: Maximize average", 
@@ -140,11 +143,11 @@ DialogSelectOptimization <- function(object){
   f.items.nom <- c("NA", "SHANNON: Maximize Shannon index", "MAX.PROP: Maximize proportion")
   
   ncon <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
-  object.optimization <- object[,-1]
-  object.continuous <- object.optimization[,1:ncon]
-  object.nominal <- object.optimization[,(ncon+1):dim(object.optimization)[2]]
-  names.continuous <- names(object.continuous)
-  names.nominal <- names(object.nominal)
+  dataset.optimization <- dataset[,-1]
+  dataset.continuous <- dataset.optimization[,1:ncon]
+  dataset.nominal <- dataset.optimization[,(ncon+1):dim(dataset.optimization)[2]]
+  names.continuous <- names(dataset.continuous)
+  names.nominal <- names(dataset.nominal)
   nsoln <- as.numeric(svalue( numberOfSolutions(analysis) ))
   
   pcategory.v1 <- 0
@@ -153,7 +156,7 @@ DialogSelectOptimization <- function(object){
   pcategory.v4 <- 0
   pcategory.v5 <- 0
   
-  win <- gbasicdialog("Selection variable for optmization", visible = F , width = 700, height = 450,
+  win <- gbasicdialog("Selection of Variables for Optimization", visible = F , width = 700, height = 450,
                       handler = function(h,...){varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
                                                 fvarop1c<<-svalue(fvarop1c);fvarop2c<<-svalue(fvarop2c);fvarop3c<<-svalue(fvarop3c);fvarop4c<<-svalue(fvarop4c);fvarop5c<<-svalue(fvarop5c);
                                                 ri1c<<-svalue(ri1c);ri2c<<-svalue(ri2c);ri3c<<-svalue(ri3c);ri4c<<-svalue(ri4c);ri5c<<-svalue(ri5c);
@@ -163,79 +166,86 @@ DialogSelectOptimization <- function(object){
   nb <- gnotebook( container = win, expand = T, tab.pos = 3)
   
   
-  lyt4=glayout(homogeneous = F, container = nb , spacing=1,label="Optimization",expand = TRUE)
-  lyt4[1,1:25] = (g4 = gframe("Optimization", container = lyt4, expand = T, horizontal = F))
-  lytg4 = glayout(homogeneous = F,  container = g4, spacing = 1, expand = T) 
-  lytg4[1,1]=(glabel=(""))
-  lytg4[2,1]=(glabel=(""))
+  lyt4 <- glayout(homogeneous = FALSE, container = nb , spacing = 10,label="Optimization Procedure",expand = TRUE)
+  lyt4[1:2,1:25] <- (glabel( text = "", container = lyt4))
   
-  lytg4[3,1] = glabel("Optimization of continuous variables: ",  container =lytg4)
-  lytg4[4,1]=(glabel=(""))
-  lytg4[5,1] = glabel("Variable: ",  container =lytg4)
+  lyt4[3,1:25] <- (g4var = gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE))
   
-  lytg4[5,2] = glabel("Objective function: ",  container =lytg4)
-  lytg4[5,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4)
+  lytg4var <- glayout(homogeneous = FALSE,  container = g4var, spacing = 5, expand = TRUE)
   
-  lytg4[6,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4))
-  lytg4[6,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[7,1] = (varop2c = gdroplist(c("NA", names.continuous),  container = lytg4))
-  lytg4[7,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[8,1] = (varop3c = gdroplist(c("NA", names.continuous),  container = lytg4))
-  lytg4[8,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[9,1] = (varop4c = gdroplist(c("NA", names.continuous),  container = lytg4))
-  lytg4[9,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[10,1] = (varop5c = gdroplist(c("NA", names.continuous),  container = lytg4))
-  lytg4[10,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4))
-  lytg4[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
+  lytg4var[1:2,1:25] <- (glabel( text = ""))
   
+  lytg4var[3,1] = glabel("Optimization of continuous variables: ",  container =lytg4var)
+  lytg4var[4,1] <- (glabel( text = ""))
+  lytg4var[5,1] = glabel("Variable: ",  container =lytg4var)
   
-  lytg4[11,1]=(glabel=(""))
-  lytg4[12,1]=(glabel=(""))
+  lytg4var[5,2] = glabel("Objective function: ",  container =lytg4var)
+  lytg4var[5,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4var)
   
-  lytg4[13,1] = glabel("Optimization of nominal variables: ",  container =lytg4)
-  lytg4[14,1]=(glabel=(""))
-  lytg4[15,1] = glabel("Variable: ",  container =lytg4)
-  lytg4[15,2] = glabel("Objective function: ",  container =lytg4)
-  lytg4[15,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4)
-  lytg4[16,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4))
-  lytg4[16,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
-    if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop1n)])))))}}))
-  lytg4[16,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[17,1] = (varop2n = gdroplist(c("NA",names.nominal),  container = lytg4))
-  lytg4[17,2] = (fvarop2n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
-    if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop2n)])))))}}))
-  lytg4[17,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[18,1] = (varop3n = gdroplist(c("NA",names.nominal),  container = lytg4))
-  lytg4[18,2] = (fvarop3n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
-    if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop3n)])))))}}))
-  lytg4[18,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[19,1] = (varop4n = gdroplist(c("NA",names.nominal),  container = lytg4))
-  lytg4[19,2] = (fvarop4n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
-    if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop4n)])))))}}))
-  lytg4[19,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  lytg4[20,1] = (varop5n = gdroplist(c("NA",names.nominal),  container = lytg4))
-  lytg4[20,2] = (fvarop5n = gdroplist(f.items.nom,  container = lytg4, handler = function(h,...){
-    if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(object[colnames(object) == svalue(varop5n)])))))}}))
-  lytg4[20,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4)) 
-  
-  lytg4[21,1]=(glabel=(""))
-  lytg4[22,1]=(glabel=(""))
-  lytg4[23,1]=(glabel=("Note: Run the optimization procedure before close the window"))
+  lytg4var[6,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4var))
+  lytg4var[6,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4var))
+  lytg4var[6,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[7,1] = (varop2c = gdroplist(c("NA", names.continuous),  container = lytg4var))
+  lytg4var[7,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4var))
+  lytg4var[7,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[8,1] = (varop3c = gdroplist(c("NA", names.continuous),  container = lytg4var))
+  lytg4var[8,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4var))
+  lytg4var[8,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[9,1] = (varop4c = gdroplist(c("NA", names.continuous),  container = lytg4var))
+  lytg4var[9,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4var))
+  lytg4var[9,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[10,1] = (varop5c = gdroplist(c("NA", names.continuous),  container = lytg4var))
+  lytg4var[10,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4var))
+  lytg4var[10,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
   
   
-  lytg4[25,2] = gbutton("Optimization",  container = lytg4,
-                        handler = function(h,...){
-                          optimizationResult(analysis) <<- f.optimization(varop1c, varop2c, varop3c, varop4c, varop5c,
-                                                                          fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
-                                                                          varop1n, varop2n, varop3n, varop4n, varop5n,
-                                                                          fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
-                                                                          pcategory.v1, pcategory.v2, pcategory.v3,
-                                                                          pcategory.v4,pcategory.v5)}) 
+  lytg4var[11,1] <- (glabel( text = ""))
+  lytg4var[12,1] <- (glabel( text = ""))
   
+  lytg4var[13,1] = glabel("Optimization of nominal variables: ",  container =lytg4var)
+  lytg4var[14,1] <- (glabel( text = ""))
+  lytg4var[15,1] = glabel("Variable: ",  container =lytg4var)
+  lytg4var[15,2] = glabel("Objective function: ",  container =lytg4var)
+  lytg4var[15,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4var)
+  lytg4var[16,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4var))
+  lytg4var[16,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop1n)])))))}}))
+  lytg4var[16,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[17,1] = (varop2n = gdroplist(c("NA",names.nominal),  container = lytg4var))
+  lytg4var[17,2] = (fvarop2n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop2n)])))))}}))
+  lytg4var[17,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[18,1] = (varop3n = gdroplist(c("NA",names.nominal),  container = lytg4var))
+  lytg4var[18,2] = (fvarop3n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop3n)])))))}}))
+  lytg4var[18,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[19,1] = (varop4n = gdroplist(c("NA",names.nominal),  container = lytg4var))
+  lytg4var[19,2] = (fvarop4n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop4n)])))))}}))
+  lytg4var[19,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[20,1] = (varop5n = gdroplist(c("NA",names.nominal),  container = lytg4var))
+  lytg4var[20,2] = (fvarop5n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop5n)])))))}}))
+  lytg4var[20,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+
+  lyt4[4:5,1:25]      <- (glabel( text = "", container = lyt4))
+  lyt4[6,1:25]        <- (g4opt = gframe("Run Optimization", container = lyt4, expand = TRUE, horizontal = FALSE))
+  
+  lytg4opt            <- glayout(homogeneous = FALSE,  container = g4opt, spacing = 5, expand = TRUE)
+  
+  lytg4opt[1:2,1:25]  <- (glabel( text = "", container = lytg4opt))
+  lytg4opt[2,1:10:15] <- (glabel( text = "Note: Run the optimization procedure before closing the window", container = lytg4opt))
+  lytg4opt[3,1:25]    <- (glabel( text = "", container = lytg4opt))
+  lytg4opt[4,10:15]   <- gbutton( "Run Optimization Analysis",  
+                                container = lytg4opt,
+                                handler = function(h,...){
+                                      optimizationResult(analysis) <<- f.optimization(
+                                                        varop1c, varop2c, varop3c, varop4c, varop5c,
+                                                        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
+                                                        varop1n, varop2n, varop3n, varop4n, varop5n,
+                                                        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
+                                                        pcategory.v1, pcategory.v2, pcategory.v3,
+                                                        pcategory.v4,pcategory.v5)}) 
   visible(win)<-TRUE
   
   RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
@@ -429,9 +439,10 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   
 }
 
-MAXVAR.type.opt <- function(output.opt0){
+MAXVAR.type.opt <- function(){
   
-  object <- currentDataSet(analysis) 
+  output.opt0 <- optimizationResult(analysis)
+  object      <- currentDataSet(analysis) 
 
   nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
@@ -539,11 +550,12 @@ MAXVAR.type.opt <- function(output.opt0){
 #' @importFrom ade4 s.label
 #' @importFrom ade4 s.corcircle
 
-PCA.type.opt <- function(output.opt0){
+PCA.type.opt <- function() {
   
-  nsoln    <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  nfinal   <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
+  output.opt0 <- optimizationResult(analysis) 
+  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  nfinal      <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
   
   object   <- currentDataSet(analysis)
   
@@ -688,12 +700,13 @@ PCA.type.opt <- function(output.opt0){
   }
 }  
 
-WSM.type.opt <- function(output.opt0){
+WSM.type.opt <- function(){
   
-  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  num.access <- as.numeric( svalue( numberOfAccessions(analysis) )) 
-  object     <- currentDataSet(analysis) 
+  output.opt0 <- optimizationResult(analysis) 
+  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  num.access  <- as.numeric( svalue( numberOfAccessions(analysis) )) 
+  object      <- currentDataSet(analysis) 
   
   ## Read ranking
   
@@ -891,12 +904,13 @@ chart <- function(out.solution, i){
   dev.off()
 }
 
-DTree.type.opt <- function(output.opt0){
+DTree.type.opt <- function(){
   
-  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ) )
-  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
-  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ) )
-  object     <- currentDataSet(analysis) 
+  output.opt0 <- optimizationResult(analysis) 
+  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ) )
+  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
+  num.access  <- as.numeric( svalue( numberOfAccessions(analysis) ) )
+  object      <- currentDataSet(analysis) 
   
   ## Read ranking importance 
   RI <- readProjectFile(  "RI" )  
