@@ -59,6 +59,8 @@ workbench <- function() {
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
   environment(saveProjectFile)          <- session
+  environment(readProjectFile)          <- session
+  environment(result.path.exists)       <- session
   environment(result.path)              <- session
   
   environment(getDataThresholds)        <- session
@@ -75,6 +77,7 @@ workbench <- function() {
   environment(descriptors.nominal)      <- session
   environment(correlation)              <- session
   environment(f.optimization)           <- session
+  environment(optimization)             <- session
   
   environment(MAXVAR.type.opt)          <- session
   environment(PCA.type.opt)             <- session
@@ -152,8 +155,8 @@ workbench <- function() {
   )
 	
 	##Descriptor analysis
-	lyt2 = glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Descriptor analysis", expand = TRUE)
-	lyt2[1,1:6] = (g2 <- gframe("General Descriptor Analysis",container = lyt2, expand = TRUE, horizontal=FALSE) )
+	lyt2 = glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Descriptor Analysis", expand = TRUE)
+	lyt2[1,1:6] = (g2 <- gframe("Trait Descriptor Analysis & Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) )
 	lytg2 = glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE) 
   
   lytg2[1:2,1:5] = (glabel( text = "",  container = lytg2))
@@ -165,7 +168,7 @@ workbench <- function() {
   lytg2[4,5] = gbutton(
                     "Run CV Analysis",
                     container = lytg2, 
-                    handler=function(h,...){ print( descriptors.continuous( currentDataSet(session$analysis) ))
+                    handler=function(h,...){ print( descriptors.continuous() )
                   }
                 )
   
@@ -178,7 +181,7 @@ workbench <- function() {
   lytg2[7,5] = gbutton(
                     "Run NV Analysis",
                     container = lytg2, 
-                    handler=function(h,...){ print( descriptors.nominal( currentDataSet(session$analysis) ))
+                    handler=function(h,...){ print( descriptors.nominal() )
                   }
                 )
 	
@@ -190,7 +193,7 @@ workbench <- function() {
   lytg2[10,5] = gbutton(
                   "Run CC Analysis",
                   container = lytg2,
-                  handler=function(h,...){ print( correlation( currentDataSet(session$analysis) ))}
+                  handler=function(h,...){ print( correlation() ) }
                 )
   
   
@@ -208,8 +211,8 @@ workbench <- function() {
   
 	lytg2[14:15,1:5]=(glabel( text = "", container=lytg2))
 	
-  lytg2[16,1:2]=(glabel( text = "Select Variables for Threshold Analysis:", container = lytg2))
-  lytg2[16,5] = gbutton(
+  lytg2[16,1:2]=(glabel( text = "Filter input trait variables with thresholds:", container = lytg2))
+  lytg2[16,3:5] = gbutton(
                   "Select...",
                   container = lytg2,
                   handler = function(h,...){ DialogSelectThresholds( currentDataSet(session$analysis) ) }
@@ -231,8 +234,7 @@ workbench <- function() {
 	lytg3[3,1:5] = (glabel( text = "", container = lytg3))
 	
 	lytg3[4,1] = glabel("Specify Optimization Analysis Variables:",  container = lytg3)
-  lytg3[4,2:3]=( glabel( text = "", container=lytg2) )
-  lytg3[4,4] = gbutton(
+  lytg3[4,2:4] = gbutton(
                 "Select...",
                 container = lytg3,
                 expand = FALSE,
@@ -263,7 +265,7 @@ workbench <- function() {
 	
 	lytg3[9,1:5] = (glabel( text = "", container = lytg3))
 	
-	lytg3[10,1] = glabel("Select Preferred Algorithm: ",  container = lytg3, horizontal = FALSE)
+	lytg3[10,1] = glabel("Select Preferred Optimization Algorithm: ",  container = lytg3, horizontal = FALSE)
 	
 	items.option <- c(
                       " ", 

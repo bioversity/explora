@@ -30,7 +30,7 @@ setClass( "ExploraAnalysis",
             percentageOfSolutions        = "guiComponent", # formerly npercen
             numberOfSolutions            = "guiComponent", # formerly Nsim
             numberOfFinalSolutions       = "guiComponent", # formerly nfinal
-            optimizationResult           = "list"          # output.opt from algorithm$f.optimization
+            optimizationResult           = "list"          # output.opt from algorithm.r f.optimization()
           )
 )
 
@@ -323,7 +323,7 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 #
 saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) {
   
-  if( is.table(results) | is.data.frame(results) ) {
+  if( is.table(results) | is.data.frame(results) | is.matrix(results) ) {
     
     path <- result.path( filename, "csv" )
     
@@ -332,7 +332,7 @@ saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) 
       projectName <- currentProjectName(analysis)
       
       if(alert) { 
-        DialogBox( paste("'", filename,"'\n data file published in project folder '", projectName,"'") )
+        DialogBox( paste("'", filename,"' data file published\nin project folder '", projectName,"'") )
       }
       
       write.csv( results, file = path, row.names = row.names)

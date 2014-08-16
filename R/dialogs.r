@@ -76,7 +76,8 @@ SelectSolution <- function(solutions){## Function to select preference category
 	return(out.solution)
 }
 
-DialogSelectThresholds <- function(object){## Function to select variables for thresholds
+## Function to select variables for thresholds
+DialogSelectThresholds <- function(object){
 	
 	object.thresholds <- object
 	ncon              <- as.numeric( svalue( numberOfContinuousVariables(analysis) )) 
@@ -195,7 +196,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 	
 	if(length(val.min) == 0 & length(val.max) == 0){
 		
-		## Extrac subset of data base from thresholds
+		## Extract subset of data base from thresholds
 		data.var.thresholds <- as.data.frame(object[,is.element(colnames(object), matrix.thresholds$Variable)])
 		rownames(data.var.thresholds) <- object.complete$n_acces
 		n_acces_subset <- matrix(NA, nrow = dim(object)[1], ncol = length(var.thresholds))
@@ -218,7 +219,7 @@ DialogSelectThresholds <- function(object){## Function to select variables for t
 		d.thresholds = sapply(data.var.thresholds.final, des.continuous)
 		row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
 		d.thresholds = as.table(d.thresholds)
-		names(dimnames(d.thresholds)) <- c(" ", paste("Variables thresholds",svalue( datasetSelector(analysis) )))
+		names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
 		
 		saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
 		saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE, alert = FALSE )   	
@@ -245,7 +246,7 @@ number.access <- function(...){
   
   object <- currentDataSet(analysis)
   
-  targetNumberOfAccessions    <- as.integer(svalue( numberOfAccessions(analysis) ))
+  targetNumberOfAccessions    <- as.integer( svalue( numberOfAccessions(analysis) ))
   
   availableNumberOfAccessions <- as.integer(dim(object)[1])
   
