@@ -300,7 +300,7 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
   
   w<- gwindow("Alert",width=100,height=100)
   g <- ggroup( container = w)
-  gimage("info", dirname="stock", size="large_toolbar",  container = g)
+  gimage("info", dirname="stock", container = g)
   
   ig <- ggroup(horizontal = FALSE,  container = g)
   glabel(message,  container = ig, expand = TRUE)

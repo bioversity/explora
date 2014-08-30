@@ -179,11 +179,11 @@ DialogSelectOptimization <- function(){
   
   lytg4var <- glayout(homogeneous = FALSE,  container = g4var, spacing = 5, expand = TRUE)
   
-  lytg4var[1,1] = glabel("Optimization Strategy for Continuous Variables: ",  container =lytg4var)
-  lytg4var[2,1] = glabel("Variable: ",  container =lytg4var)
+  lytg4var[1,1] = glabel("Optimization Strategy for Continuous Variables: ",  container = lytg4var)
+  lytg4var[2,1] = glabel("Variable: ",  container = lytg4var)
   
-  lytg4var[2,2] = glabel("Objective function: ",  container =lytg4var)
-  lytg4var[2,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4var)
+  lytg4var[2,2] = glabel("Objective function: ",  container = lytg4var)
+  lytg4var[2,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
   
   lytg4var[3,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4var))
   lytg4var[3,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4var))
@@ -201,10 +201,10 @@ DialogSelectOptimization <- function(){
   lytg4var[7,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4var))
   lytg4var[7,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
   
-  lytg4var[8,1] = glabel("Optimization Strategy for Nominal Variables: ",  container =lytg4var)
-  lytg4var[9,1] = glabel("Variable: ",  container =lytg4var)
-  lytg4var[9,2] = glabel("Objective function: ",  container =lytg4var)
-  lytg4var[9,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container =lytg4var)
+  lytg4var[8,1] = glabel("Optimization Strategy for Nominal Variables: ",  container = lytg4var)
+  lytg4var[9,1] = glabel("Variable: ",  container = lytg4var)
+  lytg4var[9,2] = glabel("Objective function: ",  container = lytg4var)
+  lytg4var[9,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
   lytg4var[10,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4var))
   lytg4var[10,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop1n)])))))}}))

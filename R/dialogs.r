@@ -27,7 +27,7 @@
 #' @importMethodsFrom gWidgets visible
 #' @importMethodsFrom gWidgets visible<-
 
-#' @import gWidgetsRGtk2
+#' @import gWidgetstcltk
 
 
 DialogBoxDTree <- function(items) {## This function make a dialog box
@@ -91,64 +91,95 @@ DialogSelectThresholds <- function(object){
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
 	
-	win <- gbasicdialog("Specify threshold variables:", visible = FALSE , width = 700, height = 450,
-			handler = function(h,...){var1 <<- svalue(var1);var2 <<- svalue(var2);var3 <<- svalue(var3);var4 <<- svalue(var4);var5 <<- svalue(var5);
-				var6 <<- svalue(var6);var7 <<- svalue(var7);var8 <<- svalue(var8);var9 <<- svalue(var9);var10 <<- svalue(var10);
-				min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2));min.var3 <<- as.numeric(svalue(min.var3));min.var4 <<- as.numeric(svalue(min.var4));min.var5 <<- as.numeric(svalue(min.var5));
-				min.var6 <<- as.numeric(svalue(min.var6)); min.var7 <<- as.numeric(svalue(min.var7));min.var8 <<- as.numeric(svalue(min.var8));min.var9 <<- as.numeric(svalue(min.var9));min.var10 <<- as.numeric(svalue(min.var10));
-				max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2));max.var3 <<- as.numeric(svalue(max.var3));max.var4 <<- as.numeric(svalue(max.var4));max.var5 <<- as.numeric(svalue(max.var5));
-				max.var6 <<- as.numeric(svalue(max.var6)); max.var7 <<- as.numeric(svalue(max.var7));max.var8 <<- as.numeric(svalue(max.var8));max.var9 <<- as.numeric(svalue(max.var9));max.var10 <<- as.numeric(svalue(max.var10))}) 
+	win <- gbasicdialog(
+            "Specify threshold variables:", 
+            visible = FALSE , 
+            width = 700, 
+            height = 450,
+      			handler = function(h,...) {
+                    var1 <<- svalue(var1);
+                    var2 <<- svalue(var2);
+                    var3 <<- svalue(var3);
+                    var4 <<- svalue(var4);
+                    var5 <<- svalue(var5);
+            				var6 <<- svalue(var6);
+                    var7 <<- svalue(var7);
+                    var8 <<- svalue(var8);
+                    var9 <<- svalue(var9);
+                    var10 <<- svalue(var10);
+            				min.var1 <<- as.numeric(svalue(min.var1));
+                    min.var2 <<- as.numeric(svalue(min.var2));
+                    min.var3 <<- as.numeric(svalue(min.var3));
+                    min.var4 <<- as.numeric(svalue(min.var4));
+                    min.var5 <<- as.numeric(svalue(min.var5));
+            				min.var6 <<- as.numeric(svalue(min.var6));
+                    min.var7 <<- as.numeric(svalue(min.var7));
+                    min.var8 <<- as.numeric(svalue(min.var8));
+                    min.var9 <<- as.numeric(svalue(min.var9));
+                    min.var10 <<- as.numeric(svalue(min.var10));
+            				max.var1 <<- as.numeric(svalue(max.var1)); 
+                    max.var2 <<- as.numeric(svalue(max.var2));
+                    max.var3 <<- as.numeric(svalue(max.var3));
+                    max.var4 <<- as.numeric(svalue(max.var4));
+                    max.var5 <<- as.numeric(svalue(max.var5));
+            				max.var6 <<- as.numeric(svalue(max.var6));
+                    max.var7 <<- as.numeric(svalue(max.var7));
+                    max.var8 <<- as.numeric(svalue(max.var8));
+                    max.var9 <<- as.numeric(svalue(max.var9));
+                    max.var10 <<- as.numeric(svalue(max.var10))
+                }
+              ) 
 	
 	nb <- gnotebook( container = win, expand = TRUE, tab.pos = 3)
 	
   ## TODO: to fix: this of variable thresholds is hard coded 
   # to a specific size. What happens if there are more variables in the dataset?
   
-	lyt3 = glayout(homogeneous = FALSE,  container = nb, spacing=1, label = "Threshold Analyses", expand = TRUE)
+	lyt3 <- glayout(homogeneous = FALSE, container = nb, spacing=1, label = "Threshold Analyses", expand = TRUE)
 	
-	lyt3[3,1]=(glabel=(""))
+	lyt3[3,1]    <- glabel( text=" ", container = lyt3 )
 	
-	lyt3[4,1] = glabel("Variables to select",  container = lyt3)
-	lyt3[5,1:4] = (var1 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[6,1:4] = (var2 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[7,1:4] = (var3 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[8,1:4] = (var4 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[9,1:4] = (var5 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[10,1:4] = (var6 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[11,1:4] = (var7 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[12,1:4] = (var8 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[13,1:4] = (var9 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
-	lyt3[14,1:4] = (var10 = gdroplist(c("NA",  names.thresholds),  container = lyt3))
+	lyt3[4,1]    <- glabel("Variables to select",  container = lyt3)
+	lyt3[5,1:4]  <- var1  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[6,1:4]  <- var2  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[7,1:4]  <- var3  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[8,1:4]  <- var4  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[9,1:4]  <- var5  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[10,1:4] <- var6  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[11,1:4] <- var7  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[12,1:4] <- var8  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[13,1:4] <- var9  <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
+	lyt3[14,1:4] <- var10 <- gdroplist(c("NA",  names.thresholds),  container = lyt3)
 	
-	lyt3[1,2]=(glabel=(""))
+	lyt3[1,2] <- glabel( text=" ", container = lyt3 )
 	
-	lyt3[4,7] = glabel("Minimum values",  container = lyt3)
-	lyt3[5,7] = (min.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[6,7] = (min.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[7,7] = (min.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[8,7] = (min.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[9,7] = (min.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[10,7] = (min.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[11,7] = (min.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[12,7] = (min.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[13,7] = (min.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
-	lyt3[14,7] = (min.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Min"))
+	lyt3[4,7]  <- glabel("Minimum values",  container = lyt3)
+	lyt3[5,7]  <- min.var1  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[6,7]  <- min.var2  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[7,7]  <- min.var3  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[8,7]  <- min.var4  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[9,7]  <- min.var5  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[10,7] <- min.var6  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[11,7] <- min.var7  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[12,7] <- min.var8  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[13,7] <- min.var9  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
+	lyt3[14,7] <- min.var10 <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Min")
 	
-	lyt3[1,8]=(glabel=(""))
+	lyt3[1,8] <- glabel( text=" ", container = lyt3 )
 	
-	lyt3[4,10] = glabel("Maximum values",  container = lyt3)
-	lyt3[5,10] = (max.var1 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[6,10] = (max.var2 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[7,10] = (max.var3 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[8,10] = (max.var4 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[9,10] = (max.var5 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[10,10] = (max.var6 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[11,10] = (max.var7 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[12,10] = (max.var8 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[13,10] = (max.var9 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
-	lyt3[14,10] = (max.var10 = gedit("",  container = lyt3, width = 3, initial.msg = "Max"))
+	lyt3[4,10]  <- glabel("Maximum values",  container = lyt3)
+	lyt3[5,10]  <- max.var1  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[6,10]  <- max.var2  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[7,10]  <- max.var3  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[8,10]  <- max.var4  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[9,10]  <- max.var5  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[10,10] <- max.var6  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[11,10] <- max.var7  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[12,10] <- max.var8  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[13,10] <- max.var9  <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
+	lyt3[14,10] <- max.var10 <- gedit(" ",  container = lyt3, width = 3, initial.msg = "Max")
 
-	visible(win)<-TRUE
+	visible(win) <- TRUE
 	
 	if(var1!="NA"){var1<-unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2<-unlist(strsplit(var2, ":"))[1]}
 	if(var3!="NA"){var3<-unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4<-unlist(strsplit(var4, ":"))[1]}
