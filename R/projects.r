@@ -14,7 +14,7 @@
 
 #' @importFrom gWidgets gfile
 #' @importClassesFrom gWidgets gCombobox
-#' @importClassesFrom gWidgets gNotebook
+#' @importClassesFrom gWidgets gLayout
 #' @importClassesFrom gWidgets guiComponent
 
 # ExploraAnalysis - S4 Class for global project data management
@@ -24,7 +24,7 @@ setClass( "ExploraAnalysis",
             datasetSelector              = "gCombobox",    # formerly nom_data
             datasetCatalog               = "character",    # new way of tracking dataset names
             currentDataSet               = "data.frame",   # active dataset being analysed
-            
+
             numberOfAccessions           = "guiComponent", # formerly num.access
             numberOfContinuousVariables  = "guiComponent", # formerly ncon
             numberOfCategoricalVariables = "guiComponent", # formerly ncat
@@ -38,8 +38,6 @@ setClass( "ExploraAnalysis",
 # 
 # Accessor Methods
 #
-
-setGeneric("window",                       function(x) standardGeneric("window"))
 
 setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
 setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
@@ -55,10 +53,20 @@ setGeneric("numberOfSolutions",            function(x) standardGeneric("numberOf
 setGeneric("numberOfFinalSolutions",       function(x) standardGeneric("numberOfFinalSolutions"))
 setGeneric("optimizationResult",           function(x) standardGeneric("optimizationResult"))
 
-setMethod("window",                       "ExploraAnalysis",function(x) x@window )
 setMethod("datasetSelector",              "ExploraAnalysis",function(x) x@datasetSelector )
 setMethod("datasetCatalog",               "ExploraAnalysis",function(x) x@datasetCatalog )
 setMethod("currentDataSet",               "ExploraAnalysis",function(x) x@currentDataSet )
+
+setMethod(  "currentProjectName",  
+            "ExploraAnalysis", 
+            function(x) { 
+              if(!is.null(attr(x@currentDataSet,"projectFolder"))) {
+                return( attr(x@currentDataSet,"identifier") )
+              } else {
+                return(NA)
+              }
+            } 
+)
 
 setMethod(  "currentProjectFolder",  
             "ExploraAnalysis", 
@@ -70,29 +78,18 @@ setMethod(  "currentProjectFolder",
               }
             } 
 )
-setMethod(  "currentProjectName",  
-            "ExploraAnalysis", 
-            function(x) { 
-              if(!is.null(attr(x@currentDataSet,"projectFolder"))) {
-                return( attr(x@currentDataSet,"identifier") )
-              } else {
-                return(NA)
-              }
-            } 
-)
-setMethod("numberOfAccessions",           "ExploraAnalysis",function(x) x@numberOfAccessions )
-setMethod("numberOfContinuousVariables",  "ExploraAnalysis",function(x) x@numberOfContinuousVariables )
-setMethod("numberOfCategoricalVariables", "ExploraAnalysis",function(x) x@numberOfCategoricalVariables )
-setMethod("percentageOfSolutions",        "ExploraAnalysis",function(x) x@percentageOfSolutions )
-setMethod("numberOfSolutions",            "ExploraAnalysis",function(x) x@numberOfSolutions )
-setMethod("numberOfFinalSolutions",       "ExploraAnalysis",function(x) x@numberOfFinalSolutions )
-setMethod("optimizationResult",           "ExploraAnalysis",function(x) x@optimizationResult )
+
+setMethod("numberOfAccessions",           "ExploraAnalysis", function(x) x@numberOfAccessions )
+setMethod("numberOfContinuousVariables",  "ExploraAnalysis", function(x) x@numberOfContinuousVariables )
+setMethod("numberOfCategoricalVariables", "ExploraAnalysis", function(x) x@numberOfCategoricalVariables )
+setMethod("percentageOfSolutions",        "ExploraAnalysis", function(x) x@percentageOfSolutions )
+setMethod("numberOfSolutions",            "ExploraAnalysis", function(x) x@numberOfSolutions )
+setMethod("numberOfFinalSolutions",       "ExploraAnalysis", function(x) x@numberOfFinalSolutions )
+setMethod("optimizationResult",           "ExploraAnalysis", function(x) x@optimizationResult )
 
 #
 # Replacement Methods
 #
-
-setGeneric("window<-",                       function(x,value) standardGeneric("window<-"))
 
 setGeneric("datasetSelector<-",              function(x,value) standardGeneric("datasetSelector<-"))
 setGeneric("datasetCatalog<-",               function(x,value) standardGeneric("datasetCatalog<-"))

@@ -135,7 +135,7 @@ correlation <- function(){
   
 }
 
-DialogSelectOptimization <- function( win, notebook, nextPageHandler){
+DialogSelectOptimization <- function( win, notebook, analysisPageHandler){
   
   dataset <- currentDataSet(analysis)
   ncon    <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
@@ -164,9 +164,9 @@ DialogSelectOptimization <- function( win, notebook, nextPageHandler){
   pcategory.v5 <- 0
   
   # A notebook within a notebook...
-  optimizationVariablePage <- gnotebook( container = notebook, expand = T, tab.pos = 3)
+  optimizationVariablesPage <- gnotebook( container = notebook, expand = T, tab.pos = 3)
   
-  lyt4 <- glayout(homogeneous = FALSE, container = optimizationVariablePage , spacing = 10, label="Optimization Procedure",expand = TRUE)
+  lyt4 <- glayout(homogeneous = FALSE, container = optimizationVariablesPage , spacing = 10, label="Optimization Procedure",expand = TRUE)
 
   lyt4[1,1:25]  <- g4var <- gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   
@@ -274,7 +274,8 @@ DialogSelectOptimization <- function( win, notebook, nextPageHandler){
                               
                               # Once the Optimization is run, you can display 
                               # the optimization Analysis page in the notebook
-                              nextPageHandler( win, notebook )
+                              analysisPageHandler() 
+                              
                             })
 
   lytg4opt[1,2]   <- ( glabel( text = "               ", container = lytg4opt))
@@ -1084,5 +1085,78 @@ DTree.type.opt <- function(){
     cat(paste("Process completed.................")) 
     
   }
+  
+  ##########################
+  ## Optimization Analysis #
+  ##########################
+  DialogOptimizationAnalysis <- function( win, notebook ) {
+      
+      lyt5 <- glayout(homogeneous = FALSE, container = notebook, spacing=10,label="Optimization Analysis",expand=TRUE)
+      lyt5[1,1:3]  <- g5 <- gframe("Optimization Analysis", container = lyt5, expand = TRUE, horizontal = FALSE)
+      lytg5        <- glayout(homogeneous = FALSE,  container = g5, spacing = 10, expand = TRUE) 
+      
+      lytg5[1,1:3] <- glabel( text = " ",  container = lytg5)
+      
+      lytg5[2,1] <- glabel("Specify Target Number of Solutions: ",  container = lytg5)
+      lytg5[2,2] <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg5)
+      lytg5[2,3] <- gbutton( 
+        "Set",  
+        container = lytg5, 
+        expand=FALSE, 
+        handler = function(h,...){ 
+          print( number.solutions() )
+        }
+      )
+      
+      lytg5[3,1:3] <- glabel( text = " ", container = lytg5)
+      
+      lytg5[4,1] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg5)
+      lytg5[4,2]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg5)
+      lytg5[4,3]   <- gbutton(
+        "Set",
+        container = lytg5,
+        expand = FALSE,
+        handler = function(h,...){ print( number.percent() )} 
+      )
+      
+      lytg5[5,1:3] <- glabel( text = " ", container = lytg5)
+      
+      lytg5[6,1] <- glabel("Enter the number of final solutions\nfor the Maximum Variation or the\nNumber of Principal Components:",  container = lytg5)
+      lytg5[6,2]   <-numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg5)
+      lytg5[6,3]   <- gbutton(
+        "Set",
+        container = lytg5,
+        expand = FALSE,
+        handler = function(h,...){ print( number.final() ) }
+      )
+      
+      lytg5[7,1:3] <- glabel( text = " ", container = lytg5)
+      
+      lytg5[8,1]  <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg5, horizontal = FALSE)
+      
+      items.option <- c(
+        " ", 
+        "Maximum variation", 
+        "Principal components",
+        "Weighted sum model",
+        "Decision tree"
+      )
+      
+      lytg5[9,1] <- option.preferred <- gdroplist(items.option,  container = lytg5)
+      lytg5[9,2] <- btn <- gbutton("Run",  container = lytg5)
+      
+      addHandlerChanged(btn, handler <- function(h,...){
+        if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
+        if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
+        if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
+        if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
+      })
+      
+      visible(win) <- TRUE
+      
+      svalue(notebook) <- 5
+      
+  }
+  
   
 }

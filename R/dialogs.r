@@ -90,12 +90,14 @@ DialogSelectThresholds <- function( win, notebook ){
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
 	
-	traitFilterPage <- gnotebook( container = notebook, expand = TRUE, tab.pos = 3)
+	traitFilterPage <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "Trait Filtering", expand = TRUE)
+  
+	# traitFilterNotebook <- gnotebook( container = traitFilterPage, expand = TRUE, tab.pos = 3)
 	
   ## TODO: to fix: this of variable thresholds seem to hard coded 
   # to a specific size. What happens if there are more variables in the dataset?
   
-	tpl <- glayout(homogeneous = FALSE, container = traitFilterPage, spacing=1, label = "Threshold Analyses", expand = TRUE)
+	tpl <- glayout(homogeneous = FALSE, container = traitFilterPage, spacing=1, label = "Trait Input Thresholds", expand = TRUE)
   
 	tpl[2,1] <- glabel( text=" ", container = tpl )
 	
@@ -139,139 +141,122 @@ DialogSelectThresholds <- function( win, notebook ){
 	tpl[13,10] <- max.var9  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
 	tpl[14,10] <- max.var10 <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
   
-	saveTraitThresholds <- function() {
-    
-  	if(var1!="NA"){var1 <<- unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2   <<-unlist(strsplit(var2, ":"))[1]}
-  	if(var3!="NA"){var3 <<- unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4   <<-unlist(strsplit(var4, ":"))[1]}
-  	if(var5!="NA"){var5 <<- unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6   <<-unlist(strsplit(var6, ":"))[1]}
-  	if(var7!="NA"){var7 <<- unlist(strsplit(var7, ":"))[1]};if(var8!="NA"){var8   <<-unlist(strsplit(var8, ":"))[1]}
-  	if(var9!="NA"){var9 <<- unlist(strsplit(var9, ":"))[1]};if(var10!="NA"){var10 <<-unlist(strsplit(var10, ":"))[1]}
-  	
-  	var.thresholds <- c(var1, var2, var3, var4, var5,
-  			var6, var7, var8, var9, var10)
-  	
-  	var.thresholds <- var.thresholds[var.thresholds!="NA"]
-  	var.thresholds <- unique(var.thresholds)
-  
-  	min.val <<- c(min.var1,min.var2,min.var3,min.var4,min.var5,
-  			min.var6,min.var7,min.var8,min.var9,min.var10)
-  	
-  	min.val <<- min.val[!is.na(min.val)]
-  
-  	max.val <<- c(max.var1,max.var2,max.var3,max.var4,max.var5,
-  			max.var6,max.var7,max.var8,max.var9,max.var10)
-  	
-  	max.val <<- max.val[!is.na(max.val)]
-  
-  	matrix.thresholds <- matrix(NA, nrow=length(var.thresholds), ncol=3) 
-  	matrix.thresholds <- cbind(var.thresholds, min.val, max.val)
-  	matrix.thresholds <- as.data.frame(matrix.thresholds, class = c("character","numeric","numeric"))
-  	colnames(matrix.thresholds) <- c("Variable", "Min", "Max")
-  	matrix.thresholds <- na.omit(matrix.thresholds)  
-  	
-  	val.min <- character(dim(matrix.thresholds)[1])
-  	val.max <- character(dim(matrix.thresholds)[1])
-  	
-  	for(i in 1:dim(matrix.thresholds)[1]){
-  		
-  		if(as.numeric(as.matrix(matrix.thresholds)[i,2]) < min(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
-  			val.min[i] <-  as.character(matrix.thresholds[i,1])
-  		}
-  		if(as.numeric(as.matrix(matrix.thresholds)[i,3]) > max(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
-  			val.max[i] <-  as.character(matrix.thresholds[i,1])
-  		}
-  	}
-  	
-  	val.min <- val.min[val.min!=""]
-  	val.max <- val.max[val.max!=""]
-  	
-  	if(length(val.min) == 0 & length(val.max) == 0){
-  		
-  		## Extract subset of data base from thresholds
-  		data.var.thresholds <- as.data.frame(currentDataSet[,is.element(colnames(currentDataSet), matrix.thresholds$Variable)])
-  		rownames(data.var.thresholds) <- object.complete$n_acces
-  		n_acces_subset <- matrix(NA, nrow = dim(currentDataSet)[1], ncol = length(var.thresholds))
-  		colnames(n_acces_subset) <- as.character(matrix.thresholds[,1])
-  		
-  		w<-1
-  		
-  		while(w <= dim(matrix.thresholds)[1]){  
-  			sub <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
-  			data.var.thresholds <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
-  			n_acces_subset[1:length(rownames(sub)),w] <- rownames(sub)
-  			w <- w +1
-  		}
-  		
-  		n_acces_subset <- as.numeric(na.omit(n_acces_subset[,dim(matrix.thresholds)[1]]))
-  		data.var.thresholds.final <- object.complete[is.element(object.complete$n_acces, n_acces_subset),]
-  		Data.Thresholds <- data.var.thresholds.final
-  		data.var.thresholds.final <- data.var.thresholds.final[,-1]
-  		data.var.thresholds.final <- data.var.thresholds.final[,1:7]
-  		d.thresholds = sapply(data.var.thresholds.final, des.continuous)
-  		row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
-  		d.thresholds = as.table(d.thresholds)
-  		names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
-  		
-  		saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
-  		saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE, alert = FALSE )   	
-  		
-      print(d.thresholds)
-  		
-  		output <- list("Threshold.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
-  		
-  		cat("\n")
-  		cat("\n")
-  		cat(paste("Process completed................."))     
-  		cat("\n")
-  		return(output)
-  	}
-  	
-  	var1; var2; var3; var4; var5; var6; var7; var8; var9; var10
-  	min.var1; min.var2; min.var3; min.var4; min.var5; min.var6; min.var7; min.var8; min.var9; min.var10
-  	max.var1; max.var2; max.var3; max.var4; max.var5; max.var6; max.var7; max.var8; max.var9; max.var10
-  }	
-  
   # Exit button here! 
   # Local saveTraitThresholds() function and variables visible by closure?
 	tpl[1,1] <- gbutton(
 	  "Save Thresholds",
 	  container = tpl,
 	  handler = function(h,...) {
-	    saveTraitThresholds() ;
-	    var1 <<- svalue(var1);
-	    var2 <<- svalue(var2);
-	    var3 <<- svalue(var3);
-	    var4 <<- svalue(var4);
-	    var5 <<- svalue(var5);
-	    var6 <<- svalue(var6);
-	    var7 <<- svalue(var7);
-	    var8 <<- svalue(var8);
-	    var9 <<- svalue(var9);
-	    var10 <<- svalue(var10);
-	    min.var1 <<- as.numeric(svalue(min.var1));
-	    min.var2 <<- as.numeric(svalue(min.var2));
-	    min.var3 <<- as.numeric(svalue(min.var3));
-	    min.var4 <<- as.numeric(svalue(min.var4));
-	    min.var5 <<- as.numeric(svalue(min.var5));
-	    min.var6 <<- as.numeric(svalue(min.var6));
-	    min.var7 <<- as.numeric(svalue(min.var7));
-	    min.var8 <<- as.numeric(svalue(min.var8));
-	    min.var9 <<- as.numeric(svalue(min.var9));
-	    min.var10 <<- as.numeric(svalue(min.var10));
-	    max.var1 <<- as.numeric(svalue(max.var1)); 
-	    max.var2 <<- as.numeric(svalue(max.var2));
-	    max.var3 <<- as.numeric(svalue(max.var3));
-	    max.var4 <<- as.numeric(svalue(max.var4));
-	    max.var5 <<- as.numeric(svalue(max.var5));
-	    max.var6 <<- as.numeric(svalue(max.var6));
-	    max.var7 <<- as.numeric(svalue(max.var7));
-	    max.var8 <<- as.numeric(svalue(max.var8));
-	    max.var9 <<- as.numeric(svalue(max.var9));
-	    max.var10 <<- as.numeric(svalue(max.var10))
-	  }
+    	    var1 <<- svalue(var1); var2 <<- svalue(var2); var3 <<- svalue(var3); var4 <<- svalue(var4); var5 <<- svalue(var5)
+    	    var6 <<- svalue(var6); var7 <<- svalue(var7); var8 <<- svalue(var8); var9 <<- svalue(var9); var10 <<- svalue(var10)
+          
+    	    min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2))
+    	    min.var3 <<- as.numeric(svalue(min.var3)); min.var4 <<- as.numeric(svalue(min.var4))
+    	    min.var5 <<- as.numeric(svalue(min.var5)); min.var6 <<- as.numeric(svalue(min.var6))
+    	    min.var7 <<- as.numeric(svalue(min.var7)); min.var8 <<- as.numeric(svalue(min.var8))
+    	    min.var9 <<- as.numeric(svalue(min.var9)); min.var10 <<- as.numeric(svalue(min.var10))
+          
+    	    max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2))
+    	    max.var3 <<- as.numeric(svalue(max.var3)); max.var4 <<- as.numeric(svalue(max.var4))
+    	    max.var5 <<- as.numeric(svalue(max.var5)); max.var6 <<- as.numeric(svalue(max.var6))
+    	    max.var7 <<- as.numeric(svalue(max.var7)); max.var8 <<- as.numeric(svalue(max.var8))
+    	    max.var9 <<- as.numeric(svalue(max.var9)); max.var10 <<- as.numeric(svalue(max.var10))
+    	      
+  	      if(var1!="NA"){var1 <<- unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2   <<-unlist(strsplit(var2, ":"))[1]}
+  	      if(var3!="NA"){var3 <<- unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4   <<-unlist(strsplit(var4, ":"))[1]}
+  	      if(var5!="NA"){var5 <<- unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6   <<-unlist(strsplit(var6, ":"))[1]}
+  	      if(var7!="NA"){var7 <<- unlist(strsplit(var7, ":"))[1]};if(var8!="NA"){var8   <<-unlist(strsplit(var8, ":"))[1]}
+  	      if(var9!="NA"){var9 <<- unlist(strsplit(var9, ":"))[1]};if(var10!="NA"){var10 <<-unlist(strsplit(var10, ":"))[1]}
+  	      
+  	      var.thresholds <- c(var1, var2, var3, var4, var5,
+  	                          var6, var7, var8, var9, var10)
+  	      
+  	      var.thresholds <- var.thresholds[var.thresholds!="NA"]
+  	      var.thresholds <- unique(var.thresholds)
+  	      
+  	      min.val <<- c(min.var1,min.var2,min.var3,min.var4,min.var5,
+  	                    min.var6,min.var7,min.var8,min.var9,min.var10)
+  	      
+  	      min.val <<- min.val[!is.na(min.val)]
+  	      
+  	      max.val <<- c(max.var1,max.var2,max.var3,max.var4,max.var5,
+  	                    max.var6,max.var7,max.var8,max.var9,max.var10)
+  	      
+  	      max.val <<- max.val[!is.na(max.val)]
+  	      
+  	      matrix.thresholds <- matrix(NA, nrow=length(var.thresholds), ncol=3) 
+  	      matrix.thresholds <- cbind(var.thresholds, min.val, max.val)
+  	      matrix.thresholds <- as.data.frame(matrix.thresholds, class = c("character","numeric","numeric"))
+  	      colnames(matrix.thresholds) <- c("Variable", "Min", "Max")
+  	      matrix.thresholds <- na.omit(matrix.thresholds)  
+  	      
+  	      val.min <- character(dim(matrix.thresholds)[1])
+  	      val.max <- character(dim(matrix.thresholds)[1])
+  	      
+  	      for(i in 1:dim(matrix.thresholds)[1]){
+  	        
+  	        if(as.numeric(as.matrix(matrix.thresholds)[i,2]) < min(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
+  	          val.min[i] <-  as.character(matrix.thresholds[i,1])
+  	        }
+  	        if(as.numeric(as.matrix(matrix.thresholds)[i,3]) > max(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
+  	          val.max[i] <-  as.character(matrix.thresholds[i,1])
+  	        }
+  	      }
+  	      
+  	      val.min <- val.min[val.min!=""]
+  	      val.max <- val.max[val.max!=""]
+  	      
+  	      if(length(val.min) == 0 & length(val.max) == 0){
+  	        
+  	        ## Extract subset of data base from thresholds
+  	        data.var.thresholds <- as.data.frame(currentDataSet[,is.element(colnames(currentDataSet), matrix.thresholds$Variable)])
+  	        rownames(data.var.thresholds) <- object.complete$n_acces
+  	        n_acces_subset <- matrix(NA, nrow = dim(currentDataSet)[1], ncol = length(var.thresholds))
+  	        colnames(n_acces_subset) <- as.character(matrix.thresholds[,1])
+  	        
+  	        w<-1
+  	        
+  	        while(w <= dim(matrix.thresholds)[1]){  
+  	          sub <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
+  	          data.var.thresholds <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
+  	          n_acces_subset[1:length(rownames(sub)),w] <- rownames(sub)
+  	          w <- w +1
+  	        }
+  	        
+  	        n_acces_subset <- as.numeric(na.omit(n_acces_subset[,dim(matrix.thresholds)[1]]))
+  	        data.var.thresholds.final <- object.complete[is.element(object.complete$n_acces, n_acces_subset),]
+  	        Data.Thresholds <- data.var.thresholds.final
+  	        data.var.thresholds.final <- data.var.thresholds.final[,-1]
+  	        data.var.thresholds.final <- data.var.thresholds.final[,1:7]
+  	        d.thresholds = sapply(data.var.thresholds.final, des.continuous)
+  	        row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
+  	        d.thresholds = as.table(d.thresholds)
+  	        names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
+  	        
+  	        saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
+  	        saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE, alert = FALSE )   	
+  	        
+  	        print(d.thresholds)
+  	        
+  	        output <- list("Threshold.Values" = matrix.thresholds, "Descript.Thresholds" = d.thresholds)
+  	        
+  	        cat("\n")
+  	        cat("\n")
+  	        cat(paste("Process completed................."))     
+  	        cat("\n")
+  	        return(output)
+  	      }
+  	      
+  	      var1; var2; var3; var4; var5; var6; var7; var8; var9; var10
+  	      min.var1; min.var2; min.var3; min.var4; min.var5; min.var6; min.var7; min.var8; min.var9; min.var10
+  	      max.var1; max.var2; max.var3; max.var4; max.var5; max.var6; max.var7; max.var8; max.var9; max.var10
+	    
+      }
 	)
 	
 	visible(win) <- TRUE
+  
+	
 	
 }
 
