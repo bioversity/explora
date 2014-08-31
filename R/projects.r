@@ -14,6 +14,7 @@
 
 #' @importFrom gWidgets gfile
 #' @importClassesFrom gWidgets gCombobox
+#' @importClassesFrom gWidgets gNotebook
 #' @importClassesFrom gWidgets guiComponent
 
 # ExploraAnalysis - S4 Class for global project data management
@@ -34,9 +35,11 @@ setClass( "ExploraAnalysis",
           )
 )
 
-#
+# 
 # Accessor Methods
 #
+
+setGeneric("window",                       function(x) standardGeneric("window"))
 
 setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
 setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
@@ -52,6 +55,7 @@ setGeneric("numberOfSolutions",            function(x) standardGeneric("numberOf
 setGeneric("numberOfFinalSolutions",       function(x) standardGeneric("numberOfFinalSolutions"))
 setGeneric("optimizationResult",           function(x) standardGeneric("optimizationResult"))
 
+setMethod("window",                       "ExploraAnalysis",function(x) x@window )
 setMethod("datasetSelector",              "ExploraAnalysis",function(x) x@datasetSelector )
 setMethod("datasetCatalog",               "ExploraAnalysis",function(x) x@datasetCatalog )
 setMethod("currentDataSet",               "ExploraAnalysis",function(x) x@currentDataSet )
@@ -88,6 +92,8 @@ setMethod("optimizationResult",           "ExploraAnalysis",function(x) x@optimi
 # Replacement Methods
 #
 
+setGeneric("window<-",                       function(x,value) standardGeneric("window<-"))
+
 setGeneric("datasetSelector<-",              function(x,value) standardGeneric("datasetSelector<-"))
 setGeneric("datasetCatalog<-",               function(x,value) standardGeneric("datasetCatalog<-"))
 setGeneric("addDataset<-",                   function(x,value) standardGeneric("addDataset<-"))
@@ -102,6 +108,14 @@ setGeneric("numberOfFinalSolutions<-",       function(x,value) standardGeneric("
 setGeneric("optimizationResult<-",           function(x,value) standardGeneric("optimizationResult<-"))
 
 setReplaceMethod(
+  "window",
+  "ExploraAnalysis", 
+  function(x,value) { 
+    x@window <- value
+    return(x)
+  }
+)
+setReplaceMethod(
   "datasetSelector",
   "ExploraAnalysis", 
   function(x,value) { 
@@ -109,7 +123,6 @@ setReplaceMethod(
     return(x)
   }
 )
-
 setReplaceMethod(
   "datasetCatalog",
   "ExploraAnalysis",

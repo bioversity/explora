@@ -135,9 +135,10 @@ correlation <- function(){
   
 }
 
-DialogSelectOptimization <- function(){
+DialogSelectOptimization <- function( win, notebook, nextPageHandler){
   
   dataset <- currentDataSet(analysis)
+  ncon    <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
   
   f.items.cont <- c("NA","CV: Maximize coefficient of variation",
                     "MAX.AV: Maximize average", 
@@ -149,7 +150,6 @@ DialogSelectOptimization <- function(){
   
   f.items.nom <- c("NA", "SHANNON: Maximize Shannon index", "MAX.PROP: Maximize proportion")
   
-  ncon <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
   dataset.optimization <- dataset[,-1]
   dataset.continuous <- dataset.optimization[,1:ncon]
   dataset.nominal <- dataset.optimization[,(ncon+1):dim(dataset.optimization)[2]]
@@ -163,106 +163,125 @@ DialogSelectOptimization <- function(){
   pcategory.v4 <- 0
   pcategory.v5 <- 0
   
-  win <- gbasicdialog("Selection of Variables for Optimization", visible = F , width = 700, height = 450,
-                      handler = function(h,...){varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
-                                                fvarop1c<<-svalue(fvarop1c);fvarop2c<<-svalue(fvarop2c);fvarop3c<<-svalue(fvarop3c);fvarop4c<<-svalue(fvarop4c);fvarop5c<<-svalue(fvarop5c);
-                                                ri1c<<-svalue(ri1c);ri2c<<-svalue(ri2c);ri3c<<-svalue(ri3c);ri4c<<-svalue(ri4c);ri5c<<-svalue(ri5c);
-                                                fvarop1n<<-svalue(fvarop1n);fvarop2n<<-svalue(fvarop2n);fvarop3n<<-svalue(fvarop3n);fvarop4n<<-svalue(fvarop4n);fvarop5n<<-svalue(fvarop5n);
-                                                ri1n<<-svalue(ri1n);ri2n<<-svalue(ri2n);ri3n<<-svalue(ri3n);ri4n<<-svalue(ri4n);ri5n<<-svalue(ri5n)}) 
+  # A notebook within a notebook...
+  optimizationVariablePage <- gnotebook( container = notebook, expand = T, tab.pos = 3)
   
-  nb <- gnotebook( container = win, expand = T, tab.pos = 3)
-  
-  
-  lyt4 <- glayout(homogeneous = FALSE, container = nb , spacing = 10,label="Optimization Procedure",expand = TRUE)
+  lyt4 <- glayout(homogeneous = FALSE, container = optimizationVariablePage , spacing = 10, label="Optimization Procedure",expand = TRUE)
 
-  lyt4[1,1:25] <- (g4var = gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE))
+  lyt4[1,1:25]  <- g4var <- gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   
-  lytg4var <- glayout(homogeneous = FALSE,  container = g4var, spacing = 5, expand = TRUE)
+  lytg4var      <- glayout(homogeneous = FALSE,  container = g4var, spacing = 5, expand = TRUE)
   
-  lytg4var[1,1] = glabel("Optimization Strategy for Continuous Variables: ",  container = lytg4var)
-  lytg4var[2,1] = glabel("Variable: ",  container = lytg4var)
+  lytg4var[1,1] <- glabel("Optimization Strategy for Continuous Variables: ",  container = lytg4var)
+  lytg4var[2,1] <- glabel("Variable: ",  container = lytg4var)
   
-  lytg4var[2,2] = glabel("Objective function: ",  container = lytg4var)
-  lytg4var[2,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
+  lytg4var[2,2] <- glabel("Objective function: ",  container = lytg4var)
+  lytg4var[2,3] <- glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
   
-  lytg4var[3,1] = (varop1c = gdroplist(c("NA", names.continuous),  container = lytg4var))
-  lytg4var[3,2] = (fvarop1c = gdroplist(f.items.cont,  container = lytg4var))
-  lytg4var[3,3] = (ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[4,1] = (varop2c = gdroplist(c("NA", names.continuous),  container = lytg4var))
-  lytg4var[4,2] = (fvarop2c = gdroplist(f.items.cont,  container = lytg4var))
-  lytg4var[4,3] = (ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[5,1] = (varop3c = gdroplist(c("NA", names.continuous),  container = lytg4var))
-  lytg4var[5,2] = (fvarop3c = gdroplist(f.items.cont,  container = lytg4var))
-  lytg4var[5,3] = (ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[6,1] = (varop4c = gdroplist(c("NA", names.continuous),  container = lytg4var))
-  lytg4var[6,2] = (fvarop4c = gdroplist(f.items.cont,  container = lytg4var))
-  lytg4var[6,3] = (ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[7,1] = (varop5c = gdroplist(c("NA", names.continuous),  container = lytg4var))
-  lytg4var[7,2] = (fvarop5c = gdroplist(f.items.cont,  container = lytg4var))
-  lytg4var[7,3] = (ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[3,1] <- varop1c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
+  lytg4var[3,2] <- fvarop1c <- gdroplist(f.items.cont,  container = lytg4var)
+  lytg4var[3,3] <- ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  lytg4var[4,1] <- varop2c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
+  lytg4var[4,2] <- fvarop2c <- gdroplist(f.items.cont,  container = lytg4var)
+  lytg4var[4,3] <- ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)
+  lytg4var[5,1] <- varop3c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
+  lytg4var[5,2] <- fvarop3c <- gdroplist(f.items.cont,  container = lytg4var)
+  lytg4var[5,3] <- ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  lytg4var[6,1] <- varop4c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
+  lytg4var[6,2] <- fvarop4c <- gdroplist(f.items.cont,  container = lytg4var)
+  lytg4var[6,3] <- ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  lytg4var[7,1] <- varop5c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
+  lytg4var[7,2] <- fvarop5c <- gdroplist(f.items.cont,  container = lytg4var)
+  lytg4var[7,3] <- ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
   
-  lytg4var[8,1] = glabel("Optimization Strategy for Nominal Variables: ",  container = lytg4var)
-  lytg4var[9,1] = glabel("Variable: ",  container = lytg4var)
-  lytg4var[9,2] = glabel("Objective function: ",  container = lytg4var)
-  lytg4var[9,3] = glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
-  lytg4var[10,1] = (varop1n = gdroplist(c("NA",names.nominal),  container = lytg4var))
-  lytg4var[10,2] = (fvarop1n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
-    if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop1n)])))))}}))
-  lytg4var[10,3] = (ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[11,1] = (varop2n = gdroplist(c("NA",names.nominal),  container = lytg4var))
-  lytg4var[11,2] = (fvarop2n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
-    if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop2n)])))))}}))
-  lytg4var[11,3] = (ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[12,1] = (varop3n = gdroplist(c("NA",names.nominal),  container = lytg4var))
-  lytg4var[12,2] = (fvarop3n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
-    if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop3n)])))))}}))
-  lytg4var[12,3] = (ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[13,1] = (varop4n = gdroplist(c("NA",names.nominal),  container = lytg4var))
-  lytg4var[13,2] = (fvarop4n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
-    if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop4n)])))))}}))
-  lytg4var[13,3] = (ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
-  lytg4var[14,1] = (varop5n = gdroplist(c("NA",names.nominal),  container = lytg4var))
-  lytg4var[14,2] = (fvarop5n = gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
-    if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop5n)])))))}}))
-  lytg4var[14,3] = (ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)) 
+  lytg4var[8,1]  <- glabel("Optimization Strategy for Nominal Variables: ",  container = lytg4var)
+  lytg4var[9,1]  <- glabel("Variable: ",  container = lytg4var)
+  lytg4var[9,2]  <- glabel("Objective function: ",  container = lytg4var)
+  lytg4var[9,3]  <- glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
+  
+  lytg4var[10,1] <- varop1n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
+  lytg4var[10,2] <- fvarop1n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){
+      pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop1n)])))))}})
+  lytg4var[10,3] <- ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
+  lytg4var[11,1] <- varop2n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
+  lytg4var[11,2] <- fvarop2n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){
+      pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop2n)])))))}})
+  lytg4var[11,3] <- ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
+  lytg4var[12,1] <- varop3n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
+  lytg4var[12,2] <- fvarop3n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){
+      pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop3n)])))))}})
+  lytg4var[12,3] <- ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
+  lytg4var[13,1] <- varop4n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
+  lytg4var[13,2] <- fvarop4n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){
+      pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop4n)])))))}})
+  lytg4var[13,3] <- ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
+  lytg4var[14,1] <- varop5n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
+  lytg4var[14,2] <- fvarop5n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
+    if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){
+      pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop5n)])))))}})
+  lytg4var[14,3] <- ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
 
-  lyt4[4,1:25]  <- (g4opt = gframe("Run Optimization", container = lyt4, expand = TRUE, horizontal = FALSE))
-  lytg4opt      <- glayout(homogeneous = FALSE,  container = g4opt, spacing = 10, expand = TRUE)
+  lyt4[4,1:25]   <- g4opt <- gframe("Run Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
+  lytg4opt       <- glayout(homogeneous = FALSE,  container = g4opt, spacing = 10, expand = TRUE)
+  
+  saveOptimizationTargets <- function() {
+    
+      RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
+                     svalue(ri1n), svalue(ri2n), svalue(ri3n), svalue(ri4n), svalue(ri5n)), ncol = 2)
+      
+      colnames(RI)<-c("ric", "rin")
+      
+      varop1c; varop2c; varop3c; varop4c; varop5c
+      fvarop1c; fvarop2c; fvarop3c; fvarop4c; fvarop5c
+      ri1c; ri2c; ri3c; ri4c; ri5c
+      varop1n; varop2n; varop3n; varop4n; varop5n
+      fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
+      ri1n; ri2n; ri3n; ri4n; ri5n
+      
+      saveProjectFile( RI, "RI", row.names = FALSE )   
+  }
+  
   lytg4opt[1,1] <- gbutton( "Run the Optimization Procedure",  
-                                container = lytg4opt,
-                                handler = function(h,...){
-                                            optimizationResult(analysis) <<- f.optimization(
-                                                        varop1c, varop2c, varop3c, varop4c, varop5c,
-                                                        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
-                                                        varop1n, varop2n, varop3n, varop4n, varop5n,
-                                                        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
-                                                        pcategory.v1, pcategory.v2, pcategory.v3,
-                                                        pcategory.v4,pcategory.v5)
-                                            lytg4opt[1,2] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
-                                      }) 
-  lytg4opt[1,2] <- ( glabel( text = "               ", container = lytg4opt))
-  lytg4opt[1,3] <- ( glabel( text = "Note: You need to run the optimization procedure before closing the window.", container = lytg4opt))
+                            container = lytg4opt,
+                            handler = function(h,...){
+                              
+                              optimizationResult(analysis) <<- f.optimization(
+                                  varop1c, varop2c, varop3c, varop4c, varop5c,
+                                  fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
+                                  varop1n, varop2n, varop3n, varop4n, varop5n,
+                                  fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
+                                  pcategory.v1, pcategory.v2, pcategory.v3,
+                                  pcategory.v4,pcategory.v5
+                              )
+                              
+                              saveOptimizationTargets()
+                              
+                              varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
+                              fvarop1c<<-svalue(fvarop1c);fvarop2c<<-svalue(fvarop2c);fvarop3c<<-svalue(fvarop3c);fvarop4c<<-svalue(fvarop4c);fvarop5c<<-svalue(fvarop5c);
+                              ri1c<<-svalue(ri1c);ri2c<<-svalue(ri2c);ri3c<<-svalue(ri3c);ri4c<<-svalue(ri4c);ri5c<<-svalue(ri5c);
+                              fvarop1n<<-svalue(fvarop1n);fvarop2n<<-svalue(fvarop2n);fvarop3n<<-svalue(fvarop3n);fvarop4n<<-svalue(fvarop4n);fvarop5n<<-svalue(fvarop5n);
+                              ri1n<<-svalue(ri1n);ri2n<<-svalue(ri2n);ri3n<<-svalue(ri3n);ri4n<<-svalue(ri4n);ri5n<<-svalue(ri5n)
+                              
+                              lytg4opt[1,2] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
+                              
+                              # Once the Optimization is run, you can display 
+                              # the optimization Analysis page in the notebook
+                              nextPageHandler( win, notebook )
+                            })
+
+  lytg4opt[1,2]   <- ( glabel( text = "               ", container = lytg4opt))
+  lytg4opt[1,3:5] <- ( glabel( text = "Run optimization procedure before continuing...", container = lytg4opt))
   
-  visible(win)<-TRUE
+  visible(win) <- TRUE
   
-  RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
-                 svalue(ri1n), svalue(ri2n), svalue(ri3n), svalue(ri4n), svalue(ri5n)), ncol = 2)
-  
-  colnames(RI)<-c("ric", "rin")
-  
-  ########################################################
-  # these seem like NOP's with no apparent side effect
-  # is this solely debugging output on the command line(?)
-  ########################################################
-  varop1c; varop2c; varop3c; varop4c; varop5c
-  fvarop1c; fvarop2c; fvarop3c; fvarop4c; fvarop5c
-  ri1c; ri2c; ri3c; ri4c; ri5c
-  varop1n; varop2n; varop3n; varop4n; varop5n
-  fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
-  ri1n; ri2n; ri3n; ri4n; ri5n
-  ########################################################
-  
-  saveProjectFile( RI, "RI", row.names = FALSE )     
 }
 
 #' @importFrom vegan diversity

@@ -94,8 +94,10 @@ workbench <- function() {
   image_dir <- paste(path.package("explora"),"/images/",sep="")
   gimage("Explora_Logo.gif", dirname = image_dir, container = welcome) 
   
-	## Load project datasets
-	lyt1        <- glayout(homogeneous = FALSE,  container = nb, spacing = 10, label = "Projects", expand = TRUE) 
+  ##########################
+	## Load project datasets #
+  ##########################
+  lyt1        <- glayout(homogeneous = FALSE,  container = nb, spacing = 10, label = "Projects", expand = TRUE) 
 	lyt1[1,1:3] <- g1 <- gframe("Projects",  container = lyt1, horizontal = TRUE)
 	lytg1       <- glayout(homogeneous = FALSE, container = g1, spacing = 10, expand = TRUE) 
 
@@ -153,8 +155,10 @@ workbench <- function() {
                   )
   
 	
-	##Descriptor analysis
-	lyt2         <- glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Descriptor Analysis", expand = TRUE)
+  ##########################
+  ##Descriptor analysis    #
+  ##########################
+  lyt2         <- glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Descriptor Analysis", expand = TRUE)
 	lyt2[1,1:6]  <- g2 <- gframe("Trait Descriptor Analysis & Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) 
 	lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE) 
   
@@ -203,88 +207,145 @@ workbench <- function() {
     			            handler = function(h,...){ print(number.access()) }
                     )
   
-	lytg2[9,1:5]  <- glabel( text = "", container=lytg2)
-	
-  lytg2[10,1:2] <- glabel( text = "Filter input trait variables with thresholds:", container = lytg2)
-  lytg2[10,3:5] <- gbutton(
-                      "Select...",
-                      container = lytg2,
-                      handler = function(h,...){ DialogSelectThresholds( currentDataSet(session$analysis) ) }
-                    )
-  
-  
-	## Optimization Analysis
-	lyt3         <- glayout(homogeneous = F, container = nb , spacing=10,label="Optimization",expand=T)
-	lyt3[1,1:10] <- g3 <- gframe("Optimization Analysis", container = lyt3, expand = TRUE, horizontal = FALSE)
-	lytg3        <- glayout(homogeneous = FALSE,  container = g3, spacing = 10, expand = TRUE) 
-	
-  lytg3[1,1:3] <- glabel( text = "",  container = lytg2)
-  
-  lytg3[2,1] <- glabel("Specify Target Number of Solutions: ",  container = lytg3)
-  lytg3[2,2] <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg3)
-  lytg3[2,3] <- gbutton( 
-                      "Set",  
-                      container = lytg3, 
-                      expand=FALSE, 
-                      handler = function(h,...){ 
-                        print( number.solutions() )
-                      }
-                    )
-	
-	lytg3[3,1:3]  <- glabel( text = "", container = lytg3)
-	
-	lytg3[4,1] <- glabel("Specify Optimization Analysis Variables:",  container = lytg3)
-  lytg3[4,3] <- gbutton(
-                      "Select...",
-                      container = lytg3,
-                      expand = FALSE,
-                      handler = function(h,...){ DialogSelectOptimization() }
-                   )
-	
-	lytg3[5,1:3] <- glabel( text = "", container = lytg3)
-	
-	lytg3[6,1] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg3)
-  lytg3[6,2]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg3)
-	lytg3[6,3]   <- gbutton(
-                    "Set",
-                    container = lytg3,
-                    expand = FALSE,
-  		            	handler = function(h,...){ print( number.percent() )} 
-                  )
-	
-	lytg3[7,1:3] <- glabel( text = "", container = lytg3)
-	
-	lytg3[8,1] <- glabel("Enter the number of final solutions\nfor the Maximum Variation or the\nNumber of Principal Components:",  container = lytg3)
-	lytg3[8,2]   <-numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg3)
-	lytg3[8,3]   <- gbutton(
-                    "Set",
-                    container = lytg3,
-                    expand = FALSE,
-  			            handler = function(h,...){ print( number.final() ) }
-                  )
-	
-	lytg3[9,1:3] <- glabel( text = "", container = lytg3)
-	
-	lytg3[10,1]  <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg3, horizontal = FALSE)
-	
-	items.option <- c(
-                      " ", 
-                      "Maximum variation", 
-                      "Principal components",
-  			              "Weighted sum model",
-                      "Decision tree"
-                    )
-	
-	lytg3[11,1] <- option.preferred <- gdroplist(items.option,  container = lytg3)
-	lytg3[11,2] <- btn <- gbutton("Run",  container = lytg3)
-	
-	addHandlerChanged(btn, handler <- function(h,...){
-				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
-				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
-				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
-				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
-			})
+  #############################
+  ##Filter Input Trait Values #
+  #############################
+  traitFilterPage <- function( win, notebook ) {
+    
+      return( function(h,...) {  # returns a gWidget handler closure for "Filter Traits..."
+      
+              ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
+              
+              if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
+                DialogBox("Set number of Continuous Variables (CV) before filtering!")
+          
+              } else {
+                
+                DialogSelectThresholds(  win, notebook )
+                
+                svalue(notebook) <- 3
+          
+              }
+          }
+      )
+  }
 
+  lytg2[9,1:5]  <- glabel( text = "", container = lytg2 )
+  
+  lytg2[10,1]   <- gbutton(
+    "Filter Traits...",
+    container = lytg2,
+    handler   =  traitFilterPage( win, nb )
+  )
+  
+  ###########################################
+  ##Specify Optimization Analysis Variables #
+  ###########################################
+  optimizationTargetsPage <- function( win, notebook, nextPageHandler ) {
+    
+      return ( 
+        
+          function(h,...) {  "Specify Optimization Target Variables..."
+                                  
+              ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
+              
+              if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
+                DialogBox("Set number of Continuous Variables (CV) before filtering!")
+                
+              } else {
+             
+                DialogSelectOptimization( # modified version of original function
+                  win = win,
+                  notebook = notebook,
+                  nextPageHandler = nextPageHandler
+                )
+                
+                svalue(notebook) <- 4
+                
+              }
+          }
+      )
+  }
+  
+  ##########################
+  ## Optimization Analysis #
+  ##########################
+  optimizationAnalysisPage <- function( win, notebook ) {
+    
+    lyt5         <- glayout(homogeneous = FALSE, container = notebook, spacing=10,label="Optimization",expand=TRUE)
+  	lyt5[1,1:3]  <- g5 <- gframe("Optimization Analysis", container = lyt5, expand = TRUE, horizontal = FALSE)
+  	lytg5        <- glayout(homogeneous = FALSE,  container = g5, spacing = 10, expand = TRUE) 
+  	
+    lytg5[1,1:3] <- glabel( text = " ",  container = lytg5)
+    
+    lytg5[2,1] <- glabel("Specify Target Number of Solutions: ",  container = lytg5)
+    lytg5[2,2] <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg5)
+    lytg5[2,3] <- gbutton( 
+                        "Set",  
+                        container = lytg5, 
+                        expand=FALSE, 
+                        handler = function(h,...){ 
+                          print( number.solutions() )
+                        }
+                      )
+  	
+  	lytg5[3,1:3] <- glabel( text = " ", container = lytg5)
+  	
+  	lytg5[4,1] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg5)
+    lytg5[4,2]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg5)
+  	lytg5[4,3]   <- gbutton(
+                      "Set",
+                      container = lytg5,
+                      expand = FALSE,
+    		            	handler = function(h,...){ print( number.percent() )} 
+                    )
+  	
+  	lytg5[5,1:3] <- glabel( text = " ", container = lytg5)
+  	
+  	lytg5[6,1] <- glabel("Enter the number of final solutions\nfor the Maximum Variation or the\nNumber of Principal Components:",  container = lytg5)
+  	lytg5[6,2]   <-numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg5)
+  	lytg5[6,3]   <- gbutton(
+                      "Set",
+                      container = lytg5,
+                      expand = FALSE,
+    			            handler = function(h,...){ print( number.final() ) }
+                    )
+  	
+  	lytg5[7,1:3] <- glabel( text = " ", container = lytg5)
+  	
+  	lytg5[8,1]  <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg5, horizontal = FALSE)
+  	
+  	items.option <- c(
+                        " ", 
+                        "Maximum variation", 
+                        "Principal components",
+    			              "Weighted sum model",
+                        "Decision tree"
+                      )
+  	
+  	lytg5[9,1] <- option.preferred <- gdroplist(items.option,  container = lytg5)
+  	lytg5[9,2] <- btn <- gbutton("Run",  container = lytg5)
+  	
+  	addHandlerChanged(btn, handler <- function(h,...){
+  				if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
+  				if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
+  				if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
+  				if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
+  			})
+    
+    visible(win) <- TRUE
+    
+    svalue(notebook) <- 5
+    
+  }
+
+
+  lytg2[10,3]   <- gbutton(
+    "Specify Optimization Target Variables...",
+    container = lytg2,
+    handler =  optimizationTargetsPage( win, nb , optimizationAnalysisPage )
+  )
+  
   svalue(nb) <- 1
   
 	visible(win) <- TRUE
