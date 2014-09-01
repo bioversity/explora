@@ -220,7 +220,9 @@ workbench <- function() {
               ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
               
               if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
-                DialogBox("Set number of Continuous Variables (CV) before filtering!")
+                DialogBox(  "You need to tell me  how many\n"+
+                            "Continuous Variables (CV) you have\n"+
+                            "before Explora can filter them!")
           
               } else {
                 

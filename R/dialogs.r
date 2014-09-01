@@ -77,12 +77,10 @@ SelectSolution <- function(solutions){## Function to select preference category
 ## Function to select variables for thresholds
 DialogSelectThresholds <- function( win, notebook ){
   
-	object.thresholds <- currentDataSet(analysis)
-	ncon    <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
-  
+  ncon  <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
+  object.thresholds <- object.complete <- theDataSet <- currentDataSet(analysis)
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
-	object.complete   <- currentDataSet
 
 	min.values <- matrix(round(as.table(sapply(object.thresholds, min)),3), ncol = 1)
 	max.values <- matrix(round(as.table(sapply(object.thresholds, max)),3), ncol = 1)
@@ -97,76 +95,74 @@ DialogSelectThresholds <- function( win, notebook ){
   ## TODO: to fix: this of variable thresholds seem to hard coded 
   # to a specific size. What happens if there are more variables in the dataset?
   
-	tpl <- glayout(homogeneous = FALSE, container = traitFilterPage, spacing=1, label = "Trait Input Thresholds", expand = TRUE)
+	tpl <- glayout(homogeneous = FALSE, container = traitFilterPage, expand=TRUE, spacing=5, label = "Trait Input Thresholds", expand = TRUE)
   
-	tpl[2,1] <- glabel( text=" ", container = tpl )
+	tpl[1,1:10] <- glabel( text=" ", container = tpl )
 	
-  tpl[3,1]    <- glabel( text=" ", container = tpl )
+	tpl[2,1:4]  <- glabel("Variables to select",  container = tpl)
+	tpl[3,1:4]  <- var1  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[4,1:4]  <- var2  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[5,1:4]  <- var3  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[6,1:4]  <- var4  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[7,1:4]  <- var5  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[8,1:4]  <- var6  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[9,1:4]  <- var7  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[10,1:4] <- var8  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[11,1:4] <- var9  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[12,1:4] <- var10 <- gdroplist(c("NA",  names.thresholds),  container = tpl)
 	
-	tpl[4,1]    <- glabel("Variables to select",  container = tpl)
-	tpl[5,1:4]  <- var1  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[6,1:4]  <- var2  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[7,1:4]  <- var3  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[8,1:4]  <- var4  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[9,1:4]  <- var5  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[10,1:4] <- var6  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[11,1:4] <- var7  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[12,1:4] <- var8  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[13,1:4] <- var9  <- gdroplist(c("NA",  names.thresholds),  container = tpl)
-	tpl[14,1:4] <- var10 <- gdroplist(c("NA",  names.thresholds),  container = tpl)
+	tpl[2,5:7] <- glabel("Minimum values", container = tpl)
+	tpl[3,7]   <- min.var1  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[4,7]   <- min.var2  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[5,7]   <- min.var3  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[6,7]   <- min.var4  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[7,7]   <- min.var5  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[8,7]   <- min.var6  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[9,7]   <- min.var7  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[10,7]  <- min.var8  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[11,7]  <- min.var9  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
+	tpl[12,7]  <- min.var10 <- gedit(" ",  container = tpl, width = 10, initial.msg = "Min")
 	
-	tpl[4,7]  <- glabel("Minimum values",  container = tpl)
-	tpl[5,7]  <- min.var1  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[6,7]  <- min.var2  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[7,7]  <- min.var3  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[8,7]  <- min.var4  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[9,7]  <- min.var5  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[10,7] <- min.var6  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[11,7] <- min.var7  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[12,7] <- min.var8  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[13,7] <- min.var9  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	tpl[14,7] <- min.var10 <- gedit(" ",  container = tpl, width = 3, initial.msg = "Min")
-	
-	tpl[2,8] <- glabel( text=" ", container = tpl )
-	
-	tpl[4,10]  <- glabel("Maximum values", container = tpl)
-	tpl[5,10]  <- max.var1  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[6,10]  <- max.var2  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[7,10]  <- max.var3  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[8,10]  <- max.var4  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[9,10]  <- max.var5  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[10,10] <- max.var6  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[11,10] <- max.var7  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[12,10] <- max.var8  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[13,10] <- max.var9  <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
-	tpl[14,10] <- max.var10 <- gedit(" ",  container = tpl, width = 3, initial.msg = "Max")
+	tpl[2,8:10] <- glabel("Maximum values", container = tpl)
+	tpl[3,10]   <- max.var1  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[4,10]   <- max.var2  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[5,10]   <- max.var3  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[6,10]   <- max.var4  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[7,10]   <- max.var5  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[8,10]   <- max.var6  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[9,10]   <- max.var7  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[10,10]  <- max.var8  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[11,10]  <- max.var9  <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
+	tpl[12,10]  <- max.var10 <- gedit(" ",  container = tpl, width = 10, initial.msg = "Max")
   
+	tpl[13,1:10] <- glabel( text=" ", container = tpl )
+	
   # Exit button here! 
   # Local saveTraitThresholds() function and variables visible by closure?
-	tpl[1,1] <- gbutton(
+	tpl[14,1:10] <- gbutton(
 	  "Save Thresholds",
 	  container = tpl,
 	  handler = function(h,...) {
-    	    var1 <<- svalue(var1); var2 <<- svalue(var2); var3 <<- svalue(var3); var4 <<- svalue(var4); var5 <<- svalue(var5)
-    	    var6 <<- svalue(var6); var7 <<- svalue(var7); var8 <<- svalue(var8); var9 <<- svalue(var9); var10 <<- svalue(var10)
+    	    var1 <- svalue(var1); var2 <- svalue(var2); var3 <- svalue(var3); var4 <- svalue(var4); var5 <- svalue(var5)
+    	    var6 <- svalue(var6); var7 <- svalue(var7); var8 <- svalue(var8); var9 <- svalue(var9); var10 <- svalue(var10)
           
-    	    min.var1 <<- as.numeric(svalue(min.var1)); min.var2 <<- as.numeric(svalue(min.var2))
-    	    min.var3 <<- as.numeric(svalue(min.var3)); min.var4 <<- as.numeric(svalue(min.var4))
-    	    min.var5 <<- as.numeric(svalue(min.var5)); min.var6 <<- as.numeric(svalue(min.var6))
-    	    min.var7 <<- as.numeric(svalue(min.var7)); min.var8 <<- as.numeric(svalue(min.var8))
-    	    min.var9 <<- as.numeric(svalue(min.var9)); min.var10 <<- as.numeric(svalue(min.var10))
+    	    min.var1 <- as.numeric(svalue(min.var1)); min.var2  <- as.numeric(svalue(min.var2))
+    	    min.var3 <- as.numeric(svalue(min.var3)); min.var4 <- as.numeric(svalue(min.var4))
+    	    min.var5 <- as.numeric(svalue(min.var5)); min.var6  <- as.numeric(svalue(min.var6))
+    	    min.var7 <- as.numeric(svalue(min.var7)); min.var8  <- as.numeric(svalue(min.var8))
+    	    min.var9 <- as.numeric(svalue(min.var9)); min.var10 <- as.numeric(svalue(min.var10))
           
-    	    max.var1 <<- as.numeric(svalue(max.var1)); max.var2 <<- as.numeric(svalue(max.var2))
-    	    max.var3 <<- as.numeric(svalue(max.var3)); max.var4 <<- as.numeric(svalue(max.var4))
-    	    max.var5 <<- as.numeric(svalue(max.var5)); max.var6 <<- as.numeric(svalue(max.var6))
-    	    max.var7 <<- as.numeric(svalue(max.var7)); max.var8 <<- as.numeric(svalue(max.var8))
-    	    max.var9 <<- as.numeric(svalue(max.var9)); max.var10 <<- as.numeric(svalue(max.var10))
+    	    max.var1 <- as.numeric(svalue(max.var1)); max.var2 <- as.numeric(svalue(max.var2))
+    	    max.var3 <- as.numeric(svalue(max.var3)); max.var4 <- as.numeric(svalue(max.var4))
+    	    max.var5 <- as.numeric(svalue(max.var5)); max.var6 <- as.numeric(svalue(max.var6))
+    	    max.var7 <- as.numeric(svalue(max.var7)); max.var8 <- as.numeric(svalue(max.var8))
+    	    max.var9 <- as.numeric(svalue(max.var9)); max.var10 <- as.numeric(svalue(max.var10))
     	      
-  	      if(var1!="NA"){var1 <<- unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2   <<-unlist(strsplit(var2, ":"))[1]}
-  	      if(var3!="NA"){var3 <<- unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4   <<-unlist(strsplit(var4, ":"))[1]}
-  	      if(var5!="NA"){var5 <<- unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6   <<-unlist(strsplit(var6, ":"))[1]}
-  	      if(var7!="NA"){var7 <<- unlist(strsplit(var7, ":"))[1]};if(var8!="NA"){var8   <<-unlist(strsplit(var8, ":"))[1]}
-  	      if(var9!="NA"){var9 <<- unlist(strsplit(var9, ":"))[1]};if(var10!="NA"){var10 <<-unlist(strsplit(var10, ":"))[1]}
+  	      if(var1!="NA"){var1 <- unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2   <-unlist(strsplit(var2, ":"))[1]}
+  	      if(var3!="NA"){var3 <- unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4   <-unlist(strsplit(var4, ":"))[1]}
+  	      if(var5!="NA"){var5 <- unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6   <-unlist(strsplit(var6, ":"))[1]}
+  	      if(var7!="NA"){var7 <- unlist(strsplit(var7, ":"))[1]};if(var8!="NA"){var8   <-unlist(strsplit(var8, ":"))[1]}
+  	      if(var9!="NA"){var9 <- unlist(strsplit(var9, ":"))[1]};if(var10!="NA"){var10 <-unlist(strsplit(var10, ":"))[1]}
   	      
   	      var.thresholds <- c(var1, var2, var3, var4, var5,
   	                          var6, var7, var8, var9, var10)
@@ -174,15 +170,15 @@ DialogSelectThresholds <- function( win, notebook ){
   	      var.thresholds <- var.thresholds[var.thresholds!="NA"]
   	      var.thresholds <- unique(var.thresholds)
   	      
-  	      min.val <<- c(min.var1,min.var2,min.var3,min.var4,min.var5,
+  	      min.val <- c(min.var1,min.var2,min.var3,min.var4,min.var5,
   	                    min.var6,min.var7,min.var8,min.var9,min.var10)
   	      
-  	      min.val <<- min.val[!is.na(min.val)]
+  	      min.val <- min.val[!is.na(min.val)]
   	      
-  	      max.val <<- c(max.var1,max.var2,max.var3,max.var4,max.var5,
+  	      max.val <- c(max.var1,max.var2,max.var3,max.var4,max.var5,
   	                    max.var6,max.var7,max.var8,max.var9,max.var10)
   	      
-  	      max.val <<- max.val[!is.na(max.val)]
+  	      max.val <- max.val[!is.na(max.val)]
   	      
   	      matrix.thresholds <- matrix(NA, nrow=length(var.thresholds), ncol=3) 
   	      matrix.thresholds <- cbind(var.thresholds, min.val, max.val)
@@ -195,10 +191,10 @@ DialogSelectThresholds <- function( win, notebook ){
   	      
   	      for(i in 1:dim(matrix.thresholds)[1]){
   	        
-  	        if(as.numeric(as.matrix(matrix.thresholds)[i,2]) < min(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
+  	        if(as.numeric(as.matrix(matrix.thresholds)[i,2]) < min(theDataSet[colnames(theDataSet) ==  as.character(matrix.thresholds[i,1])])){
   	          val.min[i] <-  as.character(matrix.thresholds[i,1])
   	        }
-  	        if(as.numeric(as.matrix(matrix.thresholds)[i,3]) > max(currentDataSet[colnames(currentDataSet) ==  as.character(matrix.thresholds[i,1])])){
+  	        if(as.numeric(as.matrix(matrix.thresholds)[i,3]) > max(theDataSet[colnames(theDataSet) ==  as.character(matrix.thresholds[i,1])])){
   	          val.max[i] <-  as.character(matrix.thresholds[i,1])
   	        }
   	      }
@@ -209,9 +205,9 @@ DialogSelectThresholds <- function( win, notebook ){
   	      if(length(val.min) == 0 & length(val.max) == 0){
   	        
   	        ## Extract subset of data base from thresholds
-  	        data.var.thresholds <- as.data.frame(currentDataSet[,is.element(colnames(currentDataSet), matrix.thresholds$Variable)])
+  	        data.var.thresholds <- as.data.frame(theDataSet[,is.element(colnames(theDataSet), matrix.thresholds$Variable)])
   	        rownames(data.var.thresholds) <- object.complete$n_acces
-  	        n_acces_subset <- matrix(NA, nrow = dim(currentDataSet)[1], ncol = length(var.thresholds))
+  	        n_acces_subset <- matrix(NA, nrow = dim(theDataSet)[1], ncol = length(var.thresholds))
   	        colnames(n_acces_subset) <- as.character(matrix.thresholds[,1])
   	        
   	        w<-1
@@ -244,6 +240,10 @@ DialogSelectThresholds <- function( win, notebook ){
   	        cat("\n")
   	        cat(paste("Process completed................."))     
   	        cat("\n")
+            
+            # Send the user back to the original notebook panel...
+  	        svalue(notebook) <- 3
+            
   	        return(output)
   	      }
   	      
