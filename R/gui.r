@@ -213,26 +213,34 @@ workbench <- function() {
   #############################
   ##Filter Input Trait Values #
   #############################
-  traitFilterPage <- function( win, notebook ) {
+  inputTraitsFiltered <- FALSE
+  optimizationTargetsSpecified <- FALSE
+  
+  traitFilterPageHandler <- function( win, notebook ) {
     
-      return( function(h,...) {  # returns a gWidget handler closure for "Filter Traits..."
+      return(
+        
+        function(h,...) {  # returns a gWidget handler closure for "Filter Traits..."
       
               ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
               
               if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
-                DialogBox(  "You need to tell me  how many\n"+
-                            "Continuous Variables (CV) you have\n"+
-                            "before Explora can filter them!")
+                DialogBox(
+                      "You need to tell Explora how many\n"+
+                      "Continuous Variables (CV) you have\n"+
+                      "before Explora can filter them!"
+                )
           
               } else {
                 
-                if( length(notebook) == 3 ) {
-                
-                    DialogSelectThresholds(  win, notebook )
-                }
-                
-                svalue(notebook) <- 4
-          
+                  # I only create new trait filter page if optimization not already attempted
+                  # and such a
+                  if( !( inputTraitsFiltered || optimizationTargetsSpecified )) {
+                  
+                      DialogSelectThresholds(  win, notebook )
+                      inputTraitsFiltered <- TRUE
+                      svalue(notebook)    <- 4
+                  }
               }
           }
       )
@@ -241,9 +249,9 @@ workbench <- function() {
   lytg2[9,1:5]  <- glabel( text = "", container = lytg2 )
   
   lytg2[10,1]   <- gbutton(
-    "Filter Traits...",
+    "(Optional) Filter Traits Inputs (Default: Use all data)...",
     container = lytg2,
-    handler   =  traitFilterPage( win, nb )
+    handler   =  traitFilterPageHandler( win, nb )
   )
   
   ###########################################
@@ -253,23 +261,33 @@ workbench <- function() {
     
     return ( 
       
-      function(h,...) { 
-          "Specify Optimization Target Variables..."
+      function(h,...) { # returns a gWidget handler closure for "Specify Optimization Target Variables..."
                          
            ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
            
            if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
-             DialogBox("Set number of Continuous Variables (CV) before filtering!")
+             DialogBox(                      
+               "You need to tell Explora how many\n"+
+                "Continuous Variables (CV) you have\n"+
+                "before Explora can set optimization targets!"
+             )
              
            } else {
              
-             if( length(notebook) == 4 ) {
-               # modified version of original function
-               DialogSelectOptimization( win, notebook, analysisPageHandler )
-             }
-             svalue(notebook) <- 5
-             
-           }
+               if( !optimizationTargetsSpecified ) {
+                 
+                   # modified version of original function
+                   DialogSelectOptimization( win, notebook, analysisPageHandler )
+                   
+                   optimizationTargetsSpecified <- TRUE
+                   
+                   if( inputTraitsFiltered ) {
+                     svalue(notebook) <- 5
+                   } else {
+                     svalue(notebook) <- 4
+                   }
+               }
+          }
       }
     )
   }
@@ -281,19 +299,24 @@ workbench <- function() {
     
       return ( 
         
-          function() {  "Specify Optimization Analysis..."
+          function() {  # returns a gWidget handler closure for "Specify Target Variables for Optimization ..."
                              
-              if( length(notebook) == 5  ) {
+              if( optimizationTargetsSpecified ) {
                                  
-                   DialogOptimizationAnalysis( win, notebook )
+                  DialogOptimizationAnalysis( win, notebook )
+                  
+                  if( inputTraitsFiltered ) {
+                    svalue(notebook) <- 6
+                  } else {
+                    svalue(notebook) <-5
+                  }
               }
-              svalue(notebook) <- 6
           }
       )
   }
  
-  lytg2[10,3]   <- gbutton(
-    "Specify Optimization Target Variables...",
+  lytg2[11,1]   <- gbutton(
+    "Specify Target Variables for Optimization ...",
     container = lytg2,
     handler =  optimizationTargetsPageHandler( win, nb , optimizationAnalysisPageHandler( win, nb ) )
   )
