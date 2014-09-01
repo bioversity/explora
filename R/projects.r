@@ -21,7 +21,7 @@
 setClass( "ExploraAnalysis", 
           representation(
             
-            datasetSelector              = "gCombobox",    # formerly nom_data
+            datasetSelector              = "gCombobox",    # formerly nom_data (abbreviated Spanglish for "nombre de datos"?)
             datasetCatalog               = "character",    # new way of tracking dataset names
             currentDataSet               = "data.frame",   # active dataset being analysed
 
@@ -231,7 +231,15 @@ createProject <- function(){
 
   print(paste("Loading dataset: ",dataset_name))
   
-	dataset <- read.csv(data_file_name, header = T, sep = ",") 
+  # loads external data into internal data.frame
+	dataset <- read.csv(data_file_name, header = TRUE, sep = ",") 
+  
+  # massage the dataset a bit to make it a bit more usable...
+  
+  # In later iterations of the application, more massaging may be attempted
+  # for example, analysis and remapping of trait column headers (to point to Crop Ontology?)
+  # For now, simply relabel the first column name from "ID" to "accession"
+  names(dataset)[1] <- "accession"
 	
   projectFolder = file.path( getwd(),paste(dataset_name,".explora",sep="") )
   print(paste("Creating project directory: ", projectFolder))

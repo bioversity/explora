@@ -226,9 +226,11 @@ workbench <- function() {
               
               if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
                 DialogBox(
-                      "You need to tell Explora how many\n"+
-                      "Continuous Variables (CV) you have\n"+
-                      "before Explora can filter them!"
+                  paste( 
+                        "You need to tell Explora how many\n",
+                        "Continuous Variables (CV) you have\n",
+                        "before Explora can filter them!"
+                  )
                 )
           
               } else {
@@ -249,7 +251,7 @@ workbench <- function() {
   lytg2[9,1:5]  <- glabel( text = "", container = lytg2 )
   
   lytg2[10,1]   <- gbutton(
-    "(Optional) Filter Traits Inputs (Default: Use all data)...",
+    "Filter Traits Inputs (Optional; Default: Use all data)...",
     container = lytg2,
     handler   =  traitFilterPageHandler( win, nb )
   )
@@ -267,9 +269,11 @@ workbench <- function() {
            
            if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
              DialogBox(                      
-               "You need to tell Explora how many\n"+
-                "Continuous Variables (CV) you have\n"+
-                "before Explora can set optimization targets!"
+               paste( 
+                 "You need to tell Explora how many\n",
+                   "Continuous Variables (CV) you have\n",
+                   "before Explora can set optimization targets!"
+               )
              )
              
            } else {

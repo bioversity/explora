@@ -206,21 +206,21 @@ DialogSelectThresholds <- function( win, notebook ){
   	        
   	        ## Extract subset of data base from thresholds
   	        data.var.thresholds <- as.data.frame(theDataSet[,is.element(colnames(theDataSet), matrix.thresholds$Variable)])
-  	        rownames(data.var.thresholds) <- object.complete$n_acces
-  	        n_acces_subset <- matrix(NA, nrow = dim(theDataSet)[1], ncol = length(var.thresholds))
-  	        colnames(n_acces_subset) <- as.character(matrix.thresholds[,1])
+  	        rownames(data.var.thresholds) <- object.complete$accession
+  	        accession_subset <- matrix(NA, nrow = dim(theDataSet)[1], ncol = length(var.thresholds))
+  	        colnames(accession_subset) <- as.character(matrix.thresholds[,1])
   	        
   	        w<-1
   	        
   	        while(w <= dim(matrix.thresholds)[1]){  
   	          sub <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
   	          data.var.thresholds <- subset(data.var.thresholds,data.var.thresholds[,w] >= as.numeric(as.character(matrix.thresholds[w,2])) & data.var.thresholds[,w] <= as.numeric(as.character(matrix.thresholds[w,3])))
-  	          n_acces_subset[1:length(rownames(sub)),w] <- rownames(sub)
+  	          accession_subset[1:length(rownames(sub)),w] <- rownames(sub)
   	          w <- w +1
   	        }
   	        
-  	        n_acces_subset <- as.numeric(na.omit(n_acces_subset[,dim(matrix.thresholds)[1]]))
-  	        data.var.thresholds.final <- object.complete[is.element(object.complete$n_acces, n_acces_subset),]
+  	        accession_subset <- as.numeric(na.omit(accession_subset[,dim(matrix.thresholds)[1]]))
+  	        data.var.thresholds.final <- object.complete[is.element(object.complete$accession, accession_subset),]
   	        Data.Thresholds <- data.var.thresholds.final
   	        data.var.thresholds.final <- data.var.thresholds.final[,-1]
   	        data.var.thresholds.final <- data.var.thresholds.final[,1:7]
