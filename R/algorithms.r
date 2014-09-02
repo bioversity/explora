@@ -324,80 +324,99 @@ DialogSelectOptimization <- function( win, notebook ){
 #' @importFrom vegan diversity
 
 ## calculate 'optimization'
-optimization <- function(data, option1, option2){ 
+optimization <- function( data, option1, option2 ){ 
   
-  num.access <- as.numeric( svalue( numberOfAccessions(analysis) )) 
+  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ) ) 
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
   
   ##6)  Sampling without replacement of random combinations
-  subset0 <- sample(data[,1],num.access, replace = F)
+  subset0 <- sample( data[,1], num.access, replace = FALSE )
   
   ##7)  Calculation of objective functions for each subset and defined variables: 
   
-  if(any(is.na(option1))==FALSE){
+  if( any(is.na(option1)) ){
+    
     data.con <- cbind(data[,1], data[,is.element(colnames(data),option1[,1])])
     colnames(data.con) <- c("accession", colnames(data)[is.element(colnames(data),option1[,1])])
     data0 <- data.con
     
     name.var.func.con <- rep(NA,dim(option1)[1])
-    val.var.func.con <- rep(NA,dim(option1)[1]) 
+    val.var.func.con  <- rep(NA,dim(option1)[1]) 
     
     for(i in 1:dim(option1)[1]){ 
       
       if(option1[i,2] == "CV: Maximize coefficient of variation"){
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "CV",sep="")
-        val.var.func.con[i] <- sd(data1)/mean(data1)
-      }else if(option1[i,2] == "MAX.AV: Maximize average"){
+        val.var.func.con[i]  <- sd(data1)/mean(data1)
+        
+      } else if(option1[i,2] == "MAX.AV: Maximize average"){
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MAX.AV",sep="")
-        val.var.func.con[i] <- mean(data1)
-      }else if(option1[i,2] == "MAX.MIN: Maximize minimum"){
+        val.var.func.con[i]  <- mean(data1)
+        
+      } else if(option1[i,2] == "MAX.MIN: Maximize minimum"){
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MAX.MIN",sep="")
-        val.var.func.con[i] <- min(data1)
-      }else if(option1[i,2] == "MAX.MAX: Maximize maximum"){
+        val.var.func.con[i]  <- min(data1)
+        
+      } else if(option1[i,2] == "MAX.MAX: Maximize maximum"){
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MAX.MAX",sep="")
-        val.var.func.con[i] <- max(data1)
-      }else if(option1[i,2] == "MIN.AV: Minimize average"){
+        val.var.func.con[i]  <- max(data1)
+        
+      } else if(option1[i,2] == "MIN.AV: Minimize average"){
+        
         data1 <- data0[,as.character(option1[i,1])]
         data2 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MIN.AV",sep="")
-        val.var.func.con[i] <- max(data1)-mean(data2)
-      }else if(option1[i,2] == "MIN.MIN: Minimize minimum"){
+        val.var.func.con[i]  <- max(data1)-mean(data2)
+        
+      } else if(option1[i,2] == "MIN.MIN: Minimize minimum"){
+        
         data1 <- data0[,as.character(option1[i,1])]
         data2 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MIN.MIN",sep="")
-        val.var.func.con[i] <- max(data1)-mean(data2)
-      }else if(option1[i,2] == "MIN.MAX: Minimize maximum"){
+        val.var.func.con[i]  <- max(data1)-mean(data2)
+        
+      } else if(option1[i,2] == "MIN.MAX: Minimize maximum"){
+        
         data1 <- data0[,as.character(option1[i,1])]
         data2 <- data0[is.element(data$accession,subset0),as.character(option1[i,1])]
         name.var.func.con[i] <- paste(option1[i,1],"-", "MIN.MAX",sep="")
-        val.var.func.con[i] <- max(data1)-max(data2)
+        val.var.func.con[i]  <- max(data1)-max(data2)
       }
     }
   } 
   
   if(any(is.na(option2))==FALSE){  
+    
     data.nom <- cbind("accession" = data[,1], data[,is.element(colnames(data),option2[,1])])
     colnames(data.nom) <- c("accession", colnames(data)[is.element(colnames(data),option2[,1])])
     data0 <- data.nom
     
     name.var.func.nom <- rep(NA, dim(option2)[1])
-    val.var.func.nom <- rep(NA, dim(option2)[1])
+    val.var.func.nom  <- rep(NA, dim(option2)[1])
     
-    for(i in 1:dim(option2)[1]){  
-      if(option2[i,2] == "MAX.PROP: Maximize proportion"){
+    for(i in 1:dim(option2)[1]){
+      
+      if(option2[i,2] == "MAX.PROP: Maximize proportion") {
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option2[i,1])]
         name.var.func.nom[i] <- paste(option2[i,1],"-", "MAX.PROP",sep="")
-        val.var.func.nom[i] <- as.numeric(prop.table(table(data1 == as.numeric(option2[i,3])))[2])
+        val.var.func.nom[i]  <- as.numeric(prop.table(table(data1 == as.numeric(option2[i,3])))[2])
         ifelse(val.var.func.nom[i] == NA, 0, val.var.func.nom[i])
-      }else if(option2[i,2] == "SHANNON: Maximize Shannon index"){
+        
+      } else if(option2[i,2] == "SHANNON: Maximize Shannon index") {
+        
         data1 <- data0[is.element(data$accession,subset0),as.character(option2[i,1])]
         name.var.func.nom[i] <- paste(option2[i,1],"-", "SHANN",sep="")
-        val.var.func.nom[i] <- diversity(as.numeric(data1), index = "shannon", MARGIN = 1) 
+        val.var.func.nom[i]  <- diversity(as.numeric(data1), index = "shannon", MARGIN = 1) 
       }
     }
   }  
@@ -472,6 +491,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   option.objective.con <- matrix(c(varop1c, varop2c, varop3c, varop4c, varop5c,
                                    fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c),
                                    nrow = 5, ncol = 2)
+  
   colnames(option.objective.con) <- c("Variable", "Objective function")
   
   
@@ -912,6 +932,7 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
   dis.matrix <- as.matrix(distance) 
   
   k.means <- kmeans(dis.matrix,2)
+  
   data.cluster <- cbind("solutions" = row.names.cluster, "cluster" = k.means$cluster, data.optimization)
   data.cluster.sol1 <- data.cluster[data.cluster$cluster == 1,]
   data.cluster.sol2 <- data.cluster[data.cluster$cluster == 2,]
