@@ -324,8 +324,8 @@ number.final <- function(h,...){
       paste(
         "Invalid size of the final subset.\n",
         "Target number must lie within the range of 1 to",
-        as.character(availableNumberOfAccessions),"."
-        sep=" "
+        as.character(availableNumberOfAccessions),".",
+        sep=" ")
     )
     nfinal <- availableNumberOfAccessions 
   }
