@@ -58,6 +58,7 @@ workbench <- function() {
   
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
+  
   environment(saveProjectFile)          <- session
   environment(deleteProjectFile)        <- session
   environment(readProjectFile)          <- session
@@ -142,6 +143,49 @@ workbench <- function() {
   
   lytg1[9,1]   <- glabel("Select Active Project for Analysis:", container = lytg1)
   lytg1[9,2]   <- glabel( text = "", container = lytg1)
+  
+  ## these flags control the analysis parameter pages
+  
+  inputTraitsFiltered <- FALSE
+  optimizationTargetsSpecified <- FALSE
+  
+  resetAnalysis <- function(notebook) {
+    # Reset the computational environment here
+    optimizationResult(analysis) <- list()
+    
+    if(inputTraitsFiltered) {
+      
+      inputTraitsFiltered <<- FALSE
+      
+      if(optimizationTargetsSpecified) {
+        
+        optimizationTargetsSpecified <<- FALSE
+        svalue(notebook) <- 5
+        dispose(notebook)
+        
+      }
+      
+      svalue(notebook) <- 4
+      dispose(notebook)
+      
+    } else {
+      
+      if(optimizationTargetsSpecified) {
+        
+        optimizationTargetsSpecified <<- FALSE
+        svalue(notebook) <- 4
+        dispose(notebook)
+        
+      } 
+      
+    }
+    
+    svalue(notebook) <- 3
+    
+  }
+  environment(resetAnalysis)            <- session
+  
+  
   lytg1[9,3]   <- datasetSelector(session$analysis) <- gdroplist( 
                     datasetCatalog(session$analysis), 
                     selected = 0,  
@@ -153,7 +197,11 @@ workbench <- function() {
                       if( length(datasetId) > 0 ) {
                         if( nchar(datasetId) > 0 ) {
                           if( !( datasetId == EMPTY_CATALOG() ) ) {
-                              currentDataSet(session$analysis) <- datasetId
+
+                            currentDataSet(session$analysis) <- datasetId
+                            
+                            resetAnalysis(nb) 
+                              
                           }
                         }
                       }
@@ -235,9 +283,6 @@ workbench <- function() {
   #############################
   ##Filter Input Trait Values #
   #############################
-  inputTraitsFiltered <- FALSE
-  optimizationTargetsSpecified <- FALSE
-  
   traitFilterPageHandler <- function( win, notebook ) {
     
       return(

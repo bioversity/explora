@@ -609,7 +609,8 @@ MAXVAR.type.opt <- function(){
 
 PCA.type.opt <- function() {
   
-  output.opt0 <- optimizationResult(analysis) 
+  output.opt0 <- optimizationResult(analysis)
+  
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   nfinal      <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
@@ -760,7 +761,8 @@ WSM.type.opt <- function(){
   
   dataset      <- currentDataSet(analysis)
   
-  output.opt0 <- optimizationResult(analysis) 
+  output.opt0 <- optimizationResult(analysis)
+  
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   num.access  <- as.numeric( svalue( numberOfAccessions(analysis) )) 
@@ -966,6 +968,7 @@ DTree.type.opt <- function(){
   dataset      <- currentDataSet(analysis) 
   
   output.opt0 <- optimizationResult(analysis) 
+  
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ) )
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
   num.access  <- as.numeric( svalue( numberOfAccessions(analysis) ) )
