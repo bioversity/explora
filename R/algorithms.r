@@ -377,11 +377,13 @@ optimization <- function(data, option1, option2){
 } 
 
 #
-# This function retrieves any available data threshold values for the current project
+# This function selects the target dataset
+# Uses a Threshold filtered data set if available
+# Otherwise, uses the whole dataset
 #
-getDataThresholds <- function(defaultData) {
-  if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
-    data <- readProjectFile(  "Data.Thresholds" )
+getTargetDataSet <- function(defaultData) {
+  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
+    data <- readProjectFile(  "ThresholdFilteredDataSubset" )
     if( !( is.na(data) || nrow(data) == 0 )) {
       return(data)
     }
@@ -429,7 +431,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
   
-  data.thresholds <- getDataThresholds(dataset)
+  data.thresholds <- getTargetDataSet(dataset)
   
   option.objective.con <- matrix(c(varop1c, varop2c, varop3c, varop4c, varop5c,
                                    fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c),
@@ -542,7 +544,7 @@ MAXVAR.type.opt <- function(){
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
   
-  dataFinal <- getDataThresholds(dataset)
+  dataFinal <- getTargetDataSet(dataset)
   
   final.subset.max.var <- dataFinal[is.element(dataFinal$accession,unique(mean.result$accessions[pos.variance.aux,1])[1:num.access]),]
   
@@ -690,7 +692,7 @@ PCA.type.opt <- function() {
     
     print(nsol.pca)
     
-    dataFinal <- getDataThresholds(dataset)
+    dataFinal <- getTargetDataSet(dataset)
     
     final.subset.pca <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.pca,]),]
     
@@ -834,7 +836,7 @@ WSM.type.opt <- function(){
   
   cat(paste("Solution by WSM: ", nsol.wsm, sep = ""))
   
-  dataFinal <- getDataThresholds(dataset)
+  dataFinal <- getTargetDataSet(dataset)
   
   final.subset.wsm <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.wsm,]),]
   
@@ -1059,7 +1061,7 @@ DTree.type.opt <- function(){
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
     
-    dataFinal <- getDataThresholds(dataset)
+    dataFinal <- getTargetDataSet(dataset)
     
     final.subset.DTree <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.DTree,]),]
     

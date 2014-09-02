@@ -59,11 +59,12 @@ workbench <- function() {
   # not elegant, but it is tricky to give these functions 
   # their session context in an encapsulated (functional) way
   environment(saveProjectFile)          <- session
+  environment(deleteProjectFile)        <- session
   environment(readProjectFile)          <- session
   environment(result.path.exists)       <- session
   environment(result.path)              <- session
   
-  environment(getDataThresholds)        <- session
+  environment(getTargetDataSet)         <- session
   
   environment(DialogSelectThresholds)   <- session
   environment(DialogSelectOptimization) <- session
@@ -235,13 +236,19 @@ workbench <- function() {
           
               } else {
                 
-                  # I only create new trait filter page if optimization not already attempted
-                  # and such a
-                  if( !( inputTraitsFiltered || optimizationTargetsSpecified )) {
-                  
-                      DialogSelectThresholds(  win, notebook )
-                      inputTraitsFiltered <- TRUE
-                      svalue(notebook)    <- 4
+                  # I only create new trait filter page if not yet visible
+                  if( !inputTraitsFiltered ) {
+
+                      # I also only create new trait filter page if optimization page is NOT already displayed
+                      if( !optimizationTargetsSpecified ) {
+                    
+                          DialogSelectThresholds(  win, notebook )
+                          inputTraitsFiltered <<- TRUE
+                          
+                      } else {
+                        DialogBox("Cannot filter out input data once you've started optimization analyses!")
+                      }
+                      svalue(notebook) <- 4
                   }
               }
           }
@@ -283,7 +290,7 @@ workbench <- function() {
                    # modified version of original function
                    DialogSelectOptimization( win, notebook, analysisPageHandler )
                    
-                   optimizationTargetsSpecified <- TRUE
+                   optimizationTargetsSpecified <<- TRUE
                    
                    if( inputTraitsFiltered ) {
                      svalue(notebook) <- 5

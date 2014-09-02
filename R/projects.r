@@ -364,6 +364,14 @@ saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) 
   return(FALSE)
 }
 
+deleteProjectFile <- function( filename ) {
+  
+    path <- result.path( filename, "csv" )
+    
+    if( !is.na(path) && file.exists(path) ) {  file.remove( c(path) ) }
+
+}
+
 #
 # opens up a PNG device to the specified file
 #
