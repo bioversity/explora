@@ -180,19 +180,23 @@ DialogSelectOptimization <- function( win, notebook ){
   
   lytg4var[3,1] <- varop1c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
   lytg4var[3,2] <- fvarop1c <- gdroplist(f.items.cont,  container = lytg4var)
-  lytg4var[3,3] <- ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  lytg4var[3,3] <- ri1c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)
+  
   lytg4var[4,1] <- varop2c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
   lytg4var[4,2] <- fvarop2c <- gdroplist(f.items.cont,  container = lytg4var)
   lytg4var[4,3] <- ri2c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)
+  
   lytg4var[5,1] <- varop3c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
   lytg4var[5,2] <- fvarop3c <- gdroplist(f.items.cont,  container = lytg4var)
   lytg4var[5,3] <- ri3c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
   lytg4var[6,1] <- varop4c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
   lytg4var[6,2] <- fvarop4c <- gdroplist(f.items.cont,  container = lytg4var)
   lytg4var[6,3] <- ri4c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  
   lytg4var[7,1] <- varop5c <- gdroplist(c("NA", names.continuous),  container = lytg4var)
   lytg4var[7,2] <- fvarop5c <- gdroplist(f.items.cont,  container = lytg4var)
-  lytg4var[7,3] <- ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
+  lytg4var[7,3] <- ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)
   
   lytg4var[8,1]  <- glabel("Optimization Strategy for Nominal Variables: ",  container = lytg4var)
   lytg4var[9,1]  <- glabel("Variable: ",  container = lytg4var)
@@ -234,8 +238,24 @@ DialogSelectOptimization <- function( win, notebook ){
   
   saveOptimizationTargets <- function() {
     
-      RI <- matrix(c(svalue(ri1c), svalue(ri2c), svalue(ri3c), svalue(ri4c), svalue(ri5c),
-                     svalue(ri1n), svalue(ri2n), svalue(ri3n), svalue(ri4n), svalue(ri5n)), ncol = 2)
+      # RMB: BUG FIX, Sept 2, 2014: If varop?c is "NA", 
+      # then the  ri?c weightings should be zero...
+      if( svalue(varop1c) != "NA") { ri1c <- svalue(ri1c) } else { ri1c <- 0 }
+      if( svalue(varop2c) != "NA") { ri2c <- svalue(ri2c) } else { ri2c <- 0 }
+      if( svalue(varop3c) != "NA") { ri3c <- svalue(ri3c) } else { ri3c <- 0 }
+      if( svalue(varop4c) != "NA") { ri4c <- svalue(ri4c) } else { ri4c <- 0 }
+      if( svalue(varop5c) != "NA") { ri5c <- svalue(ri5c) } else { ri5c <- 0 }
+      if( svalue(varop1n) != "NA") { ri1n <- svalue(ri1n) } else { ri1n <- 0 }
+      if( svalue(varop2n) != "NA") { ri2n <- svalue(ri2n) } else { ri2n <- 0 }
+      if( svalue(varop3n) != "NA") { ri3n <- svalue(ri3n) } else { ri3n <- 0 }
+      if( svalue(varop4n) != "NA") { ri4n <- svalue(ri4n) } else { ri4n <- 0 }
+      if( svalue(varop5n) != "NA") { ri5n <- svalue(ri5n) } else { ri5n <- 0 }
+    
+      RI <- matrix( 
+                    c( ri1c,  ri2c,  ri3c,  ri4c,  ri5c,
+                       ri1n,  ri2n,  ri3n,  ri4n,  ri5n ), 
+                    ncol = 2
+                   )
       
       colnames(RI)<-c("ric", "rin")
       
@@ -779,6 +799,7 @@ WSM.type.opt <- function(){
   
   ##Exclude zero-valued weights
   weights <- weights[weights != 0]
+  
   cat("\n")
   cat("Weights:")
   cat("\n")
