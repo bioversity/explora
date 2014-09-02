@@ -221,7 +221,7 @@ DialogSelectThresholds <- function( win, notebook ){
   	        
   	        accession_subset <- as.numeric(na.omit(accession_subset[,dim(matrix.thresholds)[1]]))
   	        data.var.thresholds.final <- object.complete[is.element(object.complete$accession, accession_subset),]
-  	        Data.Thresholds <- data.var.thresholds.final
+  	        thresholdFilteredDataSubset <- data.var.thresholds.final
   	        data.var.thresholds.final <- data.var.thresholds.final[,-1]
   	        data.var.thresholds.final <- data.var.thresholds.final[,1:7]
   	        d.thresholds = sapply(data.var.thresholds.final, des.continuous)
@@ -229,8 +229,8 @@ DialogSelectThresholds <- function( win, notebook ){
   	        d.thresholds = as.table(d.thresholds)
   	        names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
   	        
-  	        saveProjectFile( d.thresholds,    "ResultsDescriptiveAnalysisThresholds" )   	
-  	        saveProjectFile( Data.Thresholds, "Data.Thresholds", row.names = FALSE, alert = FALSE )   	
+  	        saveProjectFile( d.thresholds,                "ResultsDescriptiveAnalysisThresholds" )   	
+  	        saveProjectFile( thresholdFilteredDataSubset, "ThresholdFilteredDataSubset", row.names = FALSE, alert = FALSE )   	
   	        
   	        print(d.thresholds)
   	        
@@ -306,25 +306,28 @@ number.final <- function(h,...){
   
   nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
   
-  if( any( dir( currentProjectFolder(analysis) ) == "Data.Thresholds.csv") == TRUE ){
+  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
     
-    Data.Thresholds <- readProjectFile( "Data.Thresholds" )
-    Data <- Data.Thresholds
+    availableData <- readProjectFile( "ThresholdFilteredDataSubset" )
     
   } else {
     
-    Data <- object
+    availableData <- object
     
   } 
   
-  availableNumberOfAccessions <- dim(Data)[1]
+  availableNumberOfAccessions <- nrow(availableData)
   if(nfinal <= availableNumberOfAccessions & nfinal > 0){
     DialogBox(paste("Size of the final subset of the accessions set to", nfinal, sep=" "))
   } else {
-    DialogBox("Invalid size of the final subset.\n",
-              "Target number must lie within the range of 1 to",
-              as.character(availableNumberOfAccessions),
-              sep=" ")
+    DialogBox(
+      paste(
+        "Invalid size of the final subset.\n",
+        "Target number must lie within the range of 1 to",
+        as.character(availableNumberOfAccessions),"."
+        sep=" "
+    )
+    nfinal <- availableNumberOfAccessions 
   }
   
   return(nfinal)

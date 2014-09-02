@@ -383,9 +383,9 @@ optimization <- function(data, option1, option2){
 #
 getTargetDataSet <- function(defaultData) {
   if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
-    data <- readProjectFile(  "ThresholdFilteredDataSubset" )
-    if( !( is.na(data) || nrow(data) == 0 )) {
-      return(data)
+    filteredData <- readProjectFile(  "ThresholdFilteredDataSubset" )
+    if( !( is.na(filteredData) || nrow(filteredData) == 0 )) {
+      return(filteredData)
     }
   } 
   return(defaultData)
