@@ -61,6 +61,8 @@ workbench <- function() {
   environment(saveProjectFile)          <- session
   environment(deleteProjectFile)        <- session
   environment(readProjectFile)          <- session
+  environment(plotImage)                <- session
+  
   environment(result.path.exists)       <- session
   environment(result.path)              <- session
   
