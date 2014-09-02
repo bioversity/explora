@@ -283,7 +283,7 @@ workbench <- function() {
   ###########################################
   ##Specify Optimization Analysis Variables #
   ###########################################
-  optimizationTargetsPageHandler <- function( win, notebook, analysisPageHandler ) {
+  optimizationTargetsPageHandler <- function( win, notebook ) {
     
     return ( 
       
@@ -305,7 +305,7 @@ workbench <- function() {
                if( !optimizationTargetsSpecified ) {
                  
                    # modified version of original function
-                   DialogSelectOptimization( win, notebook, analysisPageHandler )
+                   DialogSelectOptimization( win, notebook )
                    
                    optimizationTargetsSpecified <<- TRUE
                    
@@ -319,34 +319,11 @@ workbench <- function() {
       }
     )
   }
-  
-  ###########################################
-  ##Specify Optimization Analysis Variables #
-  ###########################################
-  optimizationAnalysisPageHandler <- function( win, notebook ) {
-    
-      return ( 
-        
-          function() {  # returns a gWidget handler closure for "Specify Target Variables for Optimization ..."
-                             
-              if( optimizationTargetsSpecified ) {
-                                 
-                  DialogOptimizationAnalysis( win, notebook )
-                  
-                  if( inputTraitsFiltered ) {
-                    svalue(notebook) <- 6
-                  } else {
-                    svalue(notebook) <-5
-                  }
-              }
-          }
-      )
-  }
  
   lytg2[8,3]   <- gbutton(
     "Specify Optimization Variables ...",
     container = lytg2,
-    handler =  optimizationTargetsPageHandler( win, nb , optimizationAnalysisPageHandler( win, nb ) )
+    handler =  optimizationTargetsPageHandler( win, nb  )
   )
   
   svalue(nb) <- 1

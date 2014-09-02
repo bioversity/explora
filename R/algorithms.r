@@ -135,7 +135,7 @@ correlation <- function(){
   
 }
 
-DialogSelectOptimization <- function( win, notebook, analysisPageHandler){
+DialogSelectOptimization <- function( win, notebook ){
   
   dataset <- currentDataSet(analysis)
   ncon    <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
@@ -166,10 +166,7 @@ DialogSelectOptimization <- function( win, notebook, analysisPageHandler){
   pcategory.v4 <- 0
   pcategory.v5 <- 0
   
-  # A notebook within a notebook...
-  optimizationVariablesPage <- gnotebook( container = notebook, expand = T, tab.pos = 3)
-  
-  lyt4 <- glayout(homogeneous = FALSE, container = optimizationVariablesPage , spacing = 10, label="Optimization Procedure",expand = TRUE)
+  lyt4 <- glayout(homogeneous = FALSE, container = notebook , spacing = 5, label="Optimization Procedure",expand = TRUE)
 
   lyt4[1,1:25]  <- g4var <- gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   
@@ -275,34 +272,30 @@ DialogSelectOptimization <- function( win, notebook, analysisPageHandler){
                               
                               lytg4opt[1,2] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
                               
-                              lytg4opt[15,1:3] <- glabel( text = " ", container = lytg5)
-                              
-                              lytg4opt[16,1]  <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg4opt, horizontal = FALSE)
-                              
-                              items.option <- c(
-                                " ", 
-                                "Maximum variation", 
-                                "Principal components",
-                                "Weighted sum model",
-                                "Decision tree"
-                              )
-                              
-                              lytg4opt[17,1] <- option.preferred <- gdroplist(items.option,  container = lytg4opt)
-                              lytg4opt[17,2] <- btn <- gbutton("Run",  container = lytg4opt)
-                              
-                              addHandlerChanged(btn, handler <- function(h,...){
-                                if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
-                                if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
-                                if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
-                                if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
-                              })
-                              
-                              visible(win) <- TRUE
-                              
                             })
 
   lytg4opt[1,2]   <- ( glabel( text = "               ", container = lytg4opt))
   lytg4opt[1,3:5] <- ( glabel( text = "Run optimization procedure before continuing...", container = lytg4opt))
+  
+  lytg4opt[2,1]   <- glabel("Select Preferred Classification Algorithm: ",  container = lytg4opt, horizontal = FALSE)
+  
+  items.option <- c(
+    " ", 
+    "Maximum variation", 
+    "Principal components",
+    "Weighted sum model",
+    "Decision tree"
+  )
+  
+  lytg4opt[2,2] <- option.preferred <- gdroplist(items.option,  container = lytg4opt)
+  lytg4opt[2,3] <- btn <- gbutton("Run",  container = lytg4opt)
+  
+  addHandlerChanged(btn, handler <- function(h,...){
+    if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
+    if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
+    if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
+    if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
+  })
   
   visible(win) <- TRUE
   
@@ -404,7 +397,7 @@ optimization <- function(data, option1, option2){
 # Uses a Threshold filtered data set if available
 # Otherwise, uses the whole dataset
 #
-getTargetDataSet <- function(defaultData) {
+getTargetDataSet <- function( dataDirectory, defaultData) {
   if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
     filteredData <- readProjectFile(  "ThresholdFilteredDataSubset" )
     if( !( is.na(filteredData) || nrow(filteredData) == 0 )) {
@@ -454,7 +447,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
   
-  data.thresholds <- getTargetDataSet(dataset)
+  data.thresholds <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset)
   
   option.objective.con <- matrix(c(varop1c, varop2c, varop3c, varop4c, varop5c,
                                    fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c),
@@ -567,7 +560,7 @@ MAXVAR.type.opt <- function(){
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
   
-  dataFinal <- getTargetDataSet(dataset)
+  dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset)
   
   final.subset.max.var <- dataFinal[is.element(dataFinal$accession,unique(mean.result$accessions[pos.variance.aux,1])[1:num.access]),]
   
@@ -715,7 +708,7 @@ PCA.type.opt <- function() {
     
     print(nsol.pca)
     
-    dataFinal <- getTargetDataSet(dataset)
+    dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
     
     final.subset.pca <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.pca,]),]
     
@@ -859,7 +852,7 @@ WSM.type.opt <- function(){
   
   cat(paste("Solution by WSM: ", nsol.wsm, sep = ""))
   
-  dataFinal <- getTargetDataSet(dataset)
+  dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
   
   final.subset.wsm <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.wsm,]),]
   
@@ -1083,7 +1076,7 @@ DTree.type.opt <- function(){
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
     
-    dataFinal <- getTargetDataSet(dataset)
+    dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
     
     final.subset.DTree <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.DTree,]),]
     
