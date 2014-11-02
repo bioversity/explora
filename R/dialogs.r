@@ -42,16 +42,21 @@ DialogBoxDTree <- function(items) {## This function make a dialog box
 	
 }  
 
-DialogSelect <- function(items){## Function to select preference category
+DialogSelectItems <- function( message, items ){
 	
   out.category <- ""
   
-	dlg <-  gbasicdialog(
-          "Select the category of preference", 
-			    handler = function(h,...){ out.category <<- svalue(txt.category) }
-        )
+	dlg <-  gbasicdialog( message )
 	
-	txt.category <- gdroplist(items,  container = dlg)
+	txt.category <- gdroplist(
+                    items,  
+                    selected = 0,
+                    container = dlg,
+                    expand = TRUE, 
+                    handler = function(h,...){ 
+                      out.category <<- svalue(h$obj) 
+                    }
+                  )
   
 	visible(dlg, set = TRUE)
 	
@@ -59,21 +64,14 @@ DialogSelect <- function(items){## Function to select preference category
 	
 }
 
-SelectSolution <- function(solutions){## Function to select preference category
-	
-  out.solution <- ""
-  
-	dlg <-  gbasicdialog(
-            "Select the solutions", 
-			      handler = function(h,...){ out.solution <<- svalue(txt.solution) }
-          )
-	
-	txt.solution <- gdroplist(solutions,  container = dlg)
-	visible(dlg, set = TRUE)
-  
-	return(out.solution)
+DialogSelectCategory <- function( categories ) { ## Function to select preference category
+  DialogSelectItems( "Select the category of preference", categories )
 }
 
+DialogSelectSolution <- function( solutions ){## Function to select solutions
+  DialogSelectItems( "Select the solutions", solutions )
+}
+	
 ## Function to select variables for thresholds
 DialogSelectThresholds <- function( win, notebook ){
   
@@ -157,7 +155,13 @@ DialogSelectThresholds <- function( win, notebook ){
     	    max.var5 <- as.numeric(svalue(max.var5)); max.var6 <- as.numeric(svalue(max.var6))
     	    max.var7 <- as.numeric(svalue(max.var7)); max.var8 <- as.numeric(svalue(max.var8))
     	    max.var9 <- as.numeric(svalue(max.var9)); max.var10 <- as.numeric(svalue(max.var10))
-    	      
+    	    
+          vars <- c(var1, var2, var3, var4, var5, var6, var7, var8, var9, var10)
+          if(all(vars=="NA")) {
+            svalue(notebook) <- 3
+            return(list())
+          }
+          
   	      if(var1!="NA"){var1 <- unlist(strsplit(var1, ":"))[1]};if(var2!="NA"){var2   <-unlist(strsplit(var2, ":"))[1]}
   	      if(var3!="NA"){var3 <- unlist(strsplit(var3, ":"))[1]};if(var4!="NA"){var4   <-unlist(strsplit(var4, ":"))[1]}
   	      if(var5!="NA"){var5 <- unlist(strsplit(var5, ":"))[1]};if(var6!="NA"){var6   <-unlist(strsplit(var6, ":"))[1]}
@@ -265,14 +269,14 @@ number.access <- function(...){
   
   object <- currentDataSet(analysis)
   
-  targetNumberOfAccessions    <- as.integer( svalue( numberOfAccessions(analysis) ))
+  desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
   
   availableNumberOfAccessions <- as.integer(dim(object)[1])
   
-  if(  targetNumberOfAccessions > 0 & 
-      targetNumberOfAccessions <= availableNumberOfAccessions 
+  if(  desiredNumberOfAccessions > 0 & 
+         desiredNumberOfAccessions <= availableNumberOfAccessions 
   ){
-    DialogBox(paste("Target number of accessions in the final set to", targetNumberOfAccessions, sep=" "))
+    DialogBox(paste("Target number of accessions in the final set to", desiredNumberOfAccessions, sep=" "))
   } else {
     DialogBox(
       paste("Invalid number of accessions.\n",
@@ -282,7 +286,7 @@ number.access <- function(...){
     )
   }
   
-  return( targetNumberOfAccessions ) 
+  return( desiredNumberOfAccessions ) 
 }
 
 number.solutions <- function(h,...) {

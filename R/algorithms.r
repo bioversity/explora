@@ -5,6 +5,10 @@
 #                                                                                             #
 #---------------------------------------------------------------------------------------------- 
 #' @include projects.r dialogs.r 
+#' 
+
+library(grid)
+library(gridExtra)
 
 ########################################################################
 # Note: I'm not sure how the previously included "cluster" package for 
@@ -206,37 +210,37 @@ DialogSelectOptimization <- function( win, notebook ){
   lytg4var[10,1] <- varop1n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
   lytg4var[10,2] <- fvarop1n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop1n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){
-      pcategory.v1 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop1n)])))))}})
+      pcategory.v1 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop1n)]))))}})
   lytg4var[10,3] <- ri1n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
   
   lytg4var[11,1] <- varop2n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
   lytg4var[11,2] <- fvarop2n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop2n) == "MAX.PROP: Maximize proportion" & svalue(varop2n) != "NA"){
-      pcategory.v2 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop2n)])))))}})
+      pcategory.v2 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop2n)]))))}})
   lytg4var[11,3] <- ri2n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
   
   lytg4var[12,1] <- varop3n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
   lytg4var[12,2] <- fvarop3n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop3n) == "MAX.PROP: Maximize proportion" & svalue(varop3n) != "NA"){
-      pcategory.v3 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop3n)])))))}})
+      pcategory.v3 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop3n)]))))}})
   lytg4var[12,3] <- ri3n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
   
   lytg4var[13,1] <- varop4n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
   lytg4var[13,2] <- fvarop4n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop4n) == "MAX.PROP: Maximize proportion" & svalue(varop4n) != "NA"){
-      pcategory.v4 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop4n)])))))}})
+      pcategory.v4 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop4n)]))))}})
   lytg4var[13,3] <- ri4n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
   
   lytg4var[14,1] <- varop5n <- gdroplist(c("NA",names.nominal),  container = lytg4var)
   lytg4var[14,2] <- fvarop5n <- gdroplist(f.items.nom,  container = lytg4var, handler = function(h,...){
     if(svalue(fvarop5n) == "MAX.PROP: Maximize proportion" & svalue(varop1n) != "NA"){
-      pcategory.v5 <<- svalue(as.numeric(DialogSelect(names(table(dataset[colnames(dataset) == svalue(varop5n)])))))}})
+      pcategory.v5 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop5n)]))))}})
   lytg4var[14,3] <- ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
 
   lyt4[4,1:25]   <- g4opt <- gframe("Run Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   lytg4opt       <- glayout(homogeneous = FALSE,  container = g4opt, spacing = 10, expand = TRUE)
   
-  saveOptimizationTargets <- function() {
+  saveOptimizationVariableRankings <- function() {
     
       # RMB: BUG FIX, Sept 2, 2014: If varop?c is "NA", 
       # then the  ri?c weightings should be zero...
@@ -266,14 +270,15 @@ DialogSelectOptimization <- function( win, notebook ){
       fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
       ri1n; ri2n; ri3n; ri4n; ri5n
       
-      saveProjectFile( RI, "RI", row.names = FALSE )   
+      saveProjectFile( RI, "RI", row.names = FALSE, alert = FALSE )   
   }
   
-  lytg4opt[1,1] <- gbutton( "Run the Optimization Procedure",  
+  lytg4opt[1,1:2] <- ( glabel( text = "Generate Sample Distribution before continuing:", container = lytg4opt))
+  lytg4opt[1,3:4] <- gbutton( "Generate Distribution",  
                             container = lytg4opt,
                             handler = function(h,...){
                               
-                              optimizationResult(analysis) <<- f.optimization(
+                              sampleDistribution(analysis) <<- generateSampleDistribution(
                                   varop1c, varop2c, varop3c, varop4c, varop5c,
                                   fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
                                   varop1n, varop2n, varop3n, varop4n, varop5n,
@@ -282,7 +287,7 @@ DialogSelectOptimization <- function( win, notebook ){
                                   pcategory.v4,pcategory.v5
                               )
                               
-                              saveOptimizationTargets()
+                              saveOptimizationVariableRankings()
                               
                               varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
                               fvarop1c<<-svalue(fvarop1c);fvarop2c<<-svalue(fvarop2c);fvarop3c<<-svalue(fvarop3c);fvarop4c<<-svalue(fvarop4c);fvarop5c<<-svalue(fvarop5c);
@@ -290,14 +295,13 @@ DialogSelectOptimization <- function( win, notebook ){
                               fvarop1n<<-svalue(fvarop1n);fvarop2n<<-svalue(fvarop2n);fvarop3n<<-svalue(fvarop3n);fvarop4n<<-svalue(fvarop4n);fvarop5n<<-svalue(fvarop5n);
                               ri1n<<-svalue(ri1n);ri2n<<-svalue(ri2n);ri3n<<-svalue(ri3n);ri4n<<-svalue(ri4n);ri5n<<-svalue(ri5n)
                               
-                              lytg4opt[1,2] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
+                              lytg4opt[1,5] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
                               
                             })
 
-  lytg4opt[1,2]   <- ( glabel( text = "               ", container = lytg4opt))
-  lytg4opt[1,3:5] <- ( glabel( text = "Run optimization procedure before continuing...", container = lytg4opt))
+  lytg4opt[1,5]   <- ( glabel( text = "               ", container = lytg4opt))
   
-  lytg4opt[2,1]   <- glabel("Select Preferred Classification Algorithm: ",  container = lytg4opt, horizontal = FALSE)
+  lytg4opt[2,1]   <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg4opt, horizontal = FALSE)
   
   items.option <- c(
     " ", 
@@ -323,19 +327,21 @@ DialogSelectOptimization <- function( win, notebook ){
 
 #' @importFrom vegan diversity
 
-## calculate 'optimization'
-optimization <- function( data, option1, option2 ){ 
+## Generate a random sample and apply objective functions
+generateSample <- function( data, option1, option2 ){ 
   
-  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ) ) 
+  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(analysis) ) ) 
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
   
   ##6)  Sampling without replacement of random combinations
-  subset0 <- sample( data[,1], num.access, replace = FALSE )
+  subset0 <- sample( data[,1], desiredNumberOfAccessions, replace = FALSE )
   
   ##7)  Calculation of objective functions for each subset and defined variables: 
   
-  if( any(is.na(option1)) ){
+  if( !all(option1[,1]=="NA") ){
+    
+    # At least one continuous variable optimization was specified
     
     data.con <- cbind(data[,1], data[,is.element(colnames(data),option1[,1])])
     colnames(data.con) <- c("accession", colnames(data)[is.element(colnames(data),option1[,1])])
@@ -345,6 +351,10 @@ optimization <- function( data, option1, option2 ){
     val.var.func.con  <- rep(NA,dim(option1)[1]) 
     
     for(i in 1:dim(option1)[1]){ 
+      
+      if(option1[i,1]=="NA") {
+        next ; # skip empty fields
+      }
       
       if(option1[i,2] == "CV: Maximize coefficient of variation"){
         
@@ -394,7 +404,9 @@ optimization <- function( data, option1, option2 ){
     }
   } 
   
-  if(any(is.na(option2))==FALSE){  
+  if( !all(option2[,1]=="NA") ) {
+    
+    # At least one nominal variable optimization was selected
     
     data.nom <- cbind("accession" = data[,1], data[,is.element(colnames(data),option2[,1])])
     colnames(data.nom) <- c("accession", colnames(data)[is.element(colnames(data),option2[,1])])
@@ -404,6 +416,10 @@ optimization <- function( data, option1, option2 ){
     val.var.func.nom  <- rep(NA, dim(option2)[1])
     
     for(i in 1:dim(option2)[1]){
+      
+      if(option2[i,1]=="NA") {
+        next ;
+      }
       
       if(option2[i,2] == "MAX.PROP: Maximize proportion") {
         
@@ -446,7 +462,7 @@ getTargetDataSet <- function( dataDirectory, defaultData) {
   return(defaultData)
 }
 
-f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
+generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,                           
                            varop1n, varop2n, varop3n, varop4n, varop5n,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
@@ -507,7 +523,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
   ## Creates the progress bar
   ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
   for(j in 1:nsoln){
-    output.opt0[[j]] <- optimization( data.thresholds, option.objective.con, option.objective.nom )
+    output.opt0[[j]] <- generateSample( data.thresholds, option.objective.con, option.objective.nom )
     setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "% progress"))
   }
   close(ProgressBar)
@@ -518,7 +534,7 @@ f.optimization <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
 
 MAXVAR.type.opt <- function(){
   
-  output.opt0  <- optimizationResult(analysis)
+  output.opt0  <- sampleDistribution(analysis)
   
   dataset      <- currentDataSet(analysis) 
 
@@ -526,7 +542,7 @@ MAXVAR.type.opt <- function(){
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   
   nfinal     <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
-  num.access <- as.numeric( svalue( numberOfAccessions(analysis) ))
+  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(analysis) ))
   
   ##8)  Standardize values in the sampled subsets:   
   result           <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -598,11 +614,11 @@ MAXVAR.type.opt <- function(){
   
   pos.nfinal <- order(variance[,3],decreasing = TRUE)
   pos.max.var <- pos.nfinal[1]
-  pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*num.access))
+  pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*desiredNumberOfAccessions))
   
   dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset)
   
-  final.subset.max.var <- dataFinal[is.element(dataFinal$accession,unique(mean.result$accessions[pos.variance.aux,1])[1:num.access]),]
+  final.subset.max.var <- dataFinal[is.element(dataFinal$accession,unique(mean.result$accessions[pos.variance.aux,1])[1:desiredNumberOfAccessions]),]
   
   ##Selection of preferred set by max variation  
   cat("\n")
@@ -629,7 +645,7 @@ MAXVAR.type.opt <- function(){
 
 PCA.type.opt <- function() {
   
-  output.opt0 <- optimizationResult(analysis)
+  output.opt0 <- sampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
@@ -701,7 +717,7 @@ PCA.type.opt <- function() {
       
     } else if(dim(result.scale.pca)[2] > 2){
       
-      pca <- dudi.pca(result.scale.pca , scannf = F, nf = 3, center = FALSE, scale = FALSE)
+      pca <- dudi.pca(result.scale.pca , scannf = FALSE, nf = 3, center = FALSE, scale = FALSE)
       
       plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
       
@@ -742,8 +758,8 @@ PCA.type.opt <- function() {
     }  
     close(ProgressBar)
     
-    nsol.pca <- SelectSolution(label.row)
-    nsol.pca <-  as.numeric(svalue(nsol.pca))
+    nsol.pca <- DialogSelectSolution(label.row)
+    nsol.pca <-  as.numeric(nsol.pca)
     
     cat("\n")
     
@@ -781,11 +797,11 @@ WSM.type.opt <- function(){
   
   dataset      <- currentDataSet(analysis)
   
-  output.opt0 <- optimizationResult(analysis)
+  output.opt0 <- sampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  num.access  <- as.numeric( svalue( numberOfAccessions(analysis) )) 
+  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions(analysis) )) 
   
   ## Read ranking
   
@@ -829,9 +845,13 @@ WSM.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  ##8)  Standardize values in the sampled subsets:   
+  ##8)  Standardize values in the sampled subsets:
+  
+  # IS THIS CORRECT: SHOULD THE 1 BE 2 IN THE SAPPLY?)
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
-  colnames(result) <- as.character(output.opt0[[1]]$names)
+  
+  # where are $names for output.opt0 meant to be set?
+  colnames(result) <- as.character(output.opt0[[1]]$names)  
   #label.col <- as.character(output.opt0[[1]]$names)
   
   ##Drop columns with NA's
@@ -954,6 +974,7 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
   return(result)
 }
 
+#' @importFrom grDevices windows
 #' @importFrom grid grid.text
 #' @importFrom grid gpar
 #' @importFrom grid grid.draw
@@ -972,15 +993,15 @@ chart <- function(out.solution, i){
   
   colnames(Table.Results) <- c("Cluster 1", "Cluster 2")
   
-  grDevices::windows()
+  windows()
   
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
-  grid.draw(tableGrob(Table.Results))
+  grid.draw(tableGrob(as.data.frame(Table.Results)))
   
   plotImage( paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
   
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
-  grid.draw( tableGrob(Table.Results) )
+  grid.draw( tableGrob(as.data.frame(Table.Results)) )
   dev.off()
 }
 
@@ -988,11 +1009,11 @@ DTree.type.opt <- function(){
   
   dataset      <- currentDataSet(analysis) 
   
-  output.opt0 <- optimizationResult(analysis) 
+  output.opt0 <- sampleDistribution(analysis) 
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ) )
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
-  num.access  <- as.numeric( svalue( numberOfAccessions(analysis) ) )
+  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions(analysis) ) )
   
   ## Read ranking importance 
   RI <- readProjectFile(  "RI" )  
@@ -1077,15 +1098,15 @@ DTree.type.opt <- function(){
     
     #step 1
     out.solution.tree <- list()
-    out.solution.tree[[1]] <- fcluster(dataset, mean.result, data.HighestStandardizedValues)
+    out.solution.tree[[1]] <- fcluster( dataset, mean.result, data.HighestStandardizedValues )
     chart(out.solution.tree[[1]],1) 
     
     ## Initialized values
     Decision <- NA
     solution <- character()
     
-    Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="ginput", icon="question")
-    Decision <- as.numeric(svalue(Decision))
+    Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="Decision Tree Clusters", icon="question")
+    Decision <- as.numeric(Decision)
     
     solution[1] <- as.character(out.solution.tree[[1]][Decision])
     items.choose <- c("Yes", "No")
@@ -1104,8 +1125,8 @@ DTree.type.opt <- function(){
       if(choose == "Yes"){
         chart(out.solution.tree[[w]],w) 
         Decision <- NA
-        Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="ginput", icon="question")
-        Decision <- as.numeric(svalue(Decision))
+        Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="Decision Tree Clusters", icon="question")
+        Decision <- as.numeric(Decision)
         solution[w] <- as.character(out.solution.tree[[w]][Decision])
       }else if(choose == "No"){break}
       
@@ -1123,7 +1144,7 @@ DTree.type.opt <- function(){
     
     dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
     
-    final.subset.DTree <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.DTree,]),]
+    final.subset.DTree <- dataFinal[is.element(dataFinal$accession, mean.result$accessions[nsol.DTree,]),]
     
     ##Selection of preferred set by Decision Tree 
     cat("\n")
@@ -1149,5 +1170,3 @@ DTree.type.opt <- function(){
   }
   
 }
-  
-

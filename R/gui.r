@@ -63,6 +63,7 @@ workbench <- function() {
   environment(deleteProjectFile)        <- session
   environment(readProjectFile)          <- session
   environment(plotImage)                <- session
+  environment(chart)                    <- session
   
   environment(result.path.exists)       <- session
   environment(result.path)              <- session
@@ -80,8 +81,8 @@ workbench <- function() {
   environment(descriptors.continuous)   <- session
   environment(descriptors.nominal)      <- session
   environment(correlation)              <- session
-  environment(f.optimization)           <- session
-  environment(optimization)             <- session
+  environment(generateSampleDistribution) <- session
+  environment(generateSample)           <- session
   
   environment(MAXVAR.type.opt)          <- session
   environment(PCA.type.opt)             <- session
@@ -151,7 +152,7 @@ workbench <- function() {
   
   resetAnalysis <- function(notebook) {
     # Reset the computational environment here
-    optimizationResult(analysis) <- list()
+    sampleDistribution(analysis) <- list()
     
     if(inputTraitsFiltered) {
       
@@ -243,7 +244,7 @@ workbench <- function() {
                 )
   
   lytg2[4,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
-  lytg2[4,3]    <- numberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
+  lytg2[4,3]    <- targetNumberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
   lytg2[4,4]    <- gbutton(
                       "Set",
                       container = lytg2, 
