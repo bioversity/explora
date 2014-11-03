@@ -25,7 +25,7 @@ setClass( "ExploraAnalysis",
             datasetCatalog               = "character",    # new way of tracking dataset names
             currentDataSet               = "data.frame",   # active dataset being analysed
 
-            targetNumberOfAccessions           = "guiComponent", # formerly num.access
+            targetNumberOfAccessions     = "guiComponent", # formerly num.access
             numberOfContinuousVariables  = "guiComponent", # formerly ncon
             numberOfCategoricalVariables = "guiComponent", # formerly ncat
             percentageOfSolutions        = "guiComponent", # formerly npercen
@@ -104,14 +104,7 @@ setGeneric("numberOfSolutions<-",            function(x,value) standardGeneric("
 setGeneric("numberOfFinalSolutions<-",       function(x,value) standardGeneric("numberOfFinalSolutions<-"))
 setGeneric("sampleDistribution<-",           function(x,value) standardGeneric("sampleDistribution<-"))
 
-setReplaceMethod(
-  "window",
-  "ExploraAnalysis", 
-  function(x,value) { 
-    x@window <- value
-    return(x)
-  }
-)
+
 setReplaceMethod(
   "datasetSelector",
   "ExploraAnalysis", 

@@ -978,7 +978,7 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
 #' @importFrom grid grid.text
 #' @importFrom grid gpar
 #' @importFrom grid grid.draw
-#' @importFrom gridExtra tableGrob
+#' @import gridExtra
 
 chart <- function(out.solution, i){
   
