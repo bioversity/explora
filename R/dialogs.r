@@ -80,8 +80,8 @@ DialogSelectThresholds <- function( win, notebook ){
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
 
-	min.values <- matrix(round(as.table(sapply(object.thresholds, min)),3), ncol = 1)
-	max.values <- matrix(round(as.table(sapply(object.thresholds, max)),3), ncol = 1)
+	min.values <- matrix(round(as.table(sapply( object.thresholds, min, na.rm=TRUE )),3), ncol = 1)
+	max.values <- matrix(round(as.table(sapply( object.thresholds, max, na.rm=TRUE )),3), ncol = 1)
 	
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
