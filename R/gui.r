@@ -70,7 +70,7 @@ workbench <- function() {
   environment(result.path.exists)       <- session
   
   environment(getTargetDataSet)         <- session
-  
+    
   environment(DialogSelectThresholds)   <- session
   environment(DialogSelectOptimization) <- session
   

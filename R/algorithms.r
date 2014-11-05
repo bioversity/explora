@@ -176,11 +176,11 @@ DialogSelectOptimization <- function( win, notebook ){
   
   lyt4 <- glayout(homogeneous = FALSE, container = notebook , spacing = 5, label="Optimization Procedure",expand = TRUE)
 
-  lyt4[1,1:25]  <- g4var <- gframe("Selection of Variables for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
+  lyt4[1,1:25]  <- g4var <- gframe("Selection of Objective Functions for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   
   lytg4var      <- glayout(homogeneous = FALSE,  container = g4var, spacing = 5, expand = TRUE)
   
-  lytg4var[1,1] <- glabel("Optimization Strategy for Continuous Variables: ",  container = lytg4var)
+  lytg4var[1,1] <- glabel("Continuous Variables: ",  container = lytg4var)
   lytg4var[2,1] <- glabel("Variable: ",  container = lytg4var)
   
   lytg4var[2,2] <- glabel("Objective function: ",  container = lytg4var)
@@ -206,7 +206,7 @@ DialogSelectOptimization <- function( win, notebook ){
   lytg4var[7,2] <- fvarop5c <- gdroplist(f.items.cont,  container = lytg4var)
   lytg4var[7,3] <- ri5c <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var)
   
-  lytg4var[8,1]  <- glabel("Optimization Strategy for Nominal Variables: ",  container = lytg4var)
+  lytg4var[8,1]  <- glabel("Nominal Variables: ",  container = lytg4var)
   lytg4var[9,1]  <- glabel("Variable: ",  container = lytg4var)
   lytg4var[9,2]  <- glabel("Objective function: ",  container = lytg4var)
   lytg4var[9,3]  <- glabel("Ranking of importance (1: Low ; 10: High):",  container = lytg4var)
@@ -241,88 +241,76 @@ DialogSelectOptimization <- function( win, notebook ){
       pcategory.v5 <<- as.numeric(DialogSelectCategory(names(table(dataset[colnames(dataset) == svalue(varop5n)]))))}})
   lytg4var[14,3] <- ri5n <- gspinbutton(from = 1, to = 10, by = 1, value = 0, container = lytg4var) 
 
-  lyt4[4,1:25]   <- g4opt <- gframe("Run Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
+  lyt4[4,1:25]   <- g4opt <- gframe("Analyze & Select Accessions", container = lyt4, expand = TRUE, horizontal = FALSE)
   lytg4opt       <- glayout(homogeneous = FALSE,  container = g4opt, spacing = 10, expand = TRUE)
   
   saveOptimizationVariableRankings <- function() {
     
       # RMB: BUG FIX, Sept 2, 2014: If varop?c is "NA", 
       # then the  ri?c weightings should be zero...
-      if( svalue(varop1c) != "NA") { ri1c <- svalue(ri1c) } else { ri1c <- 0 }
-      if( svalue(varop2c) != "NA") { ri2c <- svalue(ri2c) } else { ri2c <- 0 }
-      if( svalue(varop3c) != "NA") { ri3c <- svalue(ri3c) } else { ri3c <- 0 }
-      if( svalue(varop4c) != "NA") { ri4c <- svalue(ri4c) } else { ri4c <- 0 }
-      if( svalue(varop5c) != "NA") { ri5c <- svalue(ri5c) } else { ri5c <- 0 }
-      if( svalue(varop1n) != "NA") { ri1n <- svalue(ri1n) } else { ri1n <- 0 }
-      if( svalue(varop2n) != "NA") { ri2n <- svalue(ri2n) } else { ri2n <- 0 }
-      if( svalue(varop3n) != "NA") { ri3n <- svalue(ri3n) } else { ri3n <- 0 }
-      if( svalue(varop4n) != "NA") { ri4n <- svalue(ri4n) } else { ri4n <- 0 }
-      if( svalue(varop5n) != "NA") { ri5n <- svalue(ri5n) } else { ri5n <- 0 }
+      if( svalue(varop1c) != "NA") { rank1c <- svalue(ri1c) } else { rank1c <- 0 }
+      if( svalue(varop2c) != "NA") { rank2c <- svalue(ri2c) } else { rank2c <- 0 }
+      if( svalue(varop3c) != "NA") { rank3c <- svalue(ri3c) } else { rank3c <- 0 }
+      if( svalue(varop4c) != "NA") { rank4c <- svalue(ri4c) } else { rank4c <- 0 }
+      if( svalue(varop5c) != "NA") { rank5c <- svalue(ri5c) } else { rank5c <- 0 }
+      if( svalue(varop1n) != "NA") { rank1n <- svalue(ri1n) } else { rank1n <- 0 }
+      if( svalue(varop2n) != "NA") { rank2n <- svalue(ri2n) } else { rank2n <- 0 }
+      if( svalue(varop3n) != "NA") { rank3n <- svalue(ri3n) } else { rank3n <- 0 }
+      if( svalue(varop4n) != "NA") { rank4n <- svalue(ri4n) } else { rank4n <- 0 }
+      if( svalue(varop5n) != "NA") { rank5n <- svalue(ri5n) } else { rank5n <- 0 }
     
       RI <- matrix( 
-                    c( ri1c,  ri2c,  ri3c,  ri4c,  ri5c,
-                       ri1n,  ri2n,  ri3n,  ri4n,  ri5n ), 
+                    c( rank1c,  rank2c,  rank3c,  rank4c,  rank5c,
+                       rank1n,  rank2n,  rank3n,  rank4n,  rank5n ), 
                     ncol = 2
                    )
       
-      colnames(RI)<-c("ric", "rin")
-      
-      varop1c; varop2c; varop3c; varop4c; varop5c
-      fvarop1c; fvarop2c; fvarop3c; fvarop4c; fvarop5c
-      ri1c; ri2c; ri3c; ri4c; ri5c
-      varop1n; varop2n; varop3n; varop4n; varop5n
-      fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
-      ri1n; ri2n; ri3n; ri4n; ri5n
+      colnames(RI)<-c("Continuous Variable Weighting", "Nominal Variable Weighting")
       
       saveProjectFile( RI, "RI", row.names = FALSE )   
   }
   
-  lytg4opt[1,1:2] <- ( glabel( text = "Generate Sample Distribution before continuing:", container = lytg4opt))
-  lytg4opt[1,3:4] <- gbutton( "Generate Distribution",  
-                            container = lytg4opt,
-                            handler = function(h,...){
-                              
-                            sampleDistribution(analysis) <<- generateSampleDistribution(
-                                  varop1c, varop2c, varop3c, varop4c, varop5c,
-                                  fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
-                                  varop1n, varop2n, varop3n, varop4n, varop5n,
-                                  fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
-                                  pcategory.v1, pcategory.v2, pcategory.v3,
-                                  pcategory.v4,pcategory.v5
-                              )
-                              
-                              saveOptimizationVariableRankings()
-                              
-                              varop1c<<-svalue(varop1c);varop2c<<-svalue(varop2c);varop3c<<-svalue(varop3c);varop4c<<-svalue(varop4c);varop5c<<-svalue(varop5c);
-                              fvarop1c<<-svalue(fvarop1c);fvarop2c<<-svalue(fvarop2c);fvarop3c<<-svalue(fvarop3c);fvarop4c<<-svalue(fvarop4c);fvarop5c<<-svalue(fvarop5c);
-                              ri1c<<-svalue(ri1c);ri2c<<-svalue(ri2c);ri3c<<-svalue(ri3c);ri4c<<-svalue(ri4c);ri5c<<-svalue(ri5c);
-                              fvarop1n<<-svalue(fvarop1n);fvarop2n<<-svalue(fvarop2n);fvarop3n<<-svalue(fvarop3n);fvarop4n<<-svalue(fvarop4n);fvarop5n<<-svalue(fvarop5n);
-                              ri1n<<-svalue(ri1n);ri2n<<-svalue(ri2n);ri3n<<-svalue(ri3n);ri4n<<-svalue(ri4n);ri5n<<-svalue(ri5n)
-                              
-                              lytg4opt[1,5] <- ( glabel( text = " *** DONE! *** ", container = lytg4opt))
-                              
-                            })
-
-  lytg4opt[1,5]   <- ( glabel( text = "               ", container = lytg4opt))
+  getSampleDistribution <<- function(analysis) {
+    
+    distribution <- sampleDistribution(analysis)
+    
+    if( !length(distribution) ) {
+      
+      # distribution is empty - need to generate first to return it!
+      distribution <- sampleDistribution(analysis) <<- generateSampleDistribution(
+        varop1c, varop2c, varop3c, varop4c, varop5c,
+        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
+        varop1n, varop2n, varop3n, varop4n, varop5n,
+        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
+        pcategory.v1, pcategory.v2, pcategory.v3,
+        pcategory.v4,pcategory.v5
+      )
+      
+      saveOptimizationVariableRankings()
+      
+    }
+    
+    return( distribution )
+  }
   
-  lytg4opt[2,1]   <- glabel("Select Preferred Optimization Algorithm: ",  container = lytg4opt, horizontal = FALSE)
+  lytg4opt[1,1]   <- glabel("Select Analysis Algorithm: ",  container = lytg4opt, horizontal = FALSE)
   
   items.option <- c(
     " ", 
-    "Maximum variation", 
-    "Principal components",
-    "Weighted sum model",
-    "Decision tree"
+    "Maximum Variation", 
+    "Principal Components",
+    "Weighted Sum Model",
+    "Decision Tree"
   )
   
-  lytg4opt[2,2] <- option.preferred <- gdroplist(items.option,  container = lytg4opt)
-  lytg4opt[2,3] <- btn <- gbutton("Run",  container = lytg4opt)
+  lytg4opt[1,2] <- option.preferred <- gdroplist(items.option,  container = lytg4opt)
+  lytg4opt[1,3] <- btn <- gbutton("Run",  container = lytg4opt)
   
   addHandlerChanged(btn, handler <- function(h,...){
-    if(svalue(option.preferred) == "Maximum variation")   { MAXVAR.type.opt()}
-    if(svalue(option.preferred) == "Principal components"){ PCA.type.opt()}
-    if(svalue(option.preferred) == "Weighted sum model")  { WSM.type.opt()}
-    if(svalue(option.preferred) == "Decision tree")       { DTree.type.opt()}
+    if(svalue(option.preferred) == "Maximum Variation")   { MAXVAR.type.opt()}
+    if(svalue(option.preferred) == "Principal Components"){ PCA.type.opt()}
+    if(svalue(option.preferred) == "Weighted Sum Model")  { WSM.type.opt()}
+    if(svalue(option.preferred) == "Decision Tree")       { DTree.type.opt()}
   })
   
   visible(win) <- TRUE
@@ -441,12 +429,8 @@ generateSample <- function( data, option1, option2 ){
     }
   }  
   
-  
-  
   output <- list(c(val.var.func.con, val.var.func.nom),subset0,
                  "names" = c(name.var.func.con, name.var.func.nom))
-  
-  
   return(output)
   
 } 
@@ -528,7 +512,7 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
   ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
   for(j in 1:nsoln){
     output.opt0[[j]] <- generateSample( data.thresholds, option.objective.con, option.objective.nom )
-    setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "Preparing for analysis: % complete"))
+    setWinProgressBar(ProgressBar, j, title=paste( "Preparing for analysis:",round(j/nsoln*100, 0),"% complete"))
   }
   close(ProgressBar)
   
@@ -540,7 +524,7 @@ MAXVAR.type.opt <- function(){
   
   dataset      <- currentDataSet(analysis)
   
-  output.opt0  <- sampleDistribution(analysis)
+  output.opt0  <- getSampleDistribution(analysis)
   
   nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
@@ -608,7 +592,7 @@ MAXVAR.type.opt <- function(){
     variance[i,]<-cbind(c[i,1], c[i,2],sum(apply(rbind(result.scale[is.element(result.scale[,1],c[i,1]),-1],
                                                        result.scale[is.element(result.scale[,1],c[i,2]),-1]),2,var)))
     
-    setWinProgressBar(ProgressBar, i, title=paste(round(i/(dim(c)[1])*100, 0), "Computing pairwise variance of solutions: % complete"))
+    setWinProgressBar(ProgressBar, i, title=paste("Computing pairwise variance of solutions:",round(i/(dim(c)[1])*100, 0), "% complete"))
   }  
   
   close(ProgressBar)
@@ -649,7 +633,7 @@ PCA.type.opt <- function() {
   
   dataset     <- currentDataSet(analysis)
   
-  output.opt0 <- sampleDistribution(analysis)
+  output.opt0 <- getSampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
@@ -789,7 +773,7 @@ WSM.type.opt <- function(){
   
   dataset     <- currentDataSet(analysis)
   
-  output.opt0 <- sampleDistribution(analysis)
+  output.opt0 <- getSampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
@@ -1001,7 +985,7 @@ DTree.type.opt <- function(){
   
   dataset     <- currentDataSet(analysis) 
   
-  output.opt0 <- sampleDistribution(analysis) 
+  output.opt0 <- getSampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ) )
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
