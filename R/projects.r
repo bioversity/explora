@@ -23,6 +23,7 @@ setClass( "ExploraAnalysis",
             
             datasetSelector              = "gCombobox",    # formerly nom_data (abbreviated Spanglish for "nombre de datos"?)
             datasetCatalog               = "character",    # new way of tracking dataset names
+            dataAnalysisTag              = "guiComponent", # character label with which to tag a agiven analysis run
             currentDataSet               = "data.frame",   # active dataset being analysed
 
             targetNumberOfAccessions     = "guiComponent", # formerly num.access
@@ -41,11 +42,12 @@ setClass( "ExploraAnalysis",
 
 setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
 setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
+setGeneric("dataAnalysisTag",              function(x) standardGeneric("dataAnalysisTag"))
 setGeneric("currentDataSet",               function(x) standardGeneric("currentDataSet"))
 setGeneric("currentProjectName",           function(x) standardGeneric("currentProjectName"))
 setGeneric("currentProjectFolder",         function(x) standardGeneric("currentProjectFolder"))
 
-setGeneric("targetNumberOfAccessions",           function(x) standardGeneric("targetNumberOfAccessions"))
+setGeneric("targetNumberOfAccessions",     function(x) standardGeneric("targetNumberOfAccessions"))
 setGeneric("numberOfContinuousVariables",  function(x) standardGeneric("numberOfContinuousVariables"))
 setGeneric("numberOfCategoricalVariables", function(x) standardGeneric("numberOfCategoricalVariables"))
 setGeneric("percentageOfSolutions",        function(x) standardGeneric("percentageOfSolutions"))
@@ -55,6 +57,7 @@ setGeneric("sampleDistribution",           function(x) standardGeneric("sampleDi
 
 setMethod("datasetSelector",              "ExploraAnalysis",function(x) x@datasetSelector )
 setMethod("datasetCatalog",               "ExploraAnalysis",function(x) x@datasetCatalog )
+setMethod("dataAnalysisTag",              "ExploraAnalysis",function(x) x@dataAnalysisTag )
 setMethod("currentDataSet",               "ExploraAnalysis",function(x) x@currentDataSet )
 
 setMethod(  "currentProjectName",  
@@ -93,6 +96,7 @@ setMethod("sampleDistribution",           "ExploraAnalysis", function(x) x@sampl
 
 setGeneric("datasetSelector<-",              function(x,value) standardGeneric("datasetSelector<-"))
 setGeneric("datasetCatalog<-",               function(x,value) standardGeneric("datasetCatalog<-"))
+setGeneric("dataAnalysisTag<-",              function(x,value) standardGeneric("dataAnalysisTag<-"))
 setGeneric("addDataset<-",                   function(x,value) standardGeneric("addDataset<-"))
 setGeneric("currentDataSet<-",               function(x,value) standardGeneric("currentDataSet<-"))
 
@@ -113,11 +117,21 @@ setReplaceMethod(
     return(x)
   }
 )
+
 setReplaceMethod(
   "datasetCatalog",
   "ExploraAnalysis",
   function(x,value) { 
     x@datasetCatalog <- sub("\\.explora","",as.character(value)) 
+    return(x)
+  }
+)
+
+setReplaceMethod(
+  "dataAnalysisTag",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@dataAnalysisTag <- value
     return(x)
   }
 )
@@ -235,13 +249,13 @@ createProject <- function(){
   names(dataset)[1] <- "accession"
 	
   projectFolder = file.path( getwd(),paste(dataset_name,".explora",sep="") )
-  print(paste("Creating project directory: ", projectFolder))
   
-  ifelse( 
-      file.exists(projectFolder)=="FALSE", 
-      dir.create(projectFolder,recursive=TRUE), 
-      paste("Project folder '",projectFolder,"' already exists?") 
-  )
+  if( !file.exists(projectFolder) ) {
+      print(paste("Creating project folder: ", projectFolder))
+      dir.create(projectFolder,recursive=TRUE)
+  } else {
+      print(paste("Project folder '",projectFolder,"' already exists... no need to recreate?"))
+  }
   
 	write.csv(dataset, file = file.path( projectFolder, paste(dataset_name,".csv", sep = "")), row.names = FALSE)
 
@@ -263,18 +277,48 @@ getProjects <- function() {
 }
 
 #
-# The result.path function builds a valid project file path, if it can
+# The result.folder function returns the current analysis result folder
+# which is constructed in the project folder based on the current dataAnalysisTag
+# TODO: should this value be cached in the ExploraAnalysis class as well rather than computed each time?
 #
-result.path <- function( filename, filext ) {
+result.folder <- function() {
   
   projectFolder <- currentProjectFolder(analysis)
   
-  if( nchar(projectFolder)>0 & 
-      file.exists(projectFolder) & 
+  # retrieve the current value of the data analysis tag widget
+  dataTag  <- as.character( svalue( dataAnalysisTag(analysis) ) )
+  
+  if( !is.na( dataTag ) ) {
+    
+    resultFolder = file.path( projectFolder, paste( "Analysis_", dataTag, sep="" ) )
+    
+    if( !file.exists(resultFolder) ) {
+      print( paste( "Creating analysis results folder: ", resultFolder ))
+      dir.create( resultFolder,recursive=TRUE )
+    }
+
+  } else {
+    # no dataAnalysisTag declared, 
+    # so just save data in the root project folder?
+    resultFolder <- projectFolder
+  }
+
+  return(resultFolder)
+}
+
+#
+# The result.path function builds a valid project result file path, if it can
+#
+result.path <- function( filename, filext ) {
+  
+  resultFolder <- result.folder()
+  
+  if( nchar(resultFolder)>0 & 
+      file.exists(resultFolder) & 
       nchar(filename)>0 
   ) {
     
-    path = file.path( projectFolder, paste( filename, ".", filext, sep="") )
+    path = file.path( resultFolder, paste( filename, ".", filext, sep="") )
     return(path) 
   }
   
@@ -332,7 +376,7 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 # to be set to valid values here(?). A simple
 # sanity check made to test this assumption
 #
-saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) {
+saveProjectFile <- function( results, filename, row.names = TRUE, alert = FALSE) {
   
   if( is.table(results) | is.data.frame(results) | is.matrix(results) ) {
     
@@ -340,10 +384,8 @@ saveProjectFile <- function( results, filename, row.names = TRUE, alert = TRUE) 
     
     if( !is.na(path) ) {
       
-      projectName <- currentProjectName(analysis)
-      
       if(alert) { 
-        DialogBox( paste("'", filename,"' data file published\nin project folder '", projectName,"'") )
+        DialogBox( paste("Data published to file\n'", filename,"'") )
       }
       
       write.csv( results, file = path, row.names = row.names)
@@ -368,7 +410,7 @@ deleteProjectFile <- function( filename ) {
 #
 # opens up a PNG device to the specified file
 #
-plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
+plotImage <- function( filename, width = 2000, height = 1000, res = NA, alert = FALSE ) {
   
   path <- result.path( filename, "png" )
   
@@ -376,7 +418,9 @@ plotImage <- function( filename, width = 2000, height = 1000, res = NA ) {
     
     projectName <- currentProjectName(analysis)
     
-    DialogBox( paste("'", filename,"'\n data image published to project folder '", projectName,"'") )
+    if( alert ) {
+      DialogBox( paste("'", filename,"'\n data image published to project folder '", projectName,"'") )
+    }
     
     png(path, width = width, height = height, res = res)
     

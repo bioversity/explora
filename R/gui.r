@@ -65,8 +65,9 @@ workbench <- function() {
   environment(plotImage)                <- session
   environment(chart)                    <- session
   
-  environment(result.path.exists)       <- session
+  environment(result.folder)            <- session
   environment(result.path)              <- session
+  environment(result.path.exists)       <- session
   
   environment(getTargetDataSet)         <- session
   
@@ -142,8 +143,8 @@ workbench <- function() {
   
   lytg1[4,1:5] <- glabel( text = " ", container = lytg1)
   
-  lytg1[9,1]   <- glabel("Select Active Project for Analysis:", container = lytg1)
-  lytg1[9,2]   <- glabel( text = "", container = lytg1)
+  lytg1[5,1]   <- glabel("Select Active Project for Analysis:", container = lytg1)
+  lytg1[5,2]   <- glabel( text = "", container = lytg1)
   
   ## these flags control the analysis parameter pages
   
@@ -151,6 +152,7 @@ workbench <- function() {
   optimizationTargetsSpecified <- FALSE
   
   resetAnalysis <- function(notebook) {
+    
     # Reset the computational environment here
     sampleDistribution(analysis) <- list()
     
@@ -181,13 +183,17 @@ workbench <- function() {
       
     }
     
+    # update the data analysis tag with a fresh time stamp?
+    svalue(dataAnalysisTag(session$analysis)) <- format(Sys.time(), "%H-%M-%S_%d-%m-%Y")
+    
     svalue(notebook) <- 3
     
   }
-  environment(resetAnalysis)            <- session
+  
+  environment(resetAnalysis) <- session
   
   
-  lytg1[9,3]   <- datasetSelector(session$analysis) <- gdroplist( 
+  lytg1[5,3]   <- datasetSelector(session$analysis) <- gdroplist( 
                     datasetCatalog(session$analysis), 
                     selected = 0,  
                     container = lytg1, 
@@ -209,52 +215,59 @@ workbench <- function() {
                     }
                   )
   
-	
   ##########################
   ##Analysis Parameters    #
   ##########################
   lyt2         <- glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Analysis Parameters", expand = TRUE)
 	lyt2[1,1:6]  <- g2 <- gframe("Analysis Parameters and Data Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) 
-	lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE) 
+	lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE)
   
-	lytg2[1,1:2] <- glabel("Number of Continuous Variables (CV): ",  container = lytg2)
-	lytg2[1,3]   <- numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lytg2, width = 10, initial.msg="" ) 
-  lytg2[1,4]   <- gbutton(
+  lytg2[1,1]   <- glabel("Data Analysis Tag: ", container = lytg2)
+  lytg2[1,3]   <- dataAnalysisTag(session$analysis) <- gedit( 
+                    format(Sys.time(), "%H-%M-%S_%d-%m-%Y"), 
+                    container = lytg2, 
+                    width = 20, 
+                    initial.msg=""
+                  )
+  
+	lytg2[2,1:2] <- glabel("Number of Continuous Variables (CV): ",  container = lytg2)
+	lytg2[2,3]   <- numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lytg2, width = 10, initial.msg="" ) 
+  lytg2[2,4]   <- gbutton(
                     "Run CV Analysis",
                     container = lytg2, 
                     handler=function(h,...){ print( descriptors.continuous() )
                   }
                 )
   
-	lytg2[2,1:2] <- glabel("Number of Nominal Variables (NV): ", container = lytg2)
-  lytg2[2,3]   <- numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lytg2, width = 10, initial.msg="" )
-  lytg2[2,4]   <- gbutton(
+	lytg2[3,1:2] <- glabel("Number of Nominal Variables (NV): ", container = lytg2)
+  lytg2[3,3]   <- numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lytg2, width = 10, initial.msg="" )
+  lytg2[3,4]   <- gbutton(
                     "Run NV Analysis",
                     container = lytg2, 
                     handler=function(h,...){ print( descriptors.nominal() )
                   }
                 )
 	
-  lytg2[3,1:2] <- glabel("Specify Coefficient of Correlation (CC):", container=lytg2)
-  lytg2[3,3]   <- ncor <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)
-  lytg2[3,4]   <- gbutton(
+  lytg2[4,1:2] <- glabel("Specify Coefficient of Correlation (CC):", container=lytg2)
+  lytg2[4,3]   <- ncor <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)
+  lytg2[4,4]   <- gbutton(
                   "Run CC Analysis",
                   container = lytg2,
                   handler=function(h,...){ print( correlation() ) }
                 )
   
-  lytg2[4,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
-  lytg2[4,3]    <- targetNumberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
-  lytg2[4,4]    <- gbutton(
+  lytg2[5,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
+  lytg2[5,3]    <- targetNumberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
+  lytg2[5,4]    <- gbutton(
                       "Set",
                       container = lytg2, 
                       expand=FALSE,
-    			            handler = function(h,...){ print(number.access()) }
+    			            handler = function(h,...){ print( number.access() ) }
                     )
   
-  lytg2[5,1:2] <- glabel("Specify Target Number of Solutions: ",  container = lytg2)
-  lytg2[5,3]   <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg2)
-  lytg2[5,4]   <- gbutton( 
+  lytg2[6,1:2] <- glabel("Specify Target Number of Solutions: ",  container = lytg2)
+  lytg2[6,3]   <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg2)
+  lytg2[6,4]   <- gbutton( 
                     "Set",  
                     container = lytg2, 
                     expand=FALSE, 
@@ -263,18 +276,18 @@ workbench <- function() {
                     }
                   )
   
-  lytg2[6,1:2] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg2)
-  lytg2[6,3]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg2)
-  lytg2[6,4]   <- gbutton(
+  lytg2[7,1:2] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg2)
+  lytg2[7,3]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg2)
+  lytg2[7,4]   <- gbutton(
                       "Set",
                       container = lytg2,
                       expand = FALSE,
                       handler = function(h,...){ print( number.percent() )} 
                  )
   
-  lytg2[7,1:2] <- glabel("Enter the number of final solutions\nfor the Maximum Variation or the\nNumber of Principal Components:",  container = lytg2)
-  lytg2[7,3]   <- numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg2)
-  lytg2[7,4]   <- gbutton(
+  lytg2[8,1:2] <- glabel("Enter the number of final solutions:",  container = lytg2)
+  lytg2[8,3]   <- numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg2)
+  lytg2[8,4]   <- gbutton(
                     "Set",
                     container = lytg2,
                     expand = FALSE,
@@ -322,7 +335,7 @@ workbench <- function() {
       )
   }
 
-  lytg2[8,1]   <- gbutton(
+  lytg2[9,1]   <- gbutton(
     "Filter Traits Inputs ... (Default: Use all data)",
     container = lytg2,
     handler   =  traitFilterPageHandler( win, nb )
@@ -368,7 +381,7 @@ workbench <- function() {
     )
   }
  
-  lytg2[8,3]   <- gbutton(
+  lytg2[9,3]   <- gbutton(
     "Specify Optimization Variables ...",
     container = lytg2,
     handler =  optimizationTargetsPageHandler( win, nb  )

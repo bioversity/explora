@@ -233,8 +233,8 @@ DialogSelectThresholds <- function( win, notebook ){
   	        d.thresholds = as.table(d.thresholds)
   	        names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
   	        
-  	        saveProjectFile( d.thresholds,                "ResultsDescriptiveAnalysisThresholds" )   	
-  	        saveProjectFile( thresholdFilteredDataSubset, "ThresholdFilteredDataSubset", row.names = FALSE, alert = FALSE )   	
+  	        saveProjectFile( d.thresholds, "ResultsDescriptiveAnalysisThresholds" )   	
+  	        saveProjectFile( thresholdFilteredDataSubset, "ThresholdFilteredDataSubset", row.names = FALSE )   	
   	        
   	        print(d.thresholds)
   	        

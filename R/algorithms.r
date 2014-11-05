@@ -129,7 +129,11 @@ correlation <- function(){
     
     correlation.ncor <- subset(correlation, abs(correlation$Correlation)>=ncor)
     
-    saveProjectFile( correlation.ncor,  paste("ResultsCorrelationAnalysisLevel",ncor,sep=""), row.names = FALSE )     
+    saveProjectFile( 
+      correlation.ncor,
+      paste("ResultsCorrelationAnalysisLevel",ncor,sep=""),
+      row.names = FALSE
+    )     
     
     cat("\n")
     cat("\n")
@@ -270,7 +274,7 @@ DialogSelectOptimization <- function( win, notebook ){
       fvarop1n; fvarop2n; fvarop3n; fvarop4n; fvarop5n
       ri1n; ri2n; ri3n; ri4n; ri5n
       
-      saveProjectFile( RI, "RI", row.names = FALSE, alert = FALSE )   
+      saveProjectFile( RI, "RI", row.names = FALSE )   
   }
   
   lytg4opt[1,1:2] <- ( glabel( text = "Generate Sample Distribution before continuing:", container = lytg4opt))
@@ -278,7 +282,7 @@ DialogSelectOptimization <- function( win, notebook ){
                             container = lytg4opt,
                             handler = function(h,...){
                               
-                              sampleDistribution(analysis) <<- generateSampleDistribution(
+                            sampleDistribution(analysis) <<- generateSampleDistribution(
                                   varop1c, varop2c, varop3c, varop4c, varop5c,
                                   fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
                                   varop1n, varop2n, varop3n, varop4n, varop5n,
@@ -524,7 +528,7 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
   ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
   for(j in 1:nsoln){
     output.opt0[[j]] <- generateSample( data.thresholds, option.objective.con, option.objective.nom )
-    setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "% progress"))
+    setWinProgressBar(ProgressBar, j, title=paste(round(j/nsoln*100, 0), "Preparing for analysis: % complete"))
   }
   close(ProgressBar)
   
@@ -534,10 +538,10 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
 
 MAXVAR.type.opt <- function(){
   
+  dataset      <- currentDataSet(analysis)
+  
   output.opt0  <- sampleDistribution(analysis)
   
-  dataset      <- currentDataSet(analysis) 
-
   nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   
@@ -573,7 +577,6 @@ MAXVAR.type.opt <- function(){
   
   saveProjectFile( 
     result.mean.accessions, 
-    
     paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
   )     
   
@@ -605,7 +608,7 @@ MAXVAR.type.opt <- function(){
     variance[i,]<-cbind(c[i,1], c[i,2],sum(apply(rbind(result.scale[is.element(result.scale[,1],c[i,1]),-1],
                                                        result.scale[is.element(result.scale[,1],c[i,2]),-1]),2,var)))
     
-    setWinProgressBar(ProgressBar, i, title=paste(round(i/(dim(c)[1])*100, 0), "% progress"))
+    setWinProgressBar(ProgressBar, i, title=paste(round(i/(dim(c)[1])*100, 0), "Computing pairwise variance of solutions: % complete"))
   }  
   
   close(ProgressBar)
@@ -632,9 +635,8 @@ MAXVAR.type.opt <- function(){
   
   saveProjectFile( 
     final.subset.max.var, 
-    
     paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
-    row.names = FALSE 
+    row.names = FALSE, alert = TRUE  
   )     
   
 }
@@ -645,13 +647,13 @@ MAXVAR.type.opt <- function(){
 
 PCA.type.opt <- function() {
   
+  dataset     <- currentDataSet(analysis)
+  
   output.opt0 <- sampleDistribution(analysis)
   
   nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
   npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
   nfinal      <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
-  
-  dataset   <- currentDataSet(analysis)
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -749,15 +751,6 @@ PCA.type.opt <- function() {
       print(as.numeric(label.row))
     }
     
-    ## Progress bar for choose soluction
-    progress <- 10
-    ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = progress, width = 500)
-    for(i in 1:progress){
-      Sys.sleep(0.5)
-      setWinProgressBar(ProgressBar, i, title = paste(round(i/progress*100, 0), "% progress"))
-    }  
-    close(ProgressBar)
-    
     nsol.pca <- DialogSelectSolution(label.row)
     nsol.pca <-  as.numeric(nsol.pca)
     
@@ -781,9 +774,8 @@ PCA.type.opt <- function() {
     
     saveProjectFile( 
       final.subset.pca, 
-      
       paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
-      row.names = FALSE
+      row.names = FALSE, alert = TRUE 
     )     
     
     cat("\n")
@@ -795,7 +787,7 @@ PCA.type.opt <- function() {
 
 WSM.type.opt <- function(){
   
-  dataset      <- currentDataSet(analysis)
+  dataset     <- currentDataSet(analysis)
   
   output.opt0 <- sampleDistribution(analysis)
   
@@ -892,7 +884,6 @@ WSM.type.opt <- function(){
   
   saveProjectFile( 
     result.scale, 
-    
     "HighestStandardizedValuesOfSubset_WSM",
     row.names = FALSE
   )     
@@ -933,9 +924,8 @@ WSM.type.opt <- function(){
   
   saveProjectFile( 
     final.subset.wsm, 
-    
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
-    row.names = FALSE
+    row.names = FALSE, alert = TRUE 
   ) 
   
   cat("\n")
@@ -982,6 +972,8 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
 
 chart <- function(out.solution, i){
   
+  require(gridExtra)
+  
   Table.Results <- as.data.frame(cbind(round(apply(out.solution$Data.cluster.sol1[,-1],2,median),2),
                                        round(apply(out.solution$Data.cluster.sol2[,-1],2,median),2)))
   
@@ -1007,7 +999,7 @@ chart <- function(out.solution, i){
 
 DTree.type.opt <- function(){
   
-  dataset      <- currentDataSet(analysis) 
+  dataset     <- currentDataSet(analysis) 
   
   output.opt0 <- sampleDistribution(analysis) 
   
@@ -1160,7 +1152,7 @@ DTree.type.opt <- function(){
     saveProjectFile( 
       final.subset.DTree,
       paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
-      row.names = FALSE
+      row.names = FALSE, alert = TRUE 
     ) 
     
     cat("\n")
