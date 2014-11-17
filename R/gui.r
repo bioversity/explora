@@ -74,6 +74,7 @@ workbench <- function() {
   environment(DialogSelectThresholds)   <- session
   environment(DialogSelectOptimization) <- session
   
+  environment(check.parameters)         <- session
   environment(number.access)            <- session
   environment(number.solutions)         <- session
   environment(number.final)             <- session
@@ -91,7 +92,7 @@ workbench <- function() {
   environment(DTree.type.opt)           <- session 
   
 	## Principal window
-	win <- gwindow("Explora Germplasm Selection Tool", visible = F , width = 500, height = 300)
+	win <- gwindow("Explora Germplasm Selection Tool", visible = FALSE , width = 500, height = 300)
   
   datasetCatalog(session$analysis) <- getProjects() 
   
@@ -258,41 +259,48 @@ workbench <- function() {
   
   lytg2[5,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
   lytg2[5,3]    <- targetNumberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
-  lytg2[5,4]    <- gbutton(
-                      "Set",
-                      container = lytg2, 
-                      expand=FALSE,
-    			            handler = function(h,...){ print( number.access() ) }
-                    )
+  #lytg2[5,4]    <- gbutton(
+  #                    "Set",
+  #                    container = lytg2, 
+  #                    expand=FALSE,
+  #  			            handler = function(h,...){ print( number.access() ) }
+  #                  )
   
   lytg2[6,1:2] <- glabel("Specify Target Number of Solutions: ",  container = lytg2)
   lytg2[6,3]   <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg2)
-  lytg2[6,4]   <- gbutton( 
-                    "Set",  
-                    container = lytg2, 
-                    expand=FALSE, 
-                    handler = function(h,...){ 
-                      print( number.solutions() )
-                    }
+  #lytg2[6,4]   <- gbutton( 
+  #                  "Set",  
+  #                  container = lytg2, 
+  #                  expand=FALSE, 
+  #                  handler = function(h,...){ 
+  #                    print( number.solutions() )
+  #                  }
+  #                )
+
+  lytg2[6,4]   <- gbutton(
+                    "Check Parameters",
+                    container = lytg2,
+                    expand = FALSE,
+                    handler = function(h,...){ check.parameters() }
                   )
   
   lytg2[7,1:2] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg2)
   lytg2[7,3]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg2)
-  lytg2[7,4]   <- gbutton(
-                      "Set",
-                      container = lytg2,
-                      expand = FALSE,
-                      handler = function(h,...){ print( number.percent() )} 
-                 )
+  #lytg2[7,4]   <- gbutton(
+  #                    "Set",
+  #                    container = lytg2,
+  #                    expand = FALSE,
+  #                    handler = function(h,...){ print( number.percent() )} 
+  #               )
   
   lytg2[8,1:2] <- glabel("Enter the number of final solutions:",  container = lytg2)
   lytg2[8,3]   <- numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg2)
-  lytg2[8,4]   <- gbutton(
-                    "Set",
-                    container = lytg2,
-                    expand = FALSE,
-                    handler = function(h,...){ print( number.final() ) }
-                  )
+  #lytg2[8,4]   <- gbutton(
+  #                  "Set",
+  #                  container = lytg2,
+  #                  expand = FALSE,
+  #                  handler = function(h,...){ print( number.final() )}
+  #                )
   
   #############################
   ##Filter Input Trait Values #

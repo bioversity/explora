@@ -264,6 +264,73 @@ DialogSelectThresholds <- function( win, notebook ){
 	
 }
 
+check.parameters <- function(...){
+  
+   error <- FALSE
+   
+   object <- currentDataSet(analysis)
+   
+   ## Selection of number of accessions in final set 
+   desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
+   
+   availableNumberOfAccessions <- as.integer(dim(object)[1])
+   
+   if(  desiredNumberOfAccessions <= 0 | 
+          desiredNumberOfAccessions > availableNumberOfAccessions 
+   ){
+     error <- TRUE
+     DialogBox(paste("Invalid number of accessions.\n",
+             "Target number must lie within the range of 1 to",
+             as.character(availableNumberOfAccessions),
+             sep=" ")
+     )
+     svalue( targetNumberOfAccessions(analysis) ) <- 10  # default back to 10
+  }
+  
+  nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  
+  if( nsoln < 0 | nsoln > 1000000){ 
+    error <- TRUE
+    DialogBox(paste("Invalid target number of solutions to screen.\n",
+              "Target number must lie within the range of 1 and 1000000")
+    )
+    svalue( numberOfSolutions(analysis)) <- 10000 # default back to 10000
+  }
+  
+  ## Selected number of final accessions
+  nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
+  
+  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
+    availableData <- readProjectFile( "ThresholdFilteredDataSubset" )
+  } else {
+    availableData <- object
+  } 
+  
+  availableNumberOfAccessions <- nrow(availableData)
+  if( nfinal <0 | nfinal > availableNumberOfAccessions){
+    error <- TRUE
+    DialogBox(paste(
+        "Invalid number of final solutions.\n",
+        "Target number must lie within the range of 1 to",
+        as.character(availableNumberOfAccessions),".",
+        sep=" ")
+    )
+    svalue( numberOfFinalSolutions(session$analysis) ) <- availableNumberOfAccessions 
+  }
+  
+  npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
+  if( npercent < 1 | npercent > 100){
+    error <- TRUE
+    DialogBox("Error: percentage of solutions out of valid range [1..100]")
+    svalue( percentageOfSolutions(analysis) ) <- 1 # default back to 1
+  }
+  
+  if(!error) {
+    DialogBox("Parameters are valid :-)")
+  }
+  
+}
+
 ## Function for selection of number of accessions in final set 
 number.access <- function(...){
   
@@ -303,7 +370,7 @@ number.solutions <- function(h,...) {
   return(nsoln) 
 }
 
-## Function to selected number of final accessions
+## Function to set selected number of final accessions
 number.final <- function(h,...){
     
   object <- currentDataSet(analysis)
@@ -341,7 +408,7 @@ number.percent <- function(h,...){
   npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
   if( npercent > 0 & npercent <= 100){
     DialogBox(paste("Target percentage of solutions is: ", npercent, "%", sep=" "))
-  } else {DialogBox("Error in the percentage of solutions")}
+  } else {DialogBox("Error: percentage of solutions out of valid range [0..100]")}
   return(npercent) 
   
 }
