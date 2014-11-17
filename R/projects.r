@@ -227,7 +227,7 @@ setReplaceMethod(
 )
 
 
-## This function used to load csv files
+## This function used to load csv files and create a project
 createProject <- function(){
   
   data_file_name <- gfile(text="",filter = list("csv data files" = list(patterns = c("*.csv"))))
@@ -247,7 +247,31 @@ createProject <- function(){
   # for example, analysis and remapping of trait column headers (to point to Crop Ontology?)
   # For now, simply relabel the first column name from "ID" to "accession"
   names(dataset)[1] <- "accession"
-	
+  
+  # Before resaving, (silently?) remove any columns and rows for which ALL data is NA (missing) 
+  # (believe it or not, some datasets have this strange problem!)
+  dataset  <- as.matrix(dataset)
+  
+  # First, check for columns with completely missing data
+  ColNA    <- apply(apply(dataset,2,is.na),2,all)
+  if(!all(!ColNA)) {
+    # warn the user that some data columns are completely missing data
+    DialogBox("Some trait data column(s) found missing all data? Skipped...")
+  }
+  dataset  <- dataset[,!ColNA]
+  
+  # Then, check for rows with completely missing data 
+  # (ignoring values in the accession id column)
+  RowNA    <- apply(apply(dataset[,-1],2,is.na),1,all)
+  if(!all(!RowNA)) {
+    # warn the user that some data rows are completely missing data
+    DialogBox("Some trait data rows found missing all data? Skipped...")
+  }
+  dataset <- dataset[!RowNA,]
+  
+  # restore the dataset as a data.frame before saving
+  dataset  <- data.frame(dataset)
+  
   projectFolder = file.path( getwd(),paste(dataset_name,".explora",sep="") )
   
   if( !file.exists(projectFolder) ) {
