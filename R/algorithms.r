@@ -10,6 +10,23 @@
 library(grid)
 library(gridExtra)
 
+#
+# The Amelia package helps impute missing data
+#
+#' @import Amelia
+impute.missing.data <- function() {
+  
+  dataset <- currentDataSet(analysis)
+  
+  if(any(is.na(dataset))) {
+      a.out <- amelia(x=dataset,m=1,idvars=c("accession"))  # exclude the accession ID from consideration
+      summary(a.out)
+      #plot(a.out)
+      dataset <- a.out["imputations"][1]
+      currentDataSet(analysis)<- as.data.frame(dataset) # updated data set?
+  }
+}
+
 ########################################################################
 # Note: I'm not sure how the previously included "cluster" package for 
 # Cluster Analysis Extended Rousseeuw et al. is being used in Explora

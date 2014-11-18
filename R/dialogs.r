@@ -29,12 +29,12 @@
 
 #' @import gWidgetstcltk
 
-DialogBoxDTree <- function(items) {## This function make a dialog box
+DialogBoxDTree <- function(items,question="") {## This function make a dialog box
 	
 	out <- ""
 	w <-  gbasicdialog("", handler = function(h,...){out <<- svalue(txt)})
 	
-	glabel("Do you want to continue?",  container = w)
+	glabel(paste(question,"Do you want to continue?",sep=""),  container = w)
 	glabel(" ",  container = w)
 	txt <- gradio(items,  container = w)
 	visible(w, set = TRUE)
@@ -368,12 +368,12 @@ check.parameters <- function(...){
   
    error <- FALSE
    
-   object <- currentDataSet(analysis)
+   dataset <- currentDataSet(analysis)
    
    ## Selection of number of accessions in final set 
    desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
    
-   availableNumberOfAccessions <- as.integer(dim(object)[1])
+   availableNumberOfAccessions <- as.integer(dim(dataset)[1])
    
    if(  desiredNumberOfAccessions <= 0 | 
           desiredNumberOfAccessions > availableNumberOfAccessions 
@@ -403,7 +403,7 @@ check.parameters <- function(...){
   if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
     availableData <- readProjectFile( "ThresholdFilteredDataSubset" )
   } else {
-    availableData <- object
+    availableData <- dataset
   } 
   
   availableNumberOfAccessions <- nrow(availableData)
@@ -429,16 +429,20 @@ check.parameters <- function(...){
     DialogBox("Parameters are valid :-)")
   }
   
+  if(any(is.na(dataset))) {
+    DialogBox("Residual missing data detected in the dataset.\nYou may wish to impute the missing data?")
+  }
+  
 }
 
 ## Function for selection of number of accessions in final set 
 number.access <- function(...){
   
-  object <- currentDataSet(analysis)
+  dataset <- currentDataSet(analysis)
   
   desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
   
-  availableNumberOfAccessions <- as.integer(dim(object)[1])
+  availableNumberOfAccessions <- as.integer(dim(dataset)[1])
   
   if(  desiredNumberOfAccessions > 0 & 
          desiredNumberOfAccessions <= availableNumberOfAccessions 
@@ -473,7 +477,7 @@ number.solutions <- function(h,...) {
 ## Function to set selected number of final accessions
 number.final <- function(h,...){
     
-  object <- currentDataSet(analysis)
+  dataset <- currentDataSet(analysis)
   
   nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
   
@@ -483,7 +487,7 @@ number.final <- function(h,...){
     
   } else {
     
-    availableData <- object
+    availableData <- dataset
     
   } 
   

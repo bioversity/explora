@@ -41,7 +41,8 @@ Imports:
     vegan,
     ade4,
     grid,
-    gridExtra
+    gridExtra,
+    Amelia
 Collate:
     'projects.r'
     'dialogs.r'

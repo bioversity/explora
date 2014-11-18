@@ -80,6 +80,7 @@ workbench <- function() {
   environment(number.final)             <- session
   environment(number.percent)           <- session
   
+  environment(impute.missing.data)      <- session
   environment(descriptors.continuous)   <- session
   environment(descriptors.nominal)      <- session
   environment(correlation)              <- session
@@ -292,6 +293,13 @@ workbench <- function() {
   #                    expand = FALSE,
   #                    handler = function(h,...){ print( number.percent() )} 
   #               )
+
+  lytg2[7,4]   <- gbutton(
+                  "Impute missing data\n(Experimental)",
+                  container = lytg2,
+                  expand = FALSE,
+                  handler = function(h,...){ impute.missing.data() }
+                )
   
   lytg2[8,1:2] <- glabel("Enter the number of final solutions:",  container = lytg2)
   lytg2[8,3]   <- numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg2)

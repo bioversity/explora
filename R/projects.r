@@ -226,7 +226,6 @@ setReplaceMethod(
   }
 )
 
-
 ## This function used to load csv files and create a project
 createProject <- function(){
   
@@ -256,7 +255,7 @@ createProject <- function(){
   ColNA    <- apply(apply(dataset,2,is.na),2,all)
   if(!all(!ColNA)) {
     # warn the user that some data columns are completely missing data
-    DialogBox("Some trait data column(s) found missing all data? Skipped...")
+    DialogBox("Some trait data column(s) full of missing data (NA)? Skipped...")
   }
   dataset  <- dataset[,!ColNA]
   
@@ -265,7 +264,7 @@ createProject <- function(){
   RowNA    <- apply(apply(dataset[,-1],2,is.na),1,all)
   if(!all(!RowNA)) {
     # warn the user that some data rows are completely missing data
-    DialogBox("Some trait data rows found missing all data? Skipped...")
+    DialogBox("Some trait data rows full of missing data (NA)? Skipped...")
   }
   dataset <- dataset[!RowNA,]
   
