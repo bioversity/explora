@@ -102,8 +102,9 @@ workbench <- function() {
   ## Welcome Window
   welcome <- ggroup(container = nb, horizontal = FALSE, label="Welcome")
   
-  image_dir <- paste(path.package("explora"),"/images/",sep="")
-  gimage("Explora_Logo.gif", dirname = image_dir, container = welcome) 
+  # image_dir <- paste(path.package("explora"),"/images/",sep="")
+  # gimage("Explora_Logo.gif", dirname = image_dir, container = welcome) 
+  gimage(system.file("images/Explora_Logo.gif", package="explora"), container=welcome)
   
   ##########################
 	## Load project datasets #
