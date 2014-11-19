@@ -14,16 +14,16 @@ library(gridExtra)
 # The Amelia package helps impute missing data
 #
 #' @import Amelia
-impute.missing.data <- function() {
+impute.missing.data <- function( context ) {
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet( context )
   
   if(any(is.na(dataset))) {
       a.out <- amelia(x=dataset,m=1,idvars=c("accession"))  # exclude the accession ID from consideration
       summary(a.out)
       #plot(a.out)
       dataset <- a.out["imputations"][1]
-      currentDataSet(analysis)<- as.data.frame(dataset) # updated data set?
+      currentDataSet(context)<- as.data.frame(dataset) # updated data set?
   }
 }
 
@@ -50,11 +50,11 @@ des.continuous <- function( traitData ){
 }
 
 ## Applies function 'des.continuous' to all columns of traits in the whole dataset 
-descriptors.continuous <- function(){
+descriptors.continuous <- function( context ){
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet( context )
   
-  ncon   <- as.numeric( svalue( numberOfContinuousVariables(analysis) ))
+  ncon   <- as.numeric( svalue( numberOfContinuousVariables(context) ))
   dataset <- dataset[,-1]
   dataset <- dataset[,1:ncon]
   
@@ -62,9 +62,9 @@ descriptors.continuous <- function(){
   
   row.names(results) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
   results <- as.table(results)
-  names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
+  names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(context) )))
   
-  saveProjectFile( results, "ResultsDescriptorAnalysisContinuousVariables" )   	
+  saveProjectFile( context, results, "ResultsDescriptorAnalysisContinuousVariables" )   	
   
   return(results)
 }
@@ -84,12 +84,12 @@ des.nominal <- function( traitData ){
 #' @importFrom plyr ldply
 
 ## Applies function 'des.nominal' to all columns of traits in the whole dataset 
-descriptors.nominal <- function(){
+descriptors.nominal <- function( context ){
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet( context )
 
-  ncon <-as.numeric( svalue( numberOfContinuousVariables(analysis) ) )
-  ncat <-as.numeric( svalue( numberOfCategoricalVariables(analysis) ) )
+  ncon <-as.numeric( svalue( numberOfContinuousVariables(context) ) )
+  ncat <-as.numeric( svalue( numberOfCategoricalVariables(context) ) )
   
   dataset <- dataset[,-1]
   dataset <- dataset[,(ncon+1):dim(dataset)[2]]
@@ -98,19 +98,22 @@ descriptors.nominal <- function(){
   results<-ldply(results, data.frame)
   colnames(results) <-c("Variable", "n", "Category", "Freq.Cat","%.Cat", "NA","NA %")
   
-  names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(analysis) )))
+  names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(context) )))
   
-  saveProjectFile( results, "ResultsDescriptorAnalysisNominalVariables", row.names = FALSE )     
+  saveProjectFile( context, results, "ResultsDescriptorAnalysisNominalVariables", row.names = FALSE )     
   
   return(results)
 }
 
 ## Correlation analysis
-correlation <- function(){
+correlationAnalysis <- function( context ){
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet( context )
   
-  ncon <-as.numeric( svalue( numberOfContinuousVariables(analysis) ))
+  ncon <-as.numeric( svalue( numberOfContinuousVariables(context) ))
+  
+  ncor <-as.numeric(svalue( coefficientOfCorrelation( context )) )
+  ncor <- abs(ncor)
   
   dataset      <- dataset[,-1]
   dataset      <- dataset[,1:ncon]
@@ -118,7 +121,7 @@ correlation <- function(){
   correlation[ lower.tri(correlation,diag = TRUE) ] <- NA 
   correlation <- as.data.frame(as.table(correlation))
   correlation <- na.omit(correlation)        
-  direction   <- rep("",times = dim(correlation)[1])
+  direction   <- rep("", times = dim(correlation)[1])
   
   for(i in 1:dim(correlation)[1]){ ## Direction of correlation
     if(correlation[i,3]>=0 & correlation[i,3]<=1)     { direction[i] <- "positive" }
@@ -128,17 +131,14 @@ correlation <- function(){
   correlation = cbind(correlation, direction)
   
   colnames(correlation) <- c("Variable 1", "Variable 2", "Correlation", "Direction") 
-  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( datasetSelector(analysis) )))
+  names(dimnames(correlation)) <- c(" ", paste("Variable",svalue( datasetSelector(context) )))
   
   cat("\n")
   cat("\n")
-  
-  ncor <-as.numeric(svalue(ncor))
-  ncor <- abs(ncor)
   
   if(ncor==0){
     
-    saveProjectFile( correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
+    saveProjectFile( context, correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
     
     return(correlation)
     
@@ -146,7 +146,7 @@ correlation <- function(){
     
     correlation.ncor <- subset(correlation, abs(correlation$Correlation)>=ncor)
     
-    saveProjectFile( 
+    saveProjectFile( context, 
       correlation.ncor,
       paste("ResultsCorrelationAnalysisLevel",ncor,sep=""),
       row.names = FALSE
@@ -160,10 +160,10 @@ correlation <- function(){
   
 }
 
-DialogSelectOptimization <- function( win, notebook ){
+DialogSelectOptimization <- function( context, win, notebook ){
   
-  dataset <- currentDataSet(analysis)
-  ncon    <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
+  dataset <- currentDataSet( context )
+  ncon    <- as.numeric( svalue( numberOfContinuousVariables( context )) )
   
   f.items.cont <- c("NA","CV: Maximize coefficient of variation",
                     "MAX.AV: Maximize average", 
@@ -183,7 +183,7 @@ DialogSelectOptimization <- function( win, notebook ){
   
   # I comment this out for now... This was called Nsim in the original Explora, but 
   # it isn't used here but causes a problem when accessed now (before it is set...)
-  #nsoln <- as.numeric(svalue( numberOfSolutions(analysis) ))
+  #nsoln <- as.numeric(svalue( numberOfSolutions(context) ))
   
   pcategory.v1 <- 0
   pcategory.v2 <- 0
@@ -191,7 +191,7 @@ DialogSelectOptimization <- function( win, notebook ){
   pcategory.v4 <- 0
   pcategory.v5 <- 0
   
-  lyt4 <- glayout(homogeneous = FALSE, container = notebook , spacing = 5, label="Optimization Procedure",expand = TRUE)
+  lyt4 <- glayout(homogeneous = FALSE, container = notebook , spacing = 5, label="STEP 4. Select Accessions",expand = TRUE)
 
   lyt4[1,1:25]  <- g4var <- gframe("Selection of Objective Functions for Optimization", container = lyt4, expand = TRUE, horizontal = FALSE)
   
@@ -284,24 +284,25 @@ DialogSelectOptimization <- function( win, notebook ){
       
       colnames(RI)<-c("Continuous Variable Weighting", "Nominal Variable Weighting")
       
-      saveProjectFile( RI, "RI", row.names = FALSE )   
+      saveProjectFile( context, RI, "RI", row.names = FALSE )   
   }
   
-  getSampleDistribution <<- function(analysis) {
+  getSampleDistribution <<- function( context ) {
     
-    distribution <- sampleDistribution(analysis)
+    distribution <- sampleDistribution( context )
     
     if( !length(distribution) ) {
       
       # distribution is empty - need to generate first to return it!
-      distribution <- sampleDistribution(analysis) <<- generateSampleDistribution(
-        varop1c, varop2c, varop3c, varop4c, varop5c,
-        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
-        varop1n, varop2n, varop3n, varop4n, varop5n,
-        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
-        pcategory.v1, pcategory.v2, pcategory.v3,
-        pcategory.v4,pcategory.v5
-      )
+      distribution <- sampleDistribution(context) <<- generateSampleDistribution(
+                                                        context,
+                                                        varop1c, varop2c, varop3c, varop4c, varop5c,
+                                                        fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,
+                                                        varop1n, varop2n, varop3n, varop4n, varop5n,
+                                                        fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
+                                                        pcategory.v1, pcategory.v2, pcategory.v3,
+                                                        pcategory.v4,pcategory.v5
+                                                      )
       
       saveOptimizationVariableRankings()
       
@@ -324,10 +325,10 @@ DialogSelectOptimization <- function( win, notebook ){
   lytg4opt[1,3] <- btn <- gbutton("Run",  container = lytg4opt)
   
   addHandlerChanged(btn, handler <- function(h,...){
-    if(svalue(option.preferred) == "Maximum Variation")   { MAXVAR.type.opt()}
-    if(svalue(option.preferred) == "Principal Components"){ PCA.type.opt()}
-    if(svalue(option.preferred) == "Weighted Sum Model")  { WSM.type.opt()}
-    if(svalue(option.preferred) == "Decision Tree")       { DTree.type.opt()}
+    if(svalue(option.preferred) == "Maximum Variation")   { MAXVAR.type.opt(context)}
+    if(svalue(option.preferred) == "Principal Components"){ PCA.type.opt(context)}
+    if(svalue(option.preferred) == "Weighted Sum Model")  { WSM.type.opt(context)}
+    if(svalue(option.preferred) == "Decision Tree")       { DTree.type.opt(context)}
   })
   
   visible(win) <- TRUE
@@ -337,9 +338,9 @@ DialogSelectOptimization <- function( win, notebook ){
 #' @importFrom vegan diversity
 
 ## Generate a random sample and apply objective functions
-generateSample <- function( data, option1, option2 ){ 
+generateSample <- function( context, data, option1, option2 ){ 
   
-  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(analysis) ) ) 
+  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(context) ) ) 
   
   name.var.func.con <- NA; val.var.func.con <- NA; name.var.func.nom <- NA; val.var.func.nom <- NA
   
@@ -457,9 +458,10 @@ generateSample <- function( data, option1, option2 ){
 # Uses a Threshold filtered data set if available
 # Otherwise, uses the whole dataset
 #
-getTargetDataSet <- function( dataDirectory, defaultData) {
-  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
-    filteredData <- readProjectFile(  "ThresholdFilteredDataSubset" )
+getTargetDataSet <- function( context, defaultData ) {
+  dataDirectory = currentProjectFolder(context)
+  if( any( dir( currentProjectFolder(context) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
+    filteredData <- readProjectFile( context,  "ThresholdFilteredDataSubset" )
     if( !( is.na(filteredData) || nrow(filteredData) == 0 )) {
       return(filteredData)
     }
@@ -467,18 +469,18 @@ getTargetDataSet <- function( dataDirectory, defaultData) {
   return(defaultData)
 }
 
-generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop5c,
+generateSampleDistribution <- function( context,
+                           varop1c, varop2c, varop3c, varop4c, varop5c,
                            fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c,                           
                            varop1n, varop2n, varop3n, varop4n, varop5n,
                            fvarop1n, fvarop2n, fvarop3n, fvarop4n, fvarop5n,
                            pcategory.v1, pcategory.v2, pcategory.v3, pcategory.v4, pcategory.v5){## load the function "optimization" and integrated into the GUI
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet(context)
   
-  ncon   <- as.numeric(svalue( numberOfContinuousVariables(analysis) )) 
-  ncat   <- as.numeric(svalue( numberOfCategoricalVariables(analysis) ))
-  
-  nsoln  <- as.numeric(svalue( numberOfSolutions(analysis) )) 
+  ncon   <- as.numeric(svalue( numberOfContinuousVariables( context ) )) 
+  ncat   <- as.numeric(svalue( numberOfCategoricalVariables( context ) ))
+  nsoln  <- as.numeric(svalue( numberOfSolutions( context ) )) 
   
   varop1c <- svalue(varop1c)
   varop1n <- svalue(varop1n)
@@ -507,7 +509,7 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
   pcategory.v4 <- svalue(pcategory.v4)
   pcategory.v5 <- svalue(pcategory.v5)
   
-  data.thresholds <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset)
+  data.thresholds <- getTargetDataSet( context,  defaultData = dataset)
   
   option.objective.con <- matrix(c(varop1c, varop2c, varop3c, varop4c, varop5c,
                                    fvarop1c, fvarop2c, fvarop3c, fvarop4c, fvarop5c),
@@ -528,7 +530,7 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
   ## Creates the progress bar
   ProgressBar <- winProgressBar(title = "Progress bar", min = 0, max = nsoln, width = 500)
   for(j in 1:nsoln){
-    output.opt0[[j]] <- generateSample( data.thresholds, option.objective.con, option.objective.nom )
+    output.opt0[[j]] <- generateSample( context, data.thresholds, option.objective.con, option.objective.nom )
     setWinProgressBar(ProgressBar, j, title=paste( "Preparing for analysis:",round(j/nsoln*100, 0),"% complete"))
   }
   close(ProgressBar)
@@ -537,17 +539,17 @@ generateSampleDistribution <- function(varop1c, varop2c, varop3c, varop4c, varop
   
 }
 
-MAXVAR.type.opt <- function(){
+MAXVAR.type.opt <- function( context ){
   
-  dataset      <- currentDataSet(analysis)
+  dataset      <- currentDataSet( context )
   
-  output.opt0  <- getSampleDistribution(analysis)
+  output.opt0  <- getSampleDistribution(context)
   
-  nsoln      <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent   <- as.numeric( svalue( percentageOfSolutions(analysis) ))
+  nsoln      <- as.numeric( svalue( numberOfSolutions(context) ))
+  npercent   <- as.numeric( svalue( percentageOfSolutions(context) ))
   
-  nfinal     <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
-  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(analysis) ))
+  nfinal     <- as.numeric( svalue( numberOfFinalSolutions(context) ))
+  desiredNumberOfAccessions <- as.numeric( svalue( targetNumberOfAccessions(context) ))
   
   ##8)  Standardize values in the sampled subsets:   
   result           <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -576,7 +578,7 @@ MAXVAR.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( 
+  saveProjectFile( context, 
     result.mean.accessions, 
     paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
   )     
@@ -591,7 +593,7 @@ MAXVAR.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
+  saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
   
   ##11)  Selection of final set of optimal solutions: 
   
@@ -620,7 +622,7 @@ MAXVAR.type.opt <- function(){
   pos.max.var <- pos.nfinal[1]
   pos.variance.aux <- sample(unique(as.numeric(c(variance[pos.nfinal,1], variance[pos.nfinal,2]))), (3*desiredNumberOfAccessions))
   
-  dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset)
+  dataFinal <- getTargetDataSet( context,  defaultData = dataset)
   
   final.subset.max.var <- dataFinal[is.element(dataFinal$accession,unique(mean.result$accessions[pos.variance.aux,1])[1:desiredNumberOfAccessions]),]
   
@@ -634,7 +636,7 @@ MAXVAR.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( 
+  saveProjectFile( context, 
     final.subset.max.var, 
     paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
     row.names = FALSE, alert = TRUE  
@@ -646,15 +648,15 @@ MAXVAR.type.opt <- function(){
 #' @importFrom ade4 s.label
 #' @importFrom ade4 s.corcircle
 
-PCA.type.opt <- function() {
+PCA.type.opt <- function( context ) {
   
-  dataset     <- currentDataSet(analysis)
+  dataset     <- currentDataSet( context )
   
-  output.opt0 <- getSampleDistribution(analysis)
+  output.opt0 <- getSampleDistribution( context )
   
-  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  nfinal      <- as.numeric( svalue( numberOfFinalSolutions(analysis) ))
+  nsoln       <- as.numeric( svalue( numberOfSolutions( context ) ))
+  npercent    <- as.numeric( svalue( percentageOfSolutions( context ) ))
+  nfinal      <- as.numeric( svalue( numberOfFinalSolutions( context ) ))
   
   ##8)  Standardize values in the sampled subsets:   
   result <- apply(t(sapply(output.opt0, "[[", 1)), MARGIN = 2, FUN = scale)
@@ -690,7 +692,7 @@ PCA.type.opt <- function() {
     row.names(result.scale.pca) <- label.row 
     
     ##Export data for PCA analysis
-    saveProjectFile( result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
+    saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
     
     cat("\n")
     cat("\n")
@@ -705,7 +707,7 @@ PCA.type.opt <- function() {
       
       pca <- dudi.pca(result.scale.pca , scannf = F, nf = 2, center = FALSE, scale = FALSE)
       
-      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
+      plotImage( context,  "Optimal_solution_PCA_1_Vs_PCA_2" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -722,7 +724,7 @@ PCA.type.opt <- function() {
       
       pca <- dudi.pca(result.scale.pca , scannf = FALSE, nf = 3, center = FALSE, scale = FALSE)
       
-      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_2" )
+      plotImage( context,  "Optimal_solution_PCA_1_Vs_PCA_2" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -730,7 +732,7 @@ PCA.type.opt <- function() {
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 2, add.plot = TRUE, clabel = 1.5)
       dev.off()  
       
-      plotImage(  "Optimal_solution_PCA_1_Vs_PCA_3" )
+      plotImage( context,  "Optimal_solution_PCA_1_Vs_PCA_3" )
       
       s.label(pca$li,sub=paste("PCA 1: ",round(pca$eig[1]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -738,7 +740,7 @@ PCA.type.opt <- function() {
       s.corcircle(pca$co, possub= "topright", xax = 1, yax = 3, add.plot = T, clabel = 1.5)
       dev.off()  
       
-      plotImage(  "Optimal_solution_PCA_2_Vs_PCA_3" )
+      plotImage( context,  "Optimal_solution_PCA_2_Vs_PCA_3" )
       
       s.label(pca$li,sub=paste("PCA 2: ",round(pca$eig[2]/sum(pca$eig)*100,2),"% - ","PCA 3: ",round(pca$eig[3]/sum(pca$eig)*100,2),"%",sep = ""),
               possub= "topright",
@@ -759,7 +761,7 @@ PCA.type.opt <- function() {
     
     print(nsol.pca)
     
-    dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
+    dataFinal <- getTargetDataSet( context,  defaultData = dataset )
     
     final.subset.pca <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.pca,]),]
     
@@ -773,7 +775,7 @@ PCA.type.opt <- function() {
     cat("\n")
     cat("\n")
     
-    saveProjectFile( 
+    saveProjectFile( context, 
       final.subset.pca, 
       paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
       row.names = FALSE, alert = TRUE 
@@ -786,19 +788,19 @@ PCA.type.opt <- function() {
   }
 }  
 
-WSM.type.opt <- function(){
+WSM.type.opt <- function( context ){
   
-  dataset     <- currentDataSet(analysis)
+  dataset     <- currentDataSet( context )
   
-  output.opt0 <- getSampleDistribution(analysis)
+  output.opt0 <- getSampleDistribution( context )
   
-  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ))
-  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ))
-  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions(analysis) )) 
+  nsoln       <- as.numeric( svalue( numberOfSolutions( context ) ))
+  npercent    <- as.numeric( svalue( percentageOfSolutions( context ) ))
+  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions( context ) )) 
   
   ## Read ranking
   
-  RI <- readProjectFile(  "RI" )  
+  RI <- readProjectFile( context,  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -883,7 +885,7 @@ WSM.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( 
+  saveProjectFile( context, 
     result.scale, 
     "HighestStandardizedValuesOfSubset_WSM",
     row.names = FALSE
@@ -907,7 +909,7 @@ WSM.type.opt <- function(){
   
   cat(paste("Solution by WSM: ", nsol.wsm, sep = ""))
   
-  dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
+  dataFinal <- getTargetDataSet( context,  defaultData = dataset )
   
   final.subset.wsm <- dataFinal[is.element(dataFinal$accession,mean.result$accessions[nsol.wsm,]),]
   
@@ -923,7 +925,7 @@ WSM.type.opt <- function(){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( 
+  saveProjectFile( context, 
     final.subset.wsm, 
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
     row.names = FALSE, alert = TRUE 
@@ -971,7 +973,7 @@ fcluster <- function(Data.acces, data.mean.result, data.optimization){
 #' @importFrom grid grid.draw
 #' @import gridExtra
 
-chart <- function(out.solution, i){
+chart <- function( context, out.solution, i){
   
   require(gridExtra)
   
@@ -991,25 +993,25 @@ chart <- function(out.solution, i){
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw(tableGrob(as.data.frame(Table.Results)))
   
-  plotImage( paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
+  plotImage( context, paste("Summary_Cluster1_Cluster2_Step",i,sep="") )
   
   grid.text(paste("Step ",i, "\n", sep = ""),gp=gpar(fontsize=30),0.5,0.9)
   grid.draw( tableGrob(as.data.frame(Table.Results)) )
   dev.off()
 }
 
-DTree.type.opt <- function(){
+DTree.type.opt <- function( context ){
   
-  dataset     <- currentDataSet(analysis) 
+  dataset     <- currentDataSet( context ) 
   
-  output.opt0 <- getSampleDistribution(analysis)
+  output.opt0 <- getSampleDistribution( context )
   
-  nsoln       <- as.numeric( svalue( numberOfSolutions(analysis) ) )
-  npercent    <- as.numeric( svalue( percentageOfSolutions(analysis) ) )
-  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions(analysis) ) )
+  nsoln       <- as.numeric( svalue( numberOfSolutions( context ) ) )
+  npercent    <- as.numeric( svalue( percentageOfSolutions( context ) ) )
+  desiredNumberOfAccessions  <- as.numeric( svalue( targetNumberOfAccessions( context ) ) )
   
   ## Read ranking importance 
-  RI <- readProjectFile(  "RI" )  
+  RI <- readProjectFile( context,  "RI" )  
   
   ri1c <- RI[1,1]
   ri2c <- RI[2,1]
@@ -1092,7 +1094,7 @@ DTree.type.opt <- function(){
     #step 1
     out.solution.tree <- list()
     out.solution.tree[[1]] <- fcluster( dataset, mean.result, data.HighestStandardizedValues )
-    chart(out.solution.tree[[1]],1) 
+    chart( context,out.solution.tree[[1]],1) 
     
     ## Initialized values
     Decision <- NA
@@ -1116,7 +1118,7 @@ DTree.type.opt <- function(){
       
       graphics.off() 
       if(choose == "Yes"){
-        chart(out.solution.tree[[w]],w) 
+        chart( context,out.solution.tree[[w]],w) 
         Decision <- NA
         Decision <- ginput("Choose the cluster (1 or 2)",text="0", title="Decision Tree Clusters", icon="question")
         Decision <- as.numeric(Decision)
@@ -1135,7 +1137,7 @@ DTree.type.opt <- function(){
     
     cat(paste("Solution by Decision Tree: ", nsol.DTree, sep = ""))
     
-    dataFinal <- getTargetDataSet( dataDirectory = currentProjectFolder(analysis), defaultData = dataset )
+    dataFinal <- getTargetDataSet( context,  defaultData = dataset )
     
     final.subset.DTree <- dataFinal[is.element(dataFinal$accession, mean.result$accessions[nsol.DTree,]),]
     
@@ -1150,7 +1152,7 @@ DTree.type.opt <- function(){
     cat("\n")
     cat("\n")
     
-    saveProjectFile( 
+    saveProjectFile( context, 
       final.subset.DTree,
       paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
       row.names = FALSE, alert = TRUE 

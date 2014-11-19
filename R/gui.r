@@ -52,55 +52,19 @@ workbench <- function() {
   # Global analysis parameters are kept in an S4 class instance of class "ExploraAnalysis"
   # and propagated into a special environment
   session  <- new.env()
-  session$analysis <- new("ExploraAnalysis")
+  session$context <- new("ExploraAnalysis")
   
-  datasetCatalog(session$analysis) <- getProjects() 
-  
-  # not elegant, but it is tricky to give these functions 
-  # their session context in an encapsulated (functional) way
-  
-  environment(saveProjectFile)          <- session
-  environment(deleteProjectFile)        <- session
-  environment(readProjectFile)          <- session
-  environment(plotImage)                <- session
-  environment(chart)                    <- session
-  
-  environment(result.folder)            <- session
-  environment(result.path)              <- session
-  environment(result.path.exists)       <- session
-  
-  environment(getTargetDataSet)         <- session
-    
-  environment(DialogSelectThresholds)   <- session
-  environment(DialogSelectOptimization) <- session
-  
-  environment(check.parameters)         <- session
-  environment(number.access)            <- session
-  environment(number.solutions)         <- session
-  environment(number.final)             <- session
-  environment(number.percent)           <- session
-  
-  environment(impute.missing.data)      <- session
-  environment(descriptors.continuous)   <- session
-  environment(descriptors.nominal)      <- session
-  environment(correlation)              <- session
-  environment(generateSampleDistribution) <- session
-  environment(generateSample)           <- session
-  
-  environment(MAXVAR.type.opt)          <- session
-  environment(PCA.type.opt)             <- session
-  environment(WSM.type.opt)             <- session
-  environment(DTree.type.opt)           <- session 
+  datasetCatalog(session$context) <- getProjects() 
   
 	## Principal window
 	win <- gwindow("Explora Germplasm Selection Tool", visible = FALSE , width = 500, height = 300)
   
-  datasetCatalog(session$analysis) <- getProjects() 
+  datasetCatalog(session$context) <- getProjects() 
   
-	nb  <- gnotebook( container = win, expand = T, tab.pos = 3)
+	notebook  <- gnotebook( container = win, expand = T, tab.pos = 3)
   
   ## Welcome Window
-  welcome <- ggroup(container = nb, horizontal = FALSE, label="Welcome")
+  welcome <- ggroup(container = notebook, horizontal = FALSE, label="Welcome")
   
   # image_dir <- paste(path.package("explora"),"/images/",sep="")
   # gimage("Explora_Logo.gif", dirname = image_dir, container = welcome) 
@@ -109,7 +73,7 @@ workbench <- function() {
   ##########################
 	## Load project datasets #
   ##########################
-  lyt1        <- glayout(homogeneous = FALSE,  container = nb, spacing = 10, label = "Projects", expand = TRUE) 
+  lyt1        <- glayout(homogeneous = FALSE,  container = notebook, spacing = 10, label = "STEP 1. Select Project", expand = TRUE) 
 	lyt1[1,1:3] <- g1 <- gframe("Projects",  container = lyt1, horizontal = TRUE)
 	lytg1       <- glayout(homogeneous = FALSE, container = g1, spacing = 10, expand = TRUE) 
 
@@ -122,8 +86,8 @@ workbench <- function() {
                                     newdir <- gfile(text = "Select directory", type = "selectdir") 
                                     if(! is.na(newdir) )  { 
                                       setwd(newdir)
-                                      datasetCatalog(session$analysis)    <- getProjects()
-                                      datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
+                                      datasetCatalog(session$context)    <- getProjects()
+                                      datasetSelector(session$context)[] <- datasetCatalog(session$context)
                                     } 
                                   } 
                       )
@@ -137,9 +101,9 @@ workbench <- function() {
                                 dataset <- createProject()
                                 dsl <- length(dataset)
                                 if( dsl > 0 && !(dsl == 1 && is.na(dataset)) ) {
-                                  addDataset(session$analysis)        <- attr(dataset,"identifier")
-                                  currentDataSet(session$analysis)    <- dataset
-                                  datasetSelector(session$analysis)[] <- datasetCatalog(session$analysis)
+                                  addDataset(session$context)        <- attr(dataset,"identifier")
+                                  currentDataSet(session$context)    <- dataset
+                                  datasetSelector(session$context)[] <- datasetCatalog(session$context)
                                 }
                             }
                 )
@@ -151,21 +115,222 @@ workbench <- function() {
   
   ## these flags control the analysis parameter pages
   
-  inputTraitsFiltered <- FALSE
-  optimizationTargetsSpecified <- FALSE
+  analysisParameterWindow <- FALSE
+  traitFilterWindow <- FALSE
+  accessionsSelectionWindow <- FALSE
   
-  resetAnalysis <- function(notebook) {
+  #############################
+  ##Filter Input Trait Values #
+  #############################
+  traitFilterPageHandler <- function( context, win, notebook ) {
     
-    # Reset the computational environment here
-    sampleDistribution(analysis) <- list()
-    
-    if(inputTraitsFiltered) {
+    return(
       
-      inputTraitsFiltered <<- FALSE
-      
-      if(optimizationTargetsSpecified) {
+      function(h,...) {  # returns a gWidget handler closure for "Filter Traits..."
         
-        optimizationTargetsSpecified <<- FALSE
+        ncon <- as.numeric( svalue( numberOfContinuousVariables( context )) )
+        
+        if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
+          DialogBox(
+            paste( 
+              "You need to tell Explora how many\n",
+              "Continuous Variables (CV) you have\n",
+              "before Explora can filter them!"
+            )
+          )
+          
+        } else {
+          
+          # I only create new trait filter page if not yet visible
+          if( !traitFilterWindow ) {
+            
+            # I also only create new trait filter page if optimization page is NOT already displayed
+            if( !accessionsSelectionWindow ) {
+              
+              DialogSelectThresholds( context, win, notebook )
+              traitFilterWindow <<- TRUE
+              
+            } else {
+              DialogBox("Cannot filter out input data once you've started optimization analyses!")
+            }
+            svalue(notebook) <- 4
+          }
+        }
+      }
+    )
+  }
+  
+  ###########################################
+  ##Specify Optimization Analysis Variables #
+  ###########################################
+  accessionSelectionHandler <- function( context, win, notebook ) {
+    
+    return ( 
+      
+      function(h,...) { # returns a gWidget handler closure for "Specify Optimization Target Variables..."
+        
+        ncon <- as.numeric( svalue( numberOfContinuousVariables( context )) )
+        
+        if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
+          DialogBox(                      
+            paste( 
+              "You need to tell Explora how many\n",
+              "Continuous Variables (CV) you have\n",
+              "before Explora can set optimization targets!"
+            )
+          )
+          
+        } else {
+          
+          if( !accessionsSelectionWindow ) {
+            
+            # modified version of original function
+            DialogSelectOptimization( context, win, notebook )
+            
+            accessionsSelectionWindow <<- TRUE
+            
+            if( traitFilterWindow ) {
+              svalue(notebook) <- 5
+            } else {
+              svalue(notebook) <- 4
+            }
+          }
+        }
+      }
+    )
+  }
+  
+  ########################
+  ## Analysis Parameters #
+  ########################
+  setAnalysisParameters <- function( context, win, notebook ) {
+    
+    lyt2         <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "STEP 2. Define Analysis Parameters", expand = TRUE)
+    lyt2[1,1:6]  <- g2 <- gframe("Analysis Parameters and Data Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) 
+    lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE)
+    
+    lytg2[1,1]   <- glabel("Data Analysis Tag: ", container = lytg2)
+    lytg2[1,3]   <- dataAnalysisTag( context ) <- gedit( 
+                      format(Sys.time(), "%H-%M-%S_%d-%m-%Y"), 
+                      container = lytg2, 
+                      width = 20, 
+                      initial.msg=""
+                    )
+    
+    lytg2[2,1:2] <- glabel("Number of Continuous Variables (CV): ",  container = lytg2)
+    lytg2[2,3]   <- numberOfContinuousVariables( context ) <- gedit( "", container = lytg2, width = 10, initial.msg="" ) 
+    lytg2[2,4]   <- gbutton(
+                      "Run CV Analysis",
+                      container = lytg2, 
+                      handler=function(h,...){ 
+                        print( descriptors.continuous( context ) )
+                      }
+                    )
+    
+    lytg2[3,1:2] <- glabel("Number of Nominal Variables (NV): ", container = lytg2)
+    lytg2[3,3]   <- numberOfCategoricalVariables(context) <- gedit( "", container = lytg2, width = 10, initial.msg="" )
+    lytg2[3,4]   <- gbutton(
+                      "Run NV Analysis",
+                      container = lytg2, 
+                      handler=function(h,...){ 
+                        print( descriptors.nominal( context ) )
+                      }
+                    )
+    
+    lytg2[4,1:2] <- glabel("Specify Coefficient of Correlation (CC):", container=lytg2)
+    lytg2[4,3]   <- coefficientOfCorrelation( context ) <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)
+    lytg2[4,4]   <- gbutton(
+                      "Run CC Analysis",
+                      container = lytg2,
+                      handler=function(h,...){ 
+                        print( correlationAnalysis( context ) ) 
+                      }
+                    )
+    
+    lytg2[5,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
+    lytg2[5,3]    <- targetNumberOfAccessions( context ) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
+    #lytg2[5,4]    <- gbutton(
+    #                    "Set",
+    #                    container = lytg2, 
+    #                    expand=FALSE,
+    #  			            handler = function(h,...){ print( number.access() ) }
+    #                  )
+    
+    lytg2[6,1:2] <- glabel("Specify Target Number of Solutions: ",  container = lytg2)
+    lytg2[6,3]   <- numberOfSolutions( context ) <- gedit("10000", width=7,  container = lytg2)
+    #lytg2[6,4]   <- gbutton( 
+    #                  "Set",  
+    #                  container = lytg2, 
+    #                  expand=FALSE, 
+    #                  handler = function(h,...){ 
+    #                    print( number.solutions(context) )
+    #                  }
+    #                )
+    
+    lytg2[6,4]   <- gbutton(
+                      "Check Parameters",
+                      container = lytg2,
+                      expand = FALSE,
+                      handler = function(h,...){ 
+                        check.parameters( context ) 
+                      }
+                    )
+    
+    lytg2[7,1:2] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg2)
+    lytg2[7,3]   <- percentageOfSolutions( context ) <- gedit("1", width=3, container = lytg2)
+    #lytg2[7,4]   <- gbutton(
+    #                    "Set",
+    #                    container = lytg2,
+    #                    expand = FALSE,
+    #                    handler = function(h,...){ print( number.percent(context) )} 
+    #               )
+    
+    lytg2[7,4]   <- gbutton(
+      "Impute missing data\n(Experimental)",
+      container = lytg2,
+      expand = FALSE,
+      handler = function(h,...){ 
+        impute.missing.data( context ) 
+      }
+    )
+    
+    lytg2[8,1:2] <- glabel("Enter the number of final solutions:",  container = lytg2)
+    lytg2[8,3]   <- numberOfFinalSolutions( context ) <- gedit("10", width=7, container = lytg2)
+    #lytg2[8,4]   <- gbutton(
+    #                  "Set",
+    #                  container = lytg2,
+    #                  expand = FALSE,
+    #                  handler = function(h,...){ print( number.final(context) )}
+    #                )
+    
+    lytg2[9,1]   <- gbutton(
+      "STEP 3. Filter Traits... (Default: Use all data)",
+      container = lytg2,
+      handler   =  traitFilterPageHandler( context, win, notebook )
+    )
+    
+    lytg2[9,3]   <- gbutton(
+      "STEP 4. Select Accessions",
+      container = lytg2,
+      handler =  accessionSelectionHandler( context, win, notebook  )
+    )
+    
+    analysisParameterWindow <<- TRUE
+    
+  }
+  
+  resetAnalysis <- function( context, win, notebook ) {
+
+    # Reset the computational environment here
+    sampleDistribution( context ) <- list()
+    
+    if(traitFilterWindow) {
+      
+      traitFilterWindow <<- FALSE
+      
+      if(accessionsSelectionWindow) {
+        
+        accessionsSelectionWindow <<- FALSE
         svalue(notebook) <- 5
         dispose(notebook)
         
@@ -176,28 +341,30 @@ workbench <- function() {
       
     } else {
       
-      if(optimizationTargetsSpecified) {
+      if(accessionsSelectionWindow) {
         
-        optimizationTargetsSpecified <<- FALSE
+        accessionsSelectionWindow <<- FALSE
         svalue(notebook) <- 4
         dispose(notebook)
         
-      } 
+      }
       
     }
     
-    # update the data analysis tag with a fresh time stamp?
-    svalue(dataAnalysisTag(session$analysis)) <- format(Sys.time(), "%H-%M-%S_%d-%m-%Y")
+    if(analysisParameterWindow) {
+      svalue(notebook) <- 3
+      dispose(notebook)
+      analysisParameterWindow <<- FALSE
+    }
+    
+    setAnalysisParameters( context, win, notebook)
     
     svalue(notebook) <- 3
     
   }
   
-  environment(resetAnalysis) <- session
-  
-  
-  lytg1[5,3]   <- datasetSelector(session$analysis) <- gdroplist( 
-                    datasetCatalog(session$analysis), 
+  lytg1[5,3]   <- datasetSelector(session$context) <- gdroplist( 
+                    datasetCatalog( session$context ), 
                     selected = 0,  
                     container = lytg1, 
                     expand = TRUE, 
@@ -208,9 +375,9 @@ workbench <- function() {
                         if( nchar(datasetId) > 0 ) {
                           if( !( datasetId == EMPTY_CATALOG() ) ) {
 
-                            currentDataSet(session$analysis) <- datasetId
+                            currentDataSet( session$context ) <- datasetId
                             
-                            resetAnalysis(nb) 
+                            resetAnalysis( session$context, win, notebook ) 
                               
                           }
                         }
@@ -218,193 +385,7 @@ workbench <- function() {
                     }
                   )
   
-  ##########################
-  ##Analysis Parameters    #
-  ##########################
-  lyt2         <- glayout( homogeneous = FALSE,  container = nb, spacing = 5, label = "Analysis Parameters", expand = TRUE)
-	lyt2[1,1:6]  <- g2 <- gframe("Analysis Parameters and Data Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) 
-	lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE)
-  
-  lytg2[1,1]   <- glabel("Data Analysis Tag: ", container = lytg2)
-  lytg2[1,3]   <- dataAnalysisTag(session$analysis) <- gedit( 
-                    format(Sys.time(), "%H-%M-%S_%d-%m-%Y"), 
-                    container = lytg2, 
-                    width = 20, 
-                    initial.msg=""
-                  )
-  
-	lytg2[2,1:2] <- glabel("Number of Continuous Variables (CV): ",  container = lytg2)
-	lytg2[2,3]   <- numberOfContinuousVariables(session$analysis)  <- gedit( "", container = lytg2, width = 10, initial.msg="" ) 
-  lytg2[2,4]   <- gbutton(
-                    "Run CV Analysis",
-                    container = lytg2, 
-                    handler=function(h,...){ print( descriptors.continuous() )
-                  }
-                )
-  
-	lytg2[3,1:2] <- glabel("Number of Nominal Variables (NV): ", container = lytg2)
-  lytg2[3,3]   <- numberOfCategoricalVariables(session$analysis) <- gedit( "", container = lytg2, width = 10, initial.msg="" )
-  lytg2[3,4]   <- gbutton(
-                    "Run NV Analysis",
-                    container = lytg2, 
-                    handler=function(h,...){ print( descriptors.nominal() )
-                  }
-                )
-	
-  lytg2[4,1:2] <- glabel("Specify Coefficient of Correlation (CC):", container=lytg2)
-  lytg2[4,3]   <- ncor <- gspinbutton( from = 0, to = 1, by = 0.1, value = 0, container = lytg2)
-  lytg2[4,4]   <- gbutton(
-                  "Run CC Analysis",
-                  container = lytg2,
-                  handler=function(h,...){ print( correlation() ) }
-                )
-  
-  lytg2[5,1:2]  <- glabel( text = "Number of Accessions in Final Dataset:", container = lytg2)
-  lytg2[5,3]    <- targetNumberOfAccessions(session$analysis) <- gedit("10",  container = lytg2, width = 10, initial.msg =" ")
-  #lytg2[5,4]    <- gbutton(
-  #                    "Set",
-  #                    container = lytg2, 
-  #                    expand=FALSE,
-  #  			            handler = function(h,...){ print( number.access() ) }
-  #                  )
-  
-  lytg2[6,1:2] <- glabel("Specify Target Number of Solutions: ",  container = lytg2)
-  lytg2[6,3]   <- numberOfSolutions(session$analysis) <- gedit("10000", width=7,  container = lytg2)
-  #lytg2[6,4]   <- gbutton( 
-  #                  "Set",  
-  #                  container = lytg2, 
-  #                  expand=FALSE, 
-  #                  handler = function(h,...){ 
-  #                    print( number.solutions() )
-  #                  }
-  #                )
-
-  lytg2[6,4]   <- gbutton(
-                    "Check Parameters",
-                    container = lytg2,
-                    expand = FALSE,
-                    handler = function(h,...){ check.parameters() }
-                  )
-  
-  lytg2[7,1:2] <- glabel("Enter Target Percentage of Solutions (%):",  container = lytg2)
-  lytg2[7,3]   <- percentageOfSolutions(session$analysis) <- gedit("1", width=3, container = lytg2)
-  #lytg2[7,4]   <- gbutton(
-  #                    "Set",
-  #                    container = lytg2,
-  #                    expand = FALSE,
-  #                    handler = function(h,...){ print( number.percent() )} 
-  #               )
-
-  lytg2[7,4]   <- gbutton(
-                  "Impute missing data\n(Experimental)",
-                  container = lytg2,
-                  expand = FALSE,
-                  handler = function(h,...){ impute.missing.data() }
-                )
-  
-  lytg2[8,1:2] <- glabel("Enter the number of final solutions:",  container = lytg2)
-  lytg2[8,3]   <- numberOfFinalSolutions(session$analysis) <- gedit("10", width=7, container = lytg2)
-  #lytg2[8,4]   <- gbutton(
-  #                  "Set",
-  #                  container = lytg2,
-  #                  expand = FALSE,
-  #                  handler = function(h,...){ print( number.final() )}
-  #                )
-  
-  #############################
-  ##Filter Input Trait Values #
-  #############################
-  traitFilterPageHandler <- function( win, notebook ) {
-    
-      return(
-        
-        function(h,...) {  # returns a gWidget handler closure for "Filter Traits..."
-      
-              ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
-              
-              if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
-                DialogBox(
-                  paste( 
-                        "You need to tell Explora how many\n",
-                        "Continuous Variables (CV) you have\n",
-                        "before Explora can filter them!"
-                  )
-                )
-          
-              } else {
-                
-                  # I only create new trait filter page if not yet visible
-                  if( !inputTraitsFiltered ) {
-
-                      # I also only create new trait filter page if optimization page is NOT already displayed
-                      if( !optimizationTargetsSpecified ) {
-                    
-                          DialogSelectThresholds(  win, notebook )
-                          inputTraitsFiltered <<- TRUE
-                          
-                      } else {
-                        DialogBox("Cannot filter out input data once you've started optimization analyses!")
-                      }
-                      svalue(notebook) <- 4
-                  }
-              }
-          }
-      )
-  }
-
-  lytg2[9,1]   <- gbutton(
-    "Filter Traits Inputs ... (Default: Use all data)",
-    container = lytg2,
-    handler   =  traitFilterPageHandler( win, nb )
-  )
-  
-  ###########################################
-  ##Specify Optimization Analysis Variables #
-  ###########################################
-  optimizationTargetsPageHandler <- function( win, notebook ) {
-    
-    return ( 
-      
-      function(h,...) { # returns a gWidget handler closure for "Specify Optimization Target Variables..."
-                         
-           ncon <- as.numeric( svalue( numberOfContinuousVariables( session$analysis )) )
-           
-           if(is.na(ncon) || !is.numeric(ncon) || !(ncon>0)) {
-             DialogBox(                      
-               paste( 
-                 "You need to tell Explora how many\n",
-                   "Continuous Variables (CV) you have\n",
-                   "before Explora can set optimization targets!"
-               )
-             )
-             
-           } else {
-             
-               if( !optimizationTargetsSpecified ) {
-                 
-                   # modified version of original function
-                   DialogSelectOptimization( win, notebook )
-                   
-                   optimizationTargetsSpecified <<- TRUE
-                   
-                   if( inputTraitsFiltered ) {
-                     svalue(notebook) <- 5
-                   } else {
-                     svalue(notebook) <- 4
-                   }
-               }
-          }
-      }
-    )
-  }
- 
-  lytg2[9,3]   <- gbutton(
-    "Specify Optimization Variables ...",
-    container = lytg2,
-    handler =  optimizationTargetsPageHandler( win, nb  )
-  )
-  
-  svalue(nb) <- 1
+  svalue(notebook) <- 1
   
 	visible(win) <- TRUE
 

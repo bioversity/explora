@@ -29,6 +29,7 @@ setClass( "ExploraAnalysis",
             targetNumberOfAccessions     = "guiComponent", # formerly num.access
             numberOfContinuousVariables  = "guiComponent", # formerly ncon
             numberOfCategoricalVariables = "guiComponent", # formerly ncat
+            coefficientOfCorrelation     = "guiComponent", # formerly ncor
             percentageOfSolutions        = "guiComponent", # formerly npercen
             numberOfSolutions            = "guiComponent", # formerly Nsim
             numberOfFinalSolutions       = "guiComponent", # formerly nfinal
@@ -50,6 +51,8 @@ setGeneric("currentProjectFolder",         function(x) standardGeneric("currentP
 setGeneric("targetNumberOfAccessions",     function(x) standardGeneric("targetNumberOfAccessions"))
 setGeneric("numberOfContinuousVariables",  function(x) standardGeneric("numberOfContinuousVariables"))
 setGeneric("numberOfCategoricalVariables", function(x) standardGeneric("numberOfCategoricalVariables"))
+setGeneric("coefficientOfCorrelation",     function(x) standardGeneric("coefficientOfCorrelation"))
+
 setGeneric("percentageOfSolutions",        function(x) standardGeneric("percentageOfSolutions"))
 setGeneric("numberOfSolutions",            function(x) standardGeneric("numberOfSolutions"))
 setGeneric("numberOfFinalSolutions",       function(x) standardGeneric("numberOfFinalSolutions"))
@@ -85,6 +88,8 @@ setMethod(  "currentProjectFolder",
 setMethod("targetNumberOfAccessions",     "ExploraAnalysis", function(x) x@targetNumberOfAccessions )
 setMethod("numberOfContinuousVariables",  "ExploraAnalysis", function(x) x@numberOfContinuousVariables )
 setMethod("numberOfCategoricalVariables", "ExploraAnalysis", function(x) x@numberOfCategoricalVariables )
+setMethod("coefficientOfCorrelation",     "ExploraAnalysis", function(x) x@coefficientOfCorrelation )
+
 setMethod("percentageOfSolutions",        "ExploraAnalysis", function(x) x@percentageOfSolutions )
 setMethod("numberOfSolutions",            "ExploraAnalysis", function(x) x@numberOfSolutions )
 setMethod("numberOfFinalSolutions",       "ExploraAnalysis", function(x) x@numberOfFinalSolutions )
@@ -103,6 +108,8 @@ setGeneric("currentDataSet<-",               function(x,value) standardGeneric("
 setGeneric("targetNumberOfAccessions<-",     function(x,value) standardGeneric("targetNumberOfAccessions<-"))
 setGeneric("numberOfContinuousVariables<-",  function(x,value) standardGeneric("numberOfContinuousVariables<-"))
 setGeneric("numberOfCategoricalVariables<-", function(x,value) standardGeneric("numberOfCategoricalVariables<-"))
+setGeneric("coefficientOfCorrelation<-",     function(x,value) standardGeneric("coefficientOfCorrelation<-"))
+
 setGeneric("percentageOfSolutions<-",        function(x,value) standardGeneric("percentageOfSolutions<-"))
 setGeneric("numberOfSolutions<-",            function(x,value) standardGeneric("numberOfSolutions<-"))
 setGeneric("numberOfFinalSolutions<-",       function(x,value) standardGeneric("numberOfFinalSolutions<-"))
@@ -190,6 +197,16 @@ setReplaceMethod(
     return(x)
   }
 )
+
+setReplaceMethod(
+  "coefficientOfCorrelation",
+  "ExploraAnalysis",
+  function(x,value) { 
+    x@coefficientOfCorrelation <- value
+    return(x)
+  }
+)
+
 setReplaceMethod(
   "percentageOfSolutions",
   "ExploraAnalysis",
@@ -304,12 +321,12 @@ getProjects <- function() {
 # which is constructed in the project folder based on the current dataAnalysisTag
 # TODO: should this value be cached in the ExploraAnalysis class as well rather than computed each time?
 #
-result.folder <- function() {
+result.folder <- function(context) {
   
-  projectFolder <- currentProjectFolder(analysis)
+  projectFolder <- currentProjectFolder(context)
   
   # retrieve the current value of the data analysis tag widget
-  dataTag  <- as.character( svalue( dataAnalysisTag(analysis) ) )
+  dataTag  <- as.character( svalue( dataAnalysisTag(context) ) )
   
   if( !is.na( dataTag ) ) {
     
@@ -332,9 +349,9 @@ result.folder <- function() {
 #
 # The result.path function builds a valid project result file path, if it can
 #
-result.path <- function( filename, filext ) {
+result.path <- function( context, filename, filext ) {
   
-  resultFolder <- result.folder()
+  resultFolder <- result.folder(context)
   
   if( nchar(resultFolder)>0 & 
       file.exists(resultFolder) & 
@@ -352,9 +369,9 @@ result.path <- function( filename, filext ) {
 # The result.path function checks the full 
 # existence of a csv data file in the projectFolder
 #
-result.path.exists <- function( filename, filext ) {
+result.path.exists <- function( context, filename, filext ) {
   
-  path <- result.path( filename, filext )
+  path <- result.path( context, filename, filext )
   
   if( !is.na(path) ) {
     
@@ -399,11 +416,11 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 # to be set to valid values here(?). A simple
 # sanity check made to test this assumption
 #
-saveProjectFile <- function( results, filename, row.names = TRUE, alert = FALSE) {
+saveProjectFile <- function( context, results, filename, row.names = TRUE, alert = FALSE) {
   
   if( is.table(results) | is.data.frame(results) | is.matrix(results) ) {
     
-    path <- result.path( filename, "csv" )
+    path <- result.path( context, filename, "csv" )
     
     if( !is.na(path) ) {
       
@@ -422,9 +439,9 @@ saveProjectFile <- function( results, filename, row.names = TRUE, alert = FALSE)
   return(FALSE)
 }
 
-deleteProjectFile <- function( filename ) {
+deleteProjectFile <- function( context, filename ) {
   
-    path <- result.path( filename, "csv" )
+    path <- result.path( context, filename, "csv" )
     
     if( !is.na(path) && file.exists(path) ) {  file.remove( c(path) ) }
 
@@ -433,13 +450,13 @@ deleteProjectFile <- function( filename ) {
 #
 # opens up a PNG device to the specified file
 #
-plotImage <- function( filename, width = 2000, height = 1000, res = NA, alert = FALSE ) {
+plotImage <- function( context, filename, width = 2000, height = 1000, res = NA, alert = FALSE ) {
   
-  path <- result.path( filename, "png" )
+  path <- result.path( context, filename, "png" )
   
   if( !is.na(path) ) {
     
-    projectName <- currentProjectName(analysis)
+    projectName <- currentProjectName(context)
     
     if( alert ) {
       DialogBox( paste("'", filename,"'\n data image published to project folder '", projectName,"'") )
@@ -461,9 +478,9 @@ plotImage <- function( filename, width = 2000, height = 1000, res = NA, alert = 
 # retrieves a previously saved csv project data file;
 # Singular file assumed here(?), should exists when this function is called
 #
-readProjectFile <- function( filename ) {
+readProjectFile <- function( context, filename ) {
   
-    path <- result.path.exists( filename, "csv" )
+    path <- result.path.exists( context, filename, "csv" )
     
     if( !is.na(path) ) {
       

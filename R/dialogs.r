@@ -73,10 +73,10 @@ DialogSelectSolution <- function( solutions ){## Function to select solutions
 }
 	
 ## Function to select variables for thresholds
-DialogSelectThresholds <- function( win, notebook ){
+DialogSelectThresholds <- function( context, win, notebook ){
   
-  ncon  <- as.numeric( svalue( numberOfContinuousVariables( analysis )) )
-  object.thresholds <- object.complete <- theDataSet <- currentDataSet(analysis)
+  ncon  <- as.numeric( svalue( numberOfContinuousVariables( context )) )
+  object.thresholds <- object.complete <- theDataSet <- currentDataSet(context)
 	object.thresholds <- object.thresholds[,-1]
 	object.thresholds <- object.thresholds[,1:ncon]
 
@@ -89,7 +89,7 @@ DialogSelectThresholds <- function( win, notebook ){
 	names.thresholds <- paste(names(object.thresholds),":(","Min = ", min.values," ; ","Max = ",
 			max.values, ")", sep = "")
 	
-	traitFilterPage <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "Trait Filtering", expand = TRUE)
+	traitFilterPage <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "STEP 3. Filter Traits", expand = TRUE)
   
 	# traitFilterNotebook <- gnotebook( container = traitFilterPage, expand = TRUE, tab.pos = 3)
 	
@@ -326,10 +326,10 @@ DialogSelectThresholds <- function( win, notebook ){
         d.thresholds = sapply(data.var.thresholds.final, des.continuous)
         row.names(d.thresholds) <- c("n","Min","Max","Average","Variance","Est.Desv","Median","CV %","NA","NA %")
         d.thresholds = as.table(d.thresholds)
-        names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(analysis) )))
+        names(dimnames(d.thresholds)) <- c(" ", paste("Variable thresholds", svalue( datasetSelector(context) )))
         
-        saveProjectFile( d.thresholds, "ResultsDescriptiveAnalysisThresholds" )   	
-        saveProjectFile( thresholdFilteredDataSubset, "ThresholdFilteredDataSubset", row.names = FALSE )   	
+        saveProjectFile( context,  d.thresholds, "ResultsDescriptiveAnalysisThresholds" )   	
+        saveProjectFile( context,  thresholdFilteredDataSubset, "ThresholdFilteredDataSubset", row.names = FALSE )   	
         
         print(d.thresholds)
         
@@ -364,14 +364,14 @@ DialogSelectThresholds <- function( win, notebook ){
 	
 }
 
-check.parameters <- function(...){
+check.parameters <- function( context ){
   
    error <- FALSE
    
-   dataset <- currentDataSet(analysis)
+   dataset <- currentDataSet( context )
    
    ## Selection of number of accessions in final set 
-   desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
+   desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions( context ) ))
    
    availableNumberOfAccessions <- as.integer(dim(dataset)[1])
    
@@ -384,24 +384,24 @@ check.parameters <- function(...){
              as.character(availableNumberOfAccessions),
              sep=" ")
      )
-     svalue( targetNumberOfAccessions(analysis) ) <- 10  # default back to 10
+     svalue( targetNumberOfAccessions(context) ) <- 10  # default back to 10
   }
   
-  nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  nsoln <- as.numeric( svalue( numberOfSolutions( context ) ))
   
   if( nsoln < 0 | nsoln > 1000000){ 
     error <- TRUE
     DialogBox(paste("Invalid target number of solutions to screen.\n",
               "Target number must lie within the range of 1 and 1000000")
     )
-    svalue( numberOfSolutions(analysis)) <- 10000 # default back to 10000
+    svalue( numberOfSolutions( context )) <- 10000 # default back to 10000
   }
   
   ## Selected number of final accessions
-  nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
+  nfinal <- as.numeric(svalue( numberOfFinalSolutions( context ) ))
   
-  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
-    availableData <- readProjectFile( "ThresholdFilteredDataSubset" )
+  if( any( dir( currentProjectFolder (context ) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
+    availableData <- readProjectFile( context, "ThresholdFilteredDataSubset" )
   } else {
     availableData <- dataset
   } 
@@ -415,14 +415,14 @@ check.parameters <- function(...){
         as.character(availableNumberOfAccessions),".",
         sep=" ")
     )
-    svalue( numberOfFinalSolutions(session$analysis) ) <- availableNumberOfAccessions 
+    svalue( numberOfFinalSolutions( context ) ) <- availableNumberOfAccessions 
   }
   
-  npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
+  npercent <- as.numeric(svalue( percentageOfSolutions( context ) ))
   if( npercent < 1 | npercent > 100){
     error <- TRUE
     DialogBox("Error: percentage of solutions out of valid range [1..100]")
-    svalue( percentageOfSolutions(analysis) ) <- 1 # default back to 1
+    svalue( percentageOfSolutions( context ) ) <- 1 # default back to 1
   }
   
   if(!error) {
@@ -436,11 +436,11 @@ check.parameters <- function(...){
 }
 
 ## Function for selection of number of accessions in final set 
-number.access <- function(...){
+number.access <- function( context ){
   
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet( context )
   
-  desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(analysis) ))
+  desiredNumberOfAccessions   <- as.integer( svalue( targetNumberOfAccessions(context) ))
   
   availableNumberOfAccessions <- as.integer(dim(dataset)[1])
   
@@ -460,9 +460,9 @@ number.access <- function(...){
   return( desiredNumberOfAccessions ) 
 }
 
-number.solutions <- function(h,...) {
+number.solutions <- function( context ) {
   
-  nsoln <- as.numeric( svalue( numberOfSolutions(analysis) ))
+  nsoln <- as.numeric( svalue( numberOfSolutions(context) ))
   
   if(nsoln > 0 & nsoln <= 1000000){
     DialogBox(paste("The target number of solutions to screen set to", nsoln, sep=" "))
@@ -475,15 +475,15 @@ number.solutions <- function(h,...) {
 }
 
 ## Function to set selected number of final accessions
-number.final <- function(h,...){
+number.final <- function( context ){
     
-  dataset <- currentDataSet(analysis)
+  dataset <- currentDataSet(context)
   
-  nfinal <- as.numeric(svalue( numberOfFinalSolutions(session$analysis) ))
+  nfinal <- as.numeric(svalue( numberOfFinalSolutions(context) ))
   
-  if( any( dir( currentProjectFolder(analysis) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
+  if( any( dir( currentProjectFolder(context) ) == "ThresholdFilteredDataSubset.csv") == TRUE ){
     
-    availableData <- readProjectFile( "ThresholdFilteredDataSubset" )
+    availableData <- readProjectFile( context, "ThresholdFilteredDataSubset" )
     
   } else {
     
@@ -508,8 +508,8 @@ number.final <- function(h,...){
   return(nfinal)
 }
 
-number.percent <- function(h,...){
-  npercent <- as.numeric(svalue( percentageOfSolutions(analysis) ))
+number.percent <- function( context ){
+  npercent <- as.numeric(svalue( percentageOfSolutions( context ) ))
   if( npercent > 0 & npercent <= 100){
     DialogBox(paste("Target percentage of solutions is: ", npercent, "%", sep=" "))
   } else {DialogBox("Error: percentage of solutions out of valid range [0..100]")}
