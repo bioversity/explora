@@ -160,7 +160,7 @@ correlationAnalysis <- function( context ){
   
 }
 
-DialogSelectOptimization <- function( context, win, notebook ){
+DialogSelectOptimization <- function( context, notebook ){
   
   dataset <- currentDataSet( context )
   ncon    <- as.numeric( svalue( numberOfContinuousVariables( context )) )
@@ -330,8 +330,6 @@ DialogSelectOptimization <- function( context, win, notebook ){
     if(svalue(option.preferred) == "Weighted Sum Model")  { WSM.type.opt(context)}
     if(svalue(option.preferred) == "Decision Tree")       { DTree.type.opt(context)}
   })
-  
-  visible(win) <- TRUE
   
 }
 

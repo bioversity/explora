@@ -73,7 +73,7 @@ DialogSelectSolution <- function( solutions ){## Function to select solutions
 }
 	
 ## Function to select variables for thresholds
-DialogSelectThresholds <- function( context, win, notebook ){
+DialogSelectThresholds <- function( context, notebook ){
   
   ncon  <- as.numeric( svalue( numberOfContinuousVariables( context )) )
   object.thresholds <- object.complete <- theDataSet <- currentDataSet(context)
@@ -357,11 +357,7 @@ DialogSelectThresholds <- function( context, win, notebook ){
     container = tpl,
     handler = saveThresholds
 	)
-	
-	visible(win) <- TRUE
-  
-	
-	
+ 	
 }
 
 check.parameters <- function( context ){

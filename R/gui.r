@@ -16,8 +16,8 @@
 #' @importFrom gWidgets gdroplist
 #' @importFrom gWidgets gedit
 #' @importFrom gWidgets gspinbutton
-#' @importFrom gWidgets ggroup
 #' @importFrom gWidgets gimage
+#' @importFrom gWidgets gtable
 #' @importFrom gWidgets visible
 #' @importMethodsFrom gWidgets addHandlerChanged
 #' 
@@ -57,14 +57,14 @@ workbench <- function() {
   datasetCatalog(session$context) <- getProjects() 
   
 	## Principal window
-	win <- gwindow("Explora Germplasm Selection Tool", visible = FALSE , width = 500, height = 300)
+  mainWindow(session$context) <- win <- gwindow("Explora Germplasm Selection Tool", visible = FALSE , width = 800, height = 600)
   
   datasetCatalog(session$context) <- getProjects() 
   
-	notebook  <- gnotebook( container = win, expand = T, tab.pos = 3)
+	notebook <- gnotebook( container = win, expand = TRUE, tab.pos = 3)
   
   ## Welcome Window
-  welcome <- ggroup(container = notebook, horizontal = FALSE, label="Welcome")
+  welcome <- ggroup(label="Welcome", container = notebook, horizontal = FALSE )
   
   # image_dir <- paste(path.package("explora"),"/images/",sep="")
   # gimage("Explora_Logo.gif", dirname = image_dir, container = welcome) 
@@ -73,48 +73,50 @@ workbench <- function() {
   ##########################
 	## Load project datasets #
   ##########################
-  lyt1        <- glayout(homogeneous = FALSE,  container = notebook, spacing = 10, label = "STEP 1. Select Project", expand = TRUE) 
-	lyt1[1,1:3] <- g1 <- gframe("Projects",  container = lyt1, horizontal = TRUE)
-	lytg1       <- glayout(homogeneous = FALSE, container = g1, spacing = 10, expand = TRUE) 
+  lyt1 <- glayout(
+                  homogeneous = TRUE,  
+                  container = notebook, 
+                  spacing = 5, 
+                  label = "STEP 1. Project Selection",
+                  expand = TRUE, fill="both"
+         )
+  
+  lyt1[ 1, 1, expand = TRUE, fill = "x" ] <- projectView <- gframe(text="Project Selection", container = lyt1 )
+  projectGroup <- glayout( spacing = 5, container = projectView )
+  
+  projectGroup[1,1] <- gbutton(
+          "Set Project Folder...",  
+          container = projectGroup, 
+          handler = function(h,...) { 
+                      newdir <- gfile(text = "Select directory", type = "selectdir") 
+                      if(! is.na(newdir) )  { 
+                        setwd(newdir)
+                        datasetCatalog(session$context)    <- getProjects()
+                        datasetSelector(session$context)[] <- datasetCatalog(session$context)
+                      } 
+                    } 
+        )
 
-  lytg1[1:2,1:5] <- glabel( text = " ", container = lytg1)
+  projectGroup[1,2] <- gbutton(
+      "Load Projects...",  
+      container = projectGroup, 
+      expand = FALSE, 
+      handler = function(h,...){ 
+                    dataset <- createProject()
+                    dsl <- length(dataset)
+                    if( dsl > 0 && !(dsl == 1 && is.na(dataset)) ) {
+                      addDataset(session$context)        <- attr(dataset,"identifier")
+                      currentDataSet(session$context)    <- dataset
+                      datasetSelector(session$context)[] <- datasetCatalog(session$context)
+                    }
+                }
+    )
   
-	lytg1[3,1]     <-  h <- gbutton(
-                        "Set Project Folder...",  
-                        container = lytg1, 
-                        handler = function(h,...) { 
-                                    newdir <- gfile(text = "Select directory", type = "selectdir") 
-                                    if(! is.na(newdir) )  { 
-                                      setwd(newdir)
-                                      datasetCatalog(session$context)    <- getProjects()
-                                      datasetSelector(session$context)[] <- datasetCatalog(session$context)
-                                    } 
-                                  } 
-                      )
-                
-	lytg1[3,2] <- glabel( text = " ", container = lytg1 )
-	lytg1[3,3] <- gbutton(
-                  "Load Datasets as Projects...",  
-                  container = lytg1, 
-                  expand = FALSE, 
-                  handler = function(h,...){ 
-                                dataset <- createProject()
-                                dsl <- length(dataset)
-                                if( dsl > 0 && !(dsl == 1 && is.na(dataset)) ) {
-                                  addDataset(session$context)        <- attr(dataset,"identifier")
-                                  currentDataSet(session$context)    <- dataset
-                                  datasetSelector(session$context)[] <- datasetCatalog(session$context)
-                                }
-                            }
-                )
-  
-  lytg1[4,1:5] <- glabel( text = " ", container = lytg1)
-  
-  lytg1[5,1]   <- glabel("Select Active Project for Analysis:", container = lytg1)
-  lytg1[5,2]   <- glabel( text = "", container = lytg1)
+  projectGroup[2,1] <- glabel("Select for Analysis:", container = projectGroup)
   
   ## these flags control the analysis parameter pages
   
+  projectLoaded <- FALSE
   analysisParameterWindow <- FALSE
   traitFilterWindow <- FALSE
   accessionsSelectionWindow <- FALSE
@@ -122,7 +124,7 @@ workbench <- function() {
   #############################
   ##Filter Input Trait Values #
   #############################
-  traitFilterPageHandler <- function( context, win, notebook ) {
+  traitFilterPageHandler <- function( context, notebook ) {
     
     return(
       
@@ -147,7 +149,7 @@ workbench <- function() {
             # I also only create new trait filter page if optimization page is NOT already displayed
             if( !accessionsSelectionWindow ) {
               
-              DialogSelectThresholds( context, win, notebook )
+              DialogSelectThresholds( context, notebook )
               traitFilterWindow <<- TRUE
               
             } else {
@@ -163,7 +165,7 @@ workbench <- function() {
   ###########################################
   ##Specify Optimization Analysis Variables #
   ###########################################
-  accessionSelectionHandler <- function( context, win, notebook ) {
+  accessionSelectionHandler <- function( context, notebook ) {
     
     return ( 
       
@@ -185,7 +187,7 @@ workbench <- function() {
           if( !accessionsSelectionWindow ) {
             
             # modified version of original function
-            DialogSelectOptimization( context, win, notebook )
+            DialogSelectOptimization( context, notebook )
             
             accessionsSelectionWindow <<- TRUE
             
@@ -203,9 +205,9 @@ workbench <- function() {
   ########################
   ## Analysis Parameters #
   ########################
-  setAnalysisParameters <- function( context, win, notebook ) {
+  setAnalysisParameters <- function( context, notebook ) {
     
-    lyt2         <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "STEP 2. Define Analysis Parameters", expand = TRUE)
+    lyt2         <- glayout( homogeneous = FALSE,  container = notebook, spacing = 5, label = "STEP 2. Analysis Parameters", expand = TRUE)
     lyt2[1,1:6]  <- g2 <- gframe("Analysis Parameters and Data Filtering",container = lyt2, expand = TRUE, horizontal=FALSE) 
     lytg2        <- glayout( homogeneous = FALSE,  container = g2, spacing = 10, expand = TRUE)
     
@@ -304,22 +306,22 @@ workbench <- function() {
     #                )
     
     lytg2[9,1]   <- gbutton(
-      "STEP 3. Filter Traits... (Default: Use all data)",
+      "STEP 3. Traits Filtering",
       container = lytg2,
-      handler   =  traitFilterPageHandler( context, win, notebook )
+      handler   =  traitFilterPageHandler( context, notebook )
     )
     
     lytg2[9,3]   <- gbutton(
-      "STEP 4. Select Accessions",
+      "STEP 4. Accession Selection",
       container = lytg2,
-      handler =  accessionSelectionHandler( context, win, notebook  )
+      handler =  accessionSelectionHandler( context, notebook  )
     )
     
     analysisParameterWindow <<- TRUE
     
   }
   
-  resetAnalysis <- function( context, win, notebook ) {
+  resetAnalysis <- function( context, notebook ) {
 
     # Reset the computational environment here
     sampleDistribution( context ) <- list()
@@ -357,36 +359,69 @@ workbench <- function() {
       analysisParameterWindow <<- FALSE
     }
     
-    setAnalysisParameters( context, win, notebook)
+  }
+  
+  dataPreview <- function( context ) {
+
+    dataWindow  <- gwindow( 
+                      paste("Explora DataSet: ",currentProjectName( context )),
+                      parent = mainWindow(context) ,
+                      visible = FALSE, 
+                      width = 800, 
+                      height = 600 
+                  )
     
-    svalue(notebook) <- 3
+    dataGroup <- ggroup(horizontal=FALSE, container = dataWindow )
+    
+    dataTable <- gtable( 
+                      currentDataSet( context ), 
+                      container = dataGroup 
+                    )
+    
+    visible(dataWindow)<-TRUE  
     
   }
   
-  lytg1[5,3]   <- datasetSelector(session$context) <- gdroplist( 
-                    datasetCatalog( session$context ), 
-                    selected = 0,  
-                    container = lytg1, 
-                    expand = TRUE, 
-                    handler = function(h,...){
-                      datasetId <- svalue( h$obj )
-                      print(paste("dataSelection.gdroplist.handler('", datasetId,"')", sep=""))
-                      if( length(datasetId) > 0 ) {
-                        if( nchar(datasetId) > 0 ) {
-                          if( !( datasetId == EMPTY_CATALOG() ) ) {
-
-                            currentDataSet( session$context ) <- datasetId
-                            
-                            resetAnalysis( session$context, win, notebook ) 
-                              
+  projectGroup[2,2] <- datasetSelector(session$context) <- gdroplist( 
+                          datasetCatalog( session$context ), 
+                          selected = 0,  
+                          container = projectGroup, 
+                          expand = TRUE, 
+                          handler = function(h,...){
+                            datasetId <- svalue( h$obj )
+                            print(paste("dataSelection.gdroplist.handler('", datasetId,"')", sep=""))
+                            if( length(datasetId) > 0 ) {
+                              if( nchar(datasetId) > 0 ) {
+                                if( !( datasetId == EMPTY_CATALOG() ) ) {
+                                    currentDataSet( session$context ) <- datasetId
+                                    resetAnalysis(  session$context, notebook )
+                                }
+                              }
+                            }
                           }
-                        }
-                      }
-                    }
-                  )
+                        )
+
+  projectGroup[3,1] <- gbutton(
+    "Preview Project Dataset",
+    container = projectGroup,
+    handler   =  function(h,...) {
+      dataPreview( session$context )
+    } 
+  )
+  
+  projectGroup[4,1] <- glabel("", container = projectGroup)
+  
+  projectGroup[5,1] <- gbutton(
+    "STEP 2. Set Analysis Parameters",
+    container = projectGroup,
+    handler   =  function(h,...) {
+      setAnalysisParameters( session$context, notebook)
+      svalue(notebook) <- 3
+    } 
+  )
   
   svalue(notebook) <- 1
   
-	visible(win) <- TRUE
-
+  visible(win) <- TRUE
+  
 }

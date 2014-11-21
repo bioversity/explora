@@ -15,11 +15,14 @@
 #' @importFrom gWidgets gfile
 #' @importClassesFrom gWidgets gCombobox
 #' @importClassesFrom gWidgets gLayout
+#' @importClassesFrom gWidgets gWindow
 #' @importClassesFrom gWidgets guiComponent
 
 # ExploraAnalysis - S4 Class for global project data management
 setClass( "ExploraAnalysis", 
           representation(
+            
+            mainWindow                   = "gWindow",    # formerly win (main graphical window)
             
             datasetSelector              = "gCombobox",    # formerly nom_data (abbreviated Spanglish for "nombre de datos"?)
             datasetCatalog               = "character",    # new way of tracking dataset names
@@ -41,6 +44,10 @@ setClass( "ExploraAnalysis",
 # Accessor Methods
 #
 
+# Generics
+
+setGeneric("mainWindow",                   function(x) standardGeneric("mainWindow"))
+
 setGeneric("datasetSelector",              function(x) standardGeneric("datasetSelector"))
 setGeneric("datasetCatalog",               function(x) standardGeneric("datasetCatalog"))
 setGeneric("dataAnalysisTag",              function(x) standardGeneric("dataAnalysisTag"))
@@ -57,6 +64,11 @@ setGeneric("percentageOfSolutions",        function(x) standardGeneric("percenta
 setGeneric("numberOfSolutions",            function(x) standardGeneric("numberOfSolutions"))
 setGeneric("numberOfFinalSolutions",       function(x) standardGeneric("numberOfFinalSolutions"))
 setGeneric("sampleDistribution",           function(x) standardGeneric("sampleDistribution"))
+
+
+# Getters
+
+setMethod("mainWindow",                   "ExploraAnalysis",function(x) x@mainWindow )
 
 setMethod("datasetSelector",              "ExploraAnalysis",function(x) x@datasetSelector )
 setMethod("datasetCatalog",               "ExploraAnalysis",function(x) x@datasetCatalog )
@@ -95,9 +107,11 @@ setMethod("numberOfSolutions",            "ExploraAnalysis", function(x) x@numbe
 setMethod("numberOfFinalSolutions",       "ExploraAnalysis", function(x) x@numberOfFinalSolutions )
 setMethod("sampleDistribution",           "ExploraAnalysis", function(x) x@sampleDistribution )
 
-#
+# 
 # Replacement Methods
 #
+
+setGeneric("mainWindow<-",                   function(x,value) standardGeneric("mainWindow<-"))
 
 setGeneric("datasetSelector<-",              function(x,value) standardGeneric("datasetSelector<-"))
 setGeneric("datasetCatalog<-",               function(x,value) standardGeneric("datasetCatalog<-"))
@@ -117,6 +131,15 @@ setGeneric("sampleDistribution<-",           function(x,value) standardGeneric("
 
 
 setReplaceMethod(
+  "mainWindow",
+  "ExploraAnalysis", 
+  function(x,value) { 
+    x@mainWindow <- value
+    return(x)
+  }
+)
+
+setReplaceMethod(
   "datasetSelector",
   "ExploraAnalysis", 
   function(x,value) { 
@@ -124,7 +147,6 @@ setReplaceMethod(
     return(x)
   }
 )
-
 setReplaceMethod(
   "datasetCatalog",
   "ExploraAnalysis",
