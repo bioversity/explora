@@ -360,6 +360,27 @@ DialogSelectThresholds <- function( context, notebook ){
  	
 }
 
+DataTableViewer <- function( context, data, title ) {
+  
+  dataWindow  <- gwindow( 
+    paste("Explora DataSet: ", title),
+    parent = mainWindow(context) ,
+    visible = FALSE, 
+    width = 800, 
+    height = 600 
+  )
+  
+  dataGroup <- ggroup(horizontal=FALSE, container = dataWindow )
+  
+  dataTable <- gtable( 
+    data, 
+    container = dataGroup 
+  )
+  
+  visible(dataWindow)<-TRUE  
+  
+}
+
 check.parameters <- function( context ){
   
    error <- FALSE
@@ -520,3 +541,5 @@ select.functions <- function(fitems, f){
   function.optimize <- gdroplist(fitems, expand = TRUE, editable = FALSE,  container = g, handler = f)
   visible(win)<-TRUE
 }
+
+

@@ -64,7 +64,7 @@ descriptors.continuous <- function( context ){
   results <- as.table(results)
   names(dimnames(results)) <- c(" ", paste("Variable",svalue( datasetSelector(context) )))
   
-  saveProjectFile( context, results, "ResultsDescriptorAnalysisContinuousVariables" )   	
+  saveProjectFile( context, results, "ResultsDescriptorAnalysisContinuousVariables", echo = TRUE )   	
   
   return(results)
 }
@@ -100,7 +100,7 @@ descriptors.nominal <- function( context ){
   
   names(dimnames(results)) <- c(" ", paste("Variable", svalue( datasetSelector(context) )))
   
-  saveProjectFile( context, results, "ResultsDescriptorAnalysisNominalVariables", row.names = FALSE )     
+  saveProjectFile( context, results, "ResultsDescriptorAnalysisNominalVariables", row.names = FALSE, echo = TRUE )     
   
   return(results)
 }
@@ -138,7 +138,7 @@ correlationAnalysis <- function( context ){
   
   if(ncor==0){
     
-    saveProjectFile( context, correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE )     
+    saveProjectFile( context, correlation,  "ResultsCorrelationAnalysisGlobal", row.names = FALSE, echo = TRUE )     
     
     return(correlation)
     
@@ -149,7 +149,7 @@ correlationAnalysis <- function( context ){
     saveProjectFile( context, 
       correlation.ncor,
       paste("ResultsCorrelationAnalysisLevel",ncor,sep=""),
-      row.names = FALSE
+      row.names = FALSE, echo = TRUE
     )     
     
     cat("\n")
@@ -578,7 +578,7 @@ MAXVAR.type.opt <- function( context ){
   
   saveProjectFile( context, 
     result.mean.accessions, 
-    paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep="")
+    paste("SubsetOfAccessionsWith",npercent,"%","HighestStandardizedMeanValues", sep=""), echo = TRUE
   )     
   
   cat("\n")
@@ -591,7 +591,7 @@ MAXVAR.type.opt <- function( context ){
   cat("\n")
   cat("\n")
   
-  saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE )     
+  saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_MV", row.names = FALSE, echo = TRUE )     
   
   ##11)  Selection of final set of optimal solutions: 
   
@@ -637,7 +637,7 @@ MAXVAR.type.opt <- function( context ){
   saveProjectFile( context, 
     final.subset.max.var, 
     paste( "subset_optimal_solution_by_MaXVAR_Solution(",pos.max.var,")", sep="" ),
-    row.names = FALSE, alert = TRUE  
+    row.names = FALSE, echo = TRUE  
   )     
   
 }
@@ -690,7 +690,7 @@ PCA.type.opt <- function( context ) {
     row.names(result.scale.pca) <- label.row 
     
     ##Export data for PCA analysis
-    saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE )     
+    saveProjectFile( context, result.scale,  "HighestStandardizedValuesOfSubset_PCA", row.names = FALSE, echo = TRUE )     
     
     cat("\n")
     cat("\n")
@@ -776,7 +776,7 @@ PCA.type.opt <- function( context ) {
     saveProjectFile( context, 
       final.subset.pca, 
       paste("subset_optimal_solution_by_final_subset_PCA_Solution(",nsol.pca,")", sep=""),
-      row.names = FALSE, alert = TRUE 
+      row.names = FALSE, echo = TRUE
     )     
     
     cat("\n")
@@ -886,7 +886,7 @@ WSM.type.opt <- function( context ){
   saveProjectFile( context, 
     result.scale, 
     "HighestStandardizedValuesOfSubset_WSM",
-    row.names = FALSE
+    row.names = FALSE, echo = TRUE
   )     
   
   result.scale.values <- as.matrix(abs(result.scale[,-1]))
@@ -926,7 +926,7 @@ WSM.type.opt <- function( context ){
   saveProjectFile( context, 
     final.subset.wsm, 
     paste("subset_optimal_solution_by_final_subset_WSM_Solution(",nsol.wsm,")", sep=""),
-    row.names = FALSE, alert = TRUE 
+    row.names = FALSE, echo = TRUE 
   ) 
   
   cat("\n")
@@ -1153,7 +1153,7 @@ DTree.type.opt <- function( context ){
     saveProjectFile( context, 
       final.subset.DTree,
       paste("subset_optimal_solution_by_final_subset_DTree_Solution(",nsol.DTree,")", sep=""),
-      row.names = FALSE, alert = TRUE 
+      row.names = FALSE, echo = TRUE
     ) 
     
     cat("\n")

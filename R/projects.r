@@ -438,7 +438,9 @@ DialogBox <- function(message, handler=NULL) {## This function make a dialog box
 # to be set to valid values here(?). A simple
 # sanity check made to test this assumption
 #
-saveProjectFile <- function( context, results, filename, row.names = TRUE, alert = FALSE) {
+# Setting the 'echo' switch to 'TRUE' forces a GUI display of the table of data.
+#
+saveProjectFile <- function( context, results, filename, row.names = TRUE, alert = FALSE, echo = FALSE ) {
   
   if( is.table(results) | is.data.frame(results) | is.matrix(results) ) {
     
@@ -451,6 +453,10 @@ saveProjectFile <- function( context, results, filename, row.names = TRUE, alert
       }
       
       write.csv( results, file = path, row.names = row.names)
+      
+      if( echo ) {
+        DataTableViewer( context, results, filename ) 
+      }
       
       return(TRUE)
     }

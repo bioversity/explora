@@ -361,27 +361,6 @@ workbench <- function() {
     
   }
   
-  dataPreview <- function( context ) {
-
-    dataWindow  <- gwindow( 
-                      paste("Explora DataSet: ",currentProjectName( context )),
-                      parent = mainWindow(context) ,
-                      visible = FALSE, 
-                      width = 800, 
-                      height = 600 
-                  )
-    
-    dataGroup <- ggroup(horizontal=FALSE, container = dataWindow )
-    
-    dataTable <- gtable( 
-                      currentDataSet( context ), 
-                      container = dataGroup 
-                    )
-    
-    visible(dataWindow)<-TRUE  
-    
-  }
-  
   projectGroup[2,2] <- datasetSelector(session$context) <- gdroplist( 
                           datasetCatalog( session$context ), 
                           selected = 0,  
@@ -405,7 +384,11 @@ workbench <- function() {
     "Preview Project Dataset",
     container = projectGroup,
     handler   =  function(h,...) {
-      dataPreview( session$context )
+      DataTableViewer( 
+        session$context, 
+        currentDataSet(session$context),
+        currentProjectName(session$context) 
+      )
     } 
   )
   
