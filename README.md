@@ -7,6 +7,10 @@ to a software engineering consultant, Johann Ospina, by Maarten van Zonneveld (B
 in collaboration with  Jacob van Etten (also of Bioversity-Costa Rica) who leads the Bioversity 
 "Seeds4Needs" project funded under the Climate Change (CCAFS) CGIAR Research Programme. 
 
+Conversion of the software to a full R statistical package and some additional user interface 
+refinements were undertaken in 2014 by Dr. Richard Bruskiewich of 
+[Crop / STAR Informatics, Canada](http://www.starinformatics.com).
+
 Detailed instructions for installation of the Explora package are available on the
 main Github project wiki at https://github.com/bioversity/germplasm-selection-tool/wiki.
 
@@ -14,7 +18,7 @@ main Github project wiki at https://github.com/bioversity/germplasm-selection-to
 
     van Zonneveld M, Ospina J, Petz M, Meckelmann S, Rios L, Libreros D, Ramirez M. 
     "Explora: a multiple-trait selection tool to identify promising 
-     crop germplasm for food security and high-value product developmentî.
+     crop germplasm for food security and high-value product development‚Äù.
 
 This software package is being designated "Open Source" under similar terms as 
 the R Statistical software framework, that is, the GNU GENERAL PUBLIC LICENSE
